@@ -86,7 +86,6 @@ def experiment_shifted_series(gamma_value, folder_figures):
     print("3. Computing Wasserstein barycenter (SGD softplus)...")
     series_wass = samples_series
     print(f"Initialization method: mean_lambda {series_wass[0].shape}")
-
     # Fix random seed for reproducibility
     bary_wass_sgd, losses = sgd_barycenter(
         series_wass, gamma=gamma_value, learning_rate=0.005,
@@ -159,7 +158,7 @@ def main():
     print("COMPLEX SIMULATION - 4 SHIFTED SERIES COMPARISON")
     print("="*80)
 
-    folder_figures = "../../results/simu_complex"
+    folder_figures = "results/simu_complex"
     os.makedirs(folder_figures, exist_ok=True)
 
     # Run experiments for different gamma values

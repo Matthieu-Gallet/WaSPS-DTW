@@ -280,7 +280,7 @@ def main():
     base_seed = 42
     
     # Create output directory
-    output_dir = Path("../../results/barycenter_rmse_analysis")
+    output_dir = Path("results/barycenter_rmse_analysis")
     output_dir.mkdir(parents=True, exist_ok=True)
     save_path = output_dir / "rmse_barycenter_analysis.csv"
     

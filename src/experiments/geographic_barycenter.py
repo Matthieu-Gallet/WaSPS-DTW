@@ -20,12 +20,12 @@ parent_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(parent_dir))
 
 from sdtw.barycenter import sdtw_barycenter
-from sdtw.wasserstein_fast import estimate_exponential_fast
 
 from utils import print_timing, setup_paths
 from optimizer import sgd_barycenter
 from dataloader import extract_multiple_windows_around_position
 from plot import create_geographic_barycenter_figures
+from estimator import LogCumulant
 
 
 def select_spatially_separated_positions(data, n_positions=3, min_distance=50, random_seed=42):
@@ -119,37 +119,37 @@ def compute_barycenters_for_geographic_zones(data, lat_positions, lon_positions,
         # Convert to numpy arrays and estimate parameters
         raw_series = series_list
         lambda_series = []
+        raw_series_2d = []
 
         # Estimate lambda parameters for methods that need them
+        estimator = LogCumulant(distribution='exponential')
         for raw_vals_list in raw_series:
-            lambda_vals = []
-            for raw_vals in raw_vals_list:
-                if len(raw_vals) > 0:
-                    lambda_val = estimate_exponential_fast(raw_vals)
-                    lambda_vals.append(lambda_val)
-                else:
-                    lambda_vals.append(np.nan)
-            lambda_series.append(np.array(lambda_vals))
-
-        if len(raw_series) < 2:
-            print(f"Warning: Not enough valid data for zone {zone_idx + 1}")
-            continue
-
-        # Prepare data for barycenters
-        raw_series_2d = []
-        for series in raw_series:
             # Check that all windows have data
-            valid_windows = [win for win in series if len(win) > 0]
-            if len(valid_windows) != len(series):
+            valid_windows = [win for win in raw_vals_list if len(win) > 0]
+            if len(valid_windows) != len(raw_vals_list):
+                # Skip this series if some windows are missing
                 continue
             
             # Ensure all windows have the same number of samples
             min_samples = min(len(win) for win in valid_windows)
             truncated_windows = [win[:min_samples] for win in valid_windows]
             
-            # Concatenate all temporal windows into columns
+            # Stack into 2D array: (n_samples, n_timesteps)
             series_2d = np.column_stack(truncated_windows)
-            raw_series_2d.append(series_2d)
+            raw_series_2d.append(series_2d)  # Store for barycenter computation
+            
+            # Transpose to (n_timesteps, n_samples) for LogCumulant 2D mode
+            series_2d_transposed = series_2d.T
+            
+            # Fit estimator on all timesteps at once
+            estimator.fit(series_2d_transposed)
+            lambda_vals = estimator.get_params()  # Returns (n_timesteps,) array
+            
+            lambda_series.append(lambda_vals)
+
+        if len(raw_series) < 2:
+            print(f"Warning: Not enough valid data for zone {zone_idx + 1}")
+            continue
 
         # Ensure all series have the same temporal length
         if len(raw_series_2d) > 0:
@@ -166,17 +166,22 @@ def compute_barycenters_for_geographic_zones(data, lat_positions, lon_positions,
         bary_init_raw = np.mean(np.array(raw_series_2d_filter), axis=0)
         bary_raw = sdtw_barycenter(raw_series_2d_filter, bary_init_raw, gamma=gamma,
                                  max_iter=50, distance="euclidean")
-        lambda_bary_raw = [estimate_exponential_fast(bary_raw[:, i]) 
-                         for i in range(bary_raw.shape[1]) 
-                         if ((len(bary_raw[:, i]) > 0) and np.all(bary_raw[:, i] > 0))]
+        estimator = LogCumulant(distribution='exponential')
+        lambda_bary_raw = []
+        for i in range(bary_raw.shape[1]):
+            if len(bary_raw[:, i]) > 0 and np.all(bary_raw[:, i] > 0):
+                estimator.fit(bary_raw[:, i])
+                lambda_bary_raw.append(estimator.get_params())
         lambda_bary_raw = np.array(lambda_bary_raw)
+
         print_timing(start_time, "Euclidean barycenter on raw data")
 
         # --- Barycenter 2: Euclidean on estimated parameters ---
         print("  Computing Euclidean barycenter on estimated parameters...")
         start_time = time.time()
         series_est = [lam[:, np.newaxis] for lam in lambda_series]
-        bary_init_est = np.ones(len(lambda_series[0]))[:, np.newaxis]
+        bary_init_est = np.mean(series_est, axis=0)
+        print(f"  [DEBUG] Barycenter init (est params): shape={bary_init_est.shape}")
         bary_est = sdtw_barycenter(series_est, bary_init_est, gamma=gamma,
                                  max_iter=500, distance="euclidean")
         lambda_bary_est = bary_est.flatten()
@@ -185,9 +190,11 @@ def compute_barycenters_for_geographic_zones(data, lat_positions, lon_positions,
         # --- Barycenter 3: Wasserstein SGD ---
         print("  Computing Wasserstein barycenter (SGD softplus)...")
         start_time = time.time()
+        # Transpose: raw_series_2d is (n_samples, n_timesteps), we need (n_timesteps, n_samples)
+        raw_series_2d_transposed = [series.T for series in raw_series_2d]#_filter]
         bary_wass_sgd, losses = sgd_barycenter(
-            raw_series_2d, barycenter_init=None, init_method='mean_lambda', gamma=gamma,
-            learning_rate=0.75, num_epochs=10, batch_size=4, lr_decay=0.95, grad_clip=10.0,
+            raw_series_2d_transposed, gamma=gamma, barycenter_init_method='mean_lambda',
+            learning_rate=0.075, num_epochs=250, batch_size=4, lr_decay=0.995, grad_clip=100.0,
             distribution="exponential", verbose=False, use_softplus=True
         )
         lambda_bary_wass_sgd = bary_wass_sgd.flatten()

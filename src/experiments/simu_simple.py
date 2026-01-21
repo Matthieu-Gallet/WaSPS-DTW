@@ -86,17 +86,12 @@ def experiment_with_gamma(gamma_value, folder_figures):
     # --- Barycenter 3: Wasserstein SGD (softplus) ---
     print("3. Computing Wasserstein barycenter (SGD softplus)...")
     series_wass = [samples1, samples2]
-    # Init: use the longer series for parameters
-    if len(lambda_est1) > len(lambda_est2):
-        bary_init_wass = lambda_est1[:, np.newaxis].copy()
-    else:
-        bary_init_wass = lambda_est2[:, np.newaxis].copy()
 
     # Fix random seed for reproducibility
     bary_wass_sgd, losses = sgd_barycenter(
-        series_wass, bary_init_wass, gamma=gamma_value, learning_rate=0.01,
-        num_epochs=500, batch_size=8, lr_decay=0.995, grad_clip=25.0,use_softplus=True,
-        distribution="exponential", verbose=True, init_method='mean_lambda', warmup_epochs=20
+        series_wass, gamma=gamma_value, learning_rate=0.01,
+        num_epochs=500, batch_size=8, lr_decay=0.995, grad_clip=25.0, use_softplus=True,
+        distribution="exponential", verbose=True, barycenter_init_method='mean_lambda', warmup_epochs=20
     )
     lambda_bary_wass_sgd = bary_wass_sgd.flatten()
 
@@ -142,7 +137,7 @@ def main():
     print("SIMPLE SIMULATION - 2 SERIES COMPARISON")
     print("="*80)
 
-    folder_figures = "../../results/simu_simple"
+    folder_figures = "results/simu_simple"
     os.makedirs(folder_figures, exist_ok=True)
 
     # Run experiments for different gamma values

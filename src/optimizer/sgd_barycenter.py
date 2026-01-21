@@ -131,6 +131,7 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
     elif barycenter_init_method == 'mean_lambda':
         # Compute mean of all lambda series, handling different lengths
         barycenter_init = np.mean(np.array([x.flatten() for x in X_params_list]), axis=0).reshape(-1, 1)
+        print(f"  [DEBUG] Barycenter init (mean_lambda): shape={barycenter_init.shape}")
 
     # Initialize barycenter - choose parameterization
     Z_init = barycenter_init.copy().astype(np.float64)

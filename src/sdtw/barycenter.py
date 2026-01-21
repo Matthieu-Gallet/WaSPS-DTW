@@ -6,8 +6,8 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import expon, weibull_min
 
-from sdtw import SoftDTW
-from sdtw.distance import SquaredEuclidean, WassersteinDistance
+from .soft_dtw import SoftDTW
+from .distance import SquaredEuclidean, WassersteinDistance
 
 
 def sdtw_barycenter(X, barycenter_init, gamma=1.0, weights=None,
