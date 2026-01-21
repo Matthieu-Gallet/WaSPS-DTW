@@ -1,0 +1,9 @@
+numpy<2.0
+scipy
+pandas
+joblib
+scikit-learn
+matplotlib
+xarray
+netcdf4
+chainer
