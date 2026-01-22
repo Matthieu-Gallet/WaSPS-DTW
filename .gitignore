@@ -3,3 +3,4 @@ __pycache__/
 *.c
 *.so
 src/dev.ipynb
+src/results/classification_dataset/*

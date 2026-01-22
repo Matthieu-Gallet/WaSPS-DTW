@@ -1,0 +1,612 @@
+code_station,nom_station,regime_hydrologique,regime_code,X_Lambert93,Y_Lambert93,superficie_km2,altitude_m,region_hydrographique,date_debut,date_fin
+A105003001,L Ill a Altkirch,Pluvial contrasté,PC,1018591.0,6733545.0,233.0,282.0,,01/01/1976,31/12/2019
+A107020001,Le Thalbacha Wittersdorf,Pluvial contrasté,PC,1020987.0,6733324.0,70.0,280.0,,15/11/1980,31/12/2019
+A116003002,L Ill a Didenheim,Pluvial contrasté,PC,1022679.0,6744002.0,656.0,243.0,,01/01/1976,31/12/2019
+A204010101,La Fecht a Wintzenheim [La Forge],Pluvio-nival,PN,1015115.0,6782141.0,211.0,279.0,,01/01/1976,08/01/2007
+A212020002,La Weiss a Kaysersberg[Freland-Gare],Pluvio-nival,PN,1013205.0,6792351.0,117.0,318.0,,01/01/1976,01/01/2007
+A231020001,Le Giessen a Thanville,Pluvio-nival,PN,1022161.0,6810961.0,99.0,228.0,,01/01/1984,31/12/2019
+A234021001,La Liepvrette a Liepvre,Pluvio-nival,PN,1018314.0,6805298.0,108.0,259.0,,01/01/1976,31/12/2019
+A235020002,Le Giessen a Selestat [Amont],Pluvio-nival,PN,1030515.0,6806291.0,260.0,172.0,,01/01/1976,29/12/2006
+A273011002,La Bruche a Russ [Wisches],Pluvio-nival,PN,1015642.0,6831304.0,229.0,263.0,,01/01/1976,31/12/2019
+A284020001,La Mossig a Soultz-Les-Bains,Pluvial contrasté,PC,1031005.0,6839665.0,163.0,167.0,,01/01/1976,31/12/2019
+A330010001,La Moder a Schweighouse-Sur-Moder[Aval],Pluvial contrasté,PC,1047946.0,6868500.0,622.0,144.0,,01/01/1976,31/12/2019
+A341020001,La Zorn a Saverne [Schinderthal],Pluvial contrasté,PC,1018558.0,6856363.0,185.0,190.0,,01/01/1976,31/12/2019
+A348020001,La Zorn a Waltenheim-Sur-Zorn,Pluvial contrasté,PC,1040476.0,6859970.0,688.0,147.0,,01/01/1976,31/12/2019
+A373020001,Le Seltzbacha Niederroedern,Pluvial contrasté,PC,1069823.0,6878903.0,202.0,120.0,,01/01/1976,31/12/2019
+A402061001,La Moselle a Fresse-Sur-Moselle,Pluvio-nival,PN,983633.0,6758630.0,71.0,511.0,,01/01/1976,31/12/2019
+A405062001,La Moselle a Rupt-Sur-Moselle,Pluvio-nival,PN,975276.0,6763000.0,152.0,432.0,,01/01/1976,31/12/2019
+A414020202,La Moselotte a Vagney [Ancienne],Pluvio-nival,PN,976859.0,6772679.0,187.0,406.0,,01/01/1976,14/12/2006
+A420063001,La Moselle a Saint-Nabord[Noirgueux],Pluvio-nival,PN,968828.0,6780044.0,626.0,371.0,,01/01/1976,31/12/2019
+A436203001,La Volognea Chenimenil,Pluvio-nival,PN,967994.0,6787546.0,355.0,370.0,,30/11/1976,31/12/2019
+A443064001,La Moselle a Epinal,Pluvio-nival,PN,956628.0,6790642.0,1217.0,324.0,,01/01/1976,31/12/2019
+A463201001,L Avierea Frizon,Pluvial contrasté,PC,949651.0,6804393.0,105.0,297.0,,01/01/1976,31/12/2019
+A503000000,L Eurona Froville,Pluvial contrasté,PC,948723.0,6824189.0,92.0,250.0,,01/01/1977,21/08/2006
+A524201001,Le Gite a Velotte-Et-Tatignecourt,Pluvial contrasté,PC,935525.0,6800218.0,114.0,273.0,,01/01/1980,31/12/2019
+A526102001,Le Madon a Mirecourt,Pluvial contrasté,PC,932569.0,6805140.0,382.0,261.0,,01/01/1976,28/09/2006
+A542201001,Le Brenon a Autrey,Pluvial contrasté,PC,931786.0,6830231.0,139.0,230.0,,01/01/1976,12/06/2007
+A543101001,Le Madon a Pulligny,Pluvial contrasté,PC,931099.0,6831736.0,943.0,225.0,,01/01/1976,31/12/2019
+A550061001,La Moselle a Pont-Saint-Vincent,Pluvial contrasté,PC,928460.0,6838554.0,3070.0,215.0,,16/09/1988,31/12/2019
+A573061001,La Moselle a Toul,Pluvial contrasté,PC,913325.0,6844981.0,3338.0,201.0,,01/01/1976,31/12/2019
+A605102001,La Meurthe a Saint-Die,Pluvio-nival,PN,993333.0,6805615.0,374.0,335.0,,01/01/1976,31/12/2019
+A615103001,La Meurthe a Raon-lEtape,Pluvio-nival,PN,984449.0,6818283.0,727.0,281.0,,01/01/1976,31/12/2019
+A654111001,La Vezouzea Thiebaumenil,Pluvial contrasté,PC,967325.0,6837320.0,458.0,231.0,,20/01/1992,31/12/2019
+A662121202,La Mortagne a Sainte-Helene,Pluvial contrasté,PC,973249.0,6805888.0,100.0,320.0,,01/01/1976,30/12/2009
+A670121001,La Mortagne a Roville-Aux-Chenes,Pluvial contrasté,PC,967421.0,6813834.0,300.0,271.0,,17/02/1992,31/12/2019
+A673122001,La Mortagne a Gerbeviller,Pluvial contrasté,PC,960336.0,6826587.0,493.0,233.0,,01/01/1976,31/12/2019
+A692101001,La Meurthe a Laneuveville-Devant-Nancy,Pluvial contrasté,PC,941091.0,6843043.0,2780.0,200.0,,31/12/1985,31/12/2019
+A695301001,L Amezule a Lay-Saint-Christophe,Pluvial contrasté,PC,935092.0,6854387.0,85.0,197.0,,01/01/1976,23/12/2005
+A701061001,La Moselle a Custines,Pluvial contrasté,PC,929435.0,6858933.0,6830.0,184.0,,01/01/1976,31/12/2019
+A764201001,La Petite Seille a Chateau-Salins,Pluvial contrasté,PC,957555.0,6863288.0,143.0,203.0,,01/01/1976,31/12/2019
+A782101001,La Seille a Nomeny,Pluvial contrasté,PC,936627.0,6870164.0,925.0,181.0,,01/01/1976,31/12/2019
+A788101001,La Seille a Metz [Pont Lothaire],Pluvial contrasté,PC,932732.0,6893684.0,1280.0,163.0,,01/01/1976,20/09/2015
+A807101001,L Orne a Boncourt,Pluvial contrasté,PC,906399.0,6899607.0,412.0,185.0,,01/01/1976,31/12/2019
+A832201001,Le Woigot a Briey,Pluvial contrasté,PC,913578.0,6909240.0,76.0,204.0,,01/01/1996,31/12/2019
+A843101001,L Orne a Rosselange,Pluvial contrasté,PC,923584.0,6910653.0,1226.0,164.0,,01/01/1976,31/12/2019
+A850061001,La Moselle a Uckange,Pluvial contrasté,PC,930740.0,6917588.0,10770.0,150.0,,01/01/1981,31/12/2019
+A900105050,La Sarre Blanchea Laneuveville-Les-Lorquin,Pluvial contrasté,PC,995191.0,6846972.0,,268.0,,01/01/1976,31/12/2019
+A901305050,La Sarre Rouge a Vasperviller,Pluvial contrasté,PC,999275.0,6845438.0,89.0,279.0,,01/01/1976,31/12/2019
+A919205040,L Albe a Sarralbe[Rech],Pluvial contrasté,PC,993507.0,6883364.0,406.0,208.0,,01/01/1976,22/08/2007
+A932215050,L Horn a Bousseviller,Pluvial contrasté,PC,1026243.0,6901170.0,95.0,265.0,,01/01/1995,31/12/2019
+A975201001,La Nied Francaisea Conde-Northen[Pontigny],Pluvial contrasté,PC,949573.0,6899535.0,499.0,205.0,,01/01/1976,31/12/2019
+A983201001,La Nied Allemande a Faulquemont,Pluvial contrasté,PC,964073.0,6888916.0,187.0,242.0,,28/04/1984,31/12/2019
+A994202002,La Nied a Bouzonville,Pluvial contrasté,PC,957420.0,6917057.0,1160.0,190.0,,01/01/1976,11/01/2006
+B022001001,La Meuse a Goncourt,Pluvial contrasté,PC,894021.0,6796578.0,364.0,300.0,,01/01/1976,31/12/2019
+B109201001,Le Mouzon a Circourt-Sur-Mouzon[Villars],Pluvial contrasté,PC,900891.0,6805313.0,405.0,290.0,,01/01/1976,31/12/2019
+B222001001,La Meuse a Saint-Mihiel,Pluvial contrasté,PC,885626.0,6866406.0,2540.0,219.0,,01/01/1976,31/12/2019
+B315002001,La Meuse a Stenay,Pluvial contrasté,PC,857829.0,6934904.0,3904.0,162.0,,01/01/1976,31/12/2019
+B517201001,La Bar a Cheveuges,Pluvial contrasté,PC,835995.0,6952882.0,389.0,152.0,,01/01/1976,31/12/2019
+B532201001,La Vence a La Francheville,Pluvial contrasté,PC,823663.0,6960083.0,124.0,150.0,,01/01/1976,31/12/2019
+B557201001,La Sormonne a Belval,Pluvial contrasté,PC,818015.0,6965828.0,368.0,144.0,,10/02/1976,31/12/2019
+D020601001,La Solre a Ferriere-La-Grande,Pluvial contrasté,PC,771188.0,7018600.0,119.0,128.0,,01/01/1976,31/12/2019
+E430601001,La Hem a Tournehem-Sur-La-Hem[Guemy],Pluvial contrasté,PC,631458.0,7078652.0,105.0,32.0,,01/01/1976,31/12/2019
+E520571001,Le Wimereux a Wimille,Pluvial contrasté,PC,603139.0,7074991.0,74.0,10.0,,01/01/1981,31/12/2019
+E530021001,La Liane a Wirwignes,Pluvial contrasté,PC,612757.0,7065614.0,100.0,32.0,,01/01/1994,31/12/2019
+E540031001,La Canche a Brimeux,Pluvial contrasté,PC,616837.0,7039592.0,918.0,8.0,,01/01/1976,31/12/2019
+E550572001,L Authie a Dompierre-Sur-Authie,Pluvial modérément contrasté,PM,622800.0,7023550.0,796.0,13.0,,01/01/1982,31/12/2019
+E639701001,L Halluea Bavelincourt,Pluvial modérément contrasté,PM,661084.0,6988046.0,115.0,46.0,,01/01/1976,31/12/2019
+E640601001,L Avre a Moreuil,Pluvial contrasté,PC,662876.0,6963443.0,624.0,36.0,,01/01/1976,31/12/2019
+E645651001,La Nievre a lEtoile,Pluvial modérément contrasté,PM,631819.0,6990490.0,269.0,10.0,,06/11/1980,25/03/2019
+F352000201,Le Tholon a Champvallon,Pluvial contrasté,PC,726521.0,6759930.0,131.0,87.0,,01/01/1976,14/07/2013
+F413000101,L Ouanne a Toucy,Pluvial contrasté,PC,721930.0,6736985.0,153.0,184.0,,01/01/1977,31/12/2019
+F415000101,L Ouanne a Charny,Pluvial contrasté,PC,706784.0,6753901.0,562.0,133.0,,01/01/1976,31/12/2019
+F416000201,L Ouanne a Gy-Les-Nonains,Pluvial contrasté,PC,688555.0,6760850.0,883.0,99.0,,01/01/1976,31/12/2019
+F438000101,Le Lunain a Paley,Pluvial contrasté,PC,689633.0,6793919.0,163.0,85.0,,01/01/1977,31/12/2019
+F438000201,Le Lunain a Episy,Pluvial contrasté,PC,683315.0,6803166.0,252.0,51.0,,01/01/1976,31/12/2019
+F461000102,L Orge a Saint-Cheron[Saint-Evroult],Pluvial contrasté,PC,634651.0,6827559.0,108.0,70.0,,13/12/1980,31/12/2019
+F462000101,La Remarde a Saint-Cyr-Sous-Dourdan,Pluvial contrasté,PC,628679.0,6830408.0,147.0,77.0,,01/01/1976,31/12/2019
+F464000201,L Orge a Epinay-Sur-Orge[Le Breuil],Pluvial contrasté,PC,649853.0,6840823.0,632.0,36.0,,16/03/1982,31/12/2019
+F467000101,L Orge a Morsang-Sur-Orge,Pluvial contrasté,PC,651454.0,6841010.0,922.0,35.0,,01/01/1976,31/12/2019
+F624000200,Le Petit Morin a Montmirail,Pluvial contrasté,PC,739282.0,6862656.0,354.0,120.0,,01/01/1976,31/12/2019
+F625000101,Le Petit Morin a Jouarre [Vanry],Pluvial contrasté,PC,711061.0,6869990.0,605.0,,,01/01/1976,31/12/2019
+F654000301,L Orgeval a Boissy-Le-Chatel[Le Theil- Ultrasons],Pluvial contrasté,PC,708266.0,6858521.0,104.0,77.0,,26/01/1989,30/12/2019
+F655000101,Le Grand Morin a Pommeuse,Pluvial contrasté,PC,701063.0,6857582.0,770.0,61.0,,01/01/1977,31/12/2019
+G111041010,L Yeresa Touffreville-Sur-Eu,Pluvial contrasté,PC,580444.0,6990420.0,267.0,14.0,,01/01/1978,31/12/2019
+G206021010,La Bethune a Saint-Aubin-Le-Cauf,Pluvial contrasté,PC,569525.0,6975418.0,307.0,14.0,,26/10/1979,31/12/2019
+G600061010,Le Durdent a Vittefleur,Pluvial modérément contrasté,PM,529713.0,6971451.0,355.0,6.0,,16/11/1985,31/12/2019
+G710061010,La Ganzeville a Ganzeville,Pluvial modérément contrasté,PM,513348.0,6962592.0,89.0,25.0,,10/04/1980,31/12/2019
+H010001001,La Seine a Nod-Sur-Seine,Pluvial contrasté,PC,817603.0,6741669.0,371.0,248.0,,01/01/1976,31/12/2019
+H010002001,La Seine a Plaines-Saint-Lange,Pluvial contrasté,PC,810425.0,6767213.0,704.0,179.0,,01/01/1976,31/12/2019
+H030101001,L Ource a Leuglay [Froidvent],Pluvial contrasté,PC,836525.0,6745805.0,173.0,277.0,,01/01/1985,31/12/2019
+H032103001,L Ource a Autricourt,Pluvial contrasté,PC,820422.0,6767628.0,548.0,198.0,,01/01/1976,31/12/2019
+H070201001,La Barse a Montieramey,Pluvial contrasté,PC,795961.0,6793718.0,235.0,124.0,,02/08/1985,31/12/2019
+H105102001,L Aube [Partielle]a Longchamp-Sur-Aujon[Outre Aube],Pluvial contrasté,PC,833553.0,6784262.0,657.0,187.0,,01/01/1976,31/12/2019
+H120101001,L Aube a Bar-Sur-Aube,Pluvial contrasté,PC,828927.0,6792338.0,1280.0,169.0,,01/01/1987,31/12/2019
+H200102001,L Yonnea Corancy,Pluvial contrasté,PC,771500.0,6666916.0,106.0,332.0,,25/01/1990,31/12/2019
+H206201001,Le Beuvrona Ouagne [Champmoreau],Pluvial contrasté,PC,737220.0,6701681.0,263.0,161.0,,01/01/1976,31/12/2019
+H207311001,Le Sauzay a Corvol-lOrgueilleux,Pluvial contrasté,PC,730740.0,6703435.0,80.0,172.0,,01/01/1976,31/12/2019
+H208000101,L Oise a Pont-Sainte-Maxence[Sarron],Pluvial contrasté,PC,672886.0,6912384.0,14200.0,26.0,,01/01/1976,20/11/2008
+H208311001,La Druyes a Surgy,Pluvial contrasté,PC,738309.0,6712264.0,194.0,151.0,,01/01/1976,30/06/2009
+H226000201,Le Sausserona Nesles-La-Vallee,Pluvial contrasté,PC,639490.0,6892179.0,101.0,37.0,,01/01/1976,31/12/2019
+H232201001,Le Serein a Bierre-Les-Semur,Pluvial contrasté,PC,797386.0,6702769.0,266.0,306.0,,01/01/1976,31/12/2019
+H244234001,La Brenne a Montbard,Pluvial contrasté,PC,799479.0,6725635.0,732.0,204.0,,05/10/1988,26/11/2019
+H245202001,L Armancona Aisy-Sur-Armancon[Aval],Pluvial contrasté,PC,792524.0,6730391.0,1350.0,194.0,,16/12/1989,31/12/2019
+H246202001,L Armancona Tronchoy,Pluvial contrasté,PC,770069.0,6757363.0,1983.0,125.0,,24/05/1991,31/12/2019
+H247301001,L Armance a Chessy-Les-Pres,Pluvial contrasté,PC,766762.0,6767984.0,480.0,112.0,,01/01/1976,12/11/2019
+H248201001,L Armancona Brienon-Sur-Armancon,Pluvial contrasté,PC,745752.0,6765164.0,2982.0,85.0,,01/01/1976,31/12/2019
+H305000301,Le Ru De Gally a Thiverval-Grignon[Les Quatre Pignons],Pluvial contrasté,PC,620255.0,6862658.0,88.0,57.0,,18/11/1987,31/12/2019
+H311041010,L Epte a Gournay-En-Bray,Pluvial contrasté,PC,607835.0,6931122.0,247.0,87.0,,01/01/1976,31/12/2019
+H317061010,L Aubette De Magny a Ambleville,Pluvial contrasté,PC,604438.0,6895371.0,99.0,35.0,,01/01/1976,31/12/2019
+H318041010,L Epte a Fourges,Pluvial contrasté,PC,601111.0,6892001.0,1403.0,23.0,,01/01/1976,31/12/2019
+H325041010,L Andellea Vascoeuil,Pluvial contrasté,PC,582727.0,6928533.0,377.0,53.0,,01/01/1976,31/12/2019
+H403021010,L Eure a Saint-Luperce,Pluvial contrasté,PC,573610.0,6817876.0,330.0,154.0,,01/01/1976,31/12/2019
+H413041010,La Drouette a Saint-Martin-De-Nigelles,Pluvial contrasté,PC,596146.0,6835976.0,231.0,100.0,,01/12/1987,31/12/2019
+H423041010,L Avre a Acon,Pluvial contrasté,PC,560710.0,6852961.0,495.0,120.0,,01/01/1976,31/12/2019
+H437042010,L Iton a Normanville,Pluvial contrasté,PC,564902.0,6888305.0,1031.0,46.0,,01/01/1976,31/12/2019
+H502301001,La Traire a Louvieres,Pluvial contrasté,PC,870138.0,6773398.0,101.0,295.0,,07/09/1989,31/12/2019
+H503331001,La Suize a Villiers-Sur-Suize,Pluvial contrasté,PC,863886.0,6766856.0,83.0,328.0,,10/08/1984,31/12/2019
+H504063010,Le Cailly a Notre-Dame-De-Bondeville,Pluvial modérément contrasté,PM,558385.0,6933834.0,199.0,20.0,,26/12/1985,31/12/2019
+H504201001,Le Rognon a Bourdons-Sur-Rognon[Lacrete],Pluvial contrasté,PC,872000.0,6792469.0,164.0,270.0,,29/09/1987,31/12/2019
+H506201001,Le Rognon a Doulaincourt-Saucourt,Pluvial contrasté,PC,860433.0,6807059.0,614.0,206.0,,01/01/1976,31/12/2019
+H508305001,La Blaise a Louvemont [Pont-Varin],Pluvial contrasté,PC,842504.0,6825700.0,480.0,156.0,,31/10/1987,31/12/2019
+H510203001,La Saulx a Mogneville,Pluvial contrasté,PC,846958.0,6855743.0,477.0,139.0,,01/01/1989,31/12/2019
+H512234001,L Ornain a Tronville-En-Barrois,Pluvial contrasté,PC,867592.0,6849571.0,672.0,212.0,,27/12/1988,31/12/2019
+H514261001,La Chee a Villotte-Devant-Louppy[Villote Devant Loupy],Pluvial contrasté,PC,850650.0,6866805.0,113.0,168.0,,01/01/1976,31/12/2019
+H514262001,La Chee a Bettancourt-La-Longue,Pluvial contrasté,PC,838394.0,6859315.0,215.0,126.0,,01/01/1976,31/12/2019
+H517201001,La Saulx a Vitry-En-Perthois,Pluvial contrasté,PC,819632.0,6850780.0,2100.0,94.0,,01/01/1976,31/12/2019
+H517311001,Le Bruxenellea Brusson,Pluvial contrasté,PC,824731.0,6851037.0,136.0,104.0,,01/01/1976,31/12/2019
+H522431001,Le Cubry a Pierry,Pluvial contrasté,PC,769321.0,6881090.0,98.0,84.0,,10/12/1987,31/12/2019
+H602021010,La Risle a Rai,Pluvial contrasté,PC,522231.0,6852582.0,149.0,205.0,,01/01/1976,31/12/2019
+H602321001,L Ante a Chatrices,Pluvial contrasté,PC,839715.0,6885288.0,113.0,142.0,,01/01/1976,31/12/2019
+H605301001,La Biesme Au Claon,Pluvial contrasté,PC,843699.0,6895448.0,70.0,146.0,,01/01/1976,31/12/2019
+H610201001,L Aire a Beausite [Amblaincourt],Pluvial contrasté,PC,861723.0,6876105.0,282.0,223.0,,01/01/1976,31/12/2019
+H612201001,L Aire a Varennes-En-Argonne,Pluvial contrasté,PC,848179.0,6905004.0,627.0,151.0,,01/01/1976,31/12/2019
+H616201001,L Aire a Chevieres,Pluvial contrasté,PC,838383.0,6916581.0,1000.0,125.0,,01/01/1976,31/12/2019
+H620101001,L Aisne a Mouron,Pluvial contrasté,PC,829661.0,6913457.0,2280.0,102.0,,01/01/1976,31/12/2019
+H622101001,L Aisne a Givry,Pluvial contrasté,PC,811443.0,6933602.0,2940.0,76.0,,01/01/1976,31/12/2019
+H623021010,La Risle a Pont-Authou,Pluvial contrasté,PC,532178.0,6907166.0,1800.0,41.0,,01/01/1976,31/12/2019
+H623302001,La Vaux a Ecly,Pluvial contrasté,PC,793794.0,6938449.0,316.0,70.0,,01/01/1984,31/12/2019
+H631302001,La Suippe a Orainville,Pluvial modérément contrasté,PM,774356.0,6920924.0,802.0,60.0,,01/01/1976,31/12/2019
+H631303002,La Suippe a Selles,Pluvial modérément contrasté,PM,793675.0,6912665.0,486.0,87.0,,31/08/1989,31/12/2019
+H641202001,La Vesle a Chalons-Sur-Vesle,Pluvial modérément contrasté,PM,767160.0,6909092.0,828.0,70.0,,01/01/1976,31/12/2019
+H642301001,L Ardres a Fismes,Pluvial contrasté,PC,748896.0,6912146.0,297.0,61.0,,01/01/1976,31/12/2019
+H643201001,La Vesle a Braine,Pluvial contrasté,PC,738230.0,6915434.0,1440.0,70.0,,01/01/1977,31/12/2019
+H703301001,Le Thon a Origny-En-Thierache,Pluvial contrasté,PC,772941.0,6977906.0,258.0,140.0,,01/01/1976,31/12/2019
+H706101001,L Oise a Origny-Sainte-Benoite,Pluvial contrasté,PC,734705.0,6971333.0,1170.0,70.0,,01/01/1976,16/09/2002
+H716201001,La Serre a Pont a Bucy,Pluvial contrasté,PC,734966.0,6954940.0,1630.0,51.0,,01/01/1976,31/12/2019
+H740101001,L Oise a Sempigny,Pluvial contrasté,PC,699559.0,6940047.0,4290.0,33.0,,01/01/1976,31/12/2019
+H741321001,La Divette a Passel,Pluvial contrasté,PC,697256.0,6939567.0,72.0,38.0,,01/01/1976,31/12/2019
+H760201001,La Breche a Nogent-Sur-Oise,Pluvial contrasté,PC,660827.0,6909890.0,468.0,34.0,,01/01/1976,31/12/2019
+H771301001,Le Petit Therain a Saint-Omer-En-Chaussee,Pluvial modérément contrasté,PM,627473.0,6937055.0,212.0,89.0,,03/06/1976,31/12/2019
+H773301001,L Avelona Goincourt,Pluvial contrasté,PC,631479.0,6926027.0,172.0,64.0,,01/01/1976,31/12/2019
+H774201001,Le Therain a Beauvais,Pluvial contrasté,PC,633573.0,6925510.0,747.0,80.0,,01/01/1976,31/12/2019
+H774202001,Le Therain a Maysel,Pluvial contrasté,PC,654707.0,6907143.0,1200.0,33.0,,01/01/1976,31/12/2019
+I039000100,La Touquesa Pont-lEveque[Aval ConfluenceCalonne],Pluvial contrasté,PC,495098.0,6913489.0,888.0,12.0,,04/08/1982,31/12/2019
+I103101001,La Touquesa Saint-Martin-De-La-Lieue,Pluvial contrasté,PC,496786.0,6893668.0,289.0,52.0,,24/10/1980,31/12/2019
+I110301001,L Orbiquet a Beuvillers,Pluvial contrasté,PC,499701.0,6895642.0,326.0,49.0,,04/08/1982,31/12/2019
+I111101000,La Touquesa Lisieux,Pluvial contrasté,PC,497316.0,6897261.0,632.0,45.0,,04/08/1982,31/12/2019
+I120301001,La CalonneAux Authieux-Sur-Calonne,Pluvial contrasté,PC,502554.0,6914308.0,175.0,29.0,,01/01/1976,31/12/2019
+I200101001,La Dives a Saint-Lambert-Sur-Dive,Pluvial contrasté,PC,485225.0,6861182.0,88.0,77.0,,13/07/1978,31/12/2019
+I202101001,La Dives a Beaumais,Pluvial contrasté,PC,474510.0,6870765.0,282.0,51.0,,01/01/1976,31/12/2019
+I223000101,L Orne a Rabodanges,Pluvial contrasté,PC,461209.0,6856586.0,995.0,122.0,,01/01/1976,31/12/2015
+I303301001,L Ure Au Bourg-Saint-Leonard,Pluvial contrasté,PC,486866.0,6854273.0,80.0,171.0,,16/02/1991,31/12/2019
+I346301001,La Vere a Saint-Pierre-Du-Regard,Pluvial contrasté,PC,442395.0,6866532.0,111.0,76.0,,01/01/1976,31/12/2019
+I371201001,L Odon a Epinay-Sur-Odon,Pluvial contrasté,PC,436010.0,6892170.0,76.0,78.0,,01/01/1991,31/12/2019
+I402201001,La Seulles a Juvigny-Sur-Seulles,Pluvial contrasté,PC,436389.0,6901861.0,133.0,55.0,,29/09/1981,31/12/2019
+I403201001,La Seulles a Tierceville,Pluvial contrasté,PC,443201.0,6915897.0,256.0,8.0,,01/01/1976,31/12/2019
+I505301001,La Souleuvrea Carville,Pluvial contrasté,PC,415313.0,6878948.0,115.0,73.0,,01/01/1976,31/12/2019
+I510101001,La Vire a Malloue,Pluvial contrasté,PC,409608.0,6877895.0,469.0,63.0,,08/02/1991,31/12/2019
+I522101001,La Vire a Saint-Lo[Moulin Des Rondelles],Pluvial contrasté,PC,400658.0,6895558.0,868.0,16.0,,01/01/1976,31/12/2019
+I540151000,L Aure a Maisons [Fosses Du Soucy],Pluvial contrasté,PC,426944.0,6920028.0,389.0,15.0,,29/09/1981,31/12/2019
+I702102001,La Sienne a Sainte-Cecile,Pluvial contrasté,PC,391637.0,6867849.0,86.0,115.0,,09/09/1981,31/12/2019
+I722202001,La Soulles a Saint-Pierre-De-Coutances,Pluvial contrasté,PC,375236.0,6890969.0,142.0,16.0,,01/11/1977,31/12/2019
+I791361001,Le Thar a Jullouville,Pluvial contrasté,PC,367215.0,6863351.0,73.0,9.0,,01/01/1976,31/12/2019
+I903101001,La Selune a Notre-Dame-Du-Touchet,Pluvial contrasté,PC,407402.0,6840437.0,203.0,76.0,,08/03/1991,31/12/2019
+I923301301,La Selune a Ducey [Vezins],Pluvial contrasté,PC,388066.0,6840453.0,720.0,27.0,,01/01/1976,31/12/2016
+J001401001,Le Nancon a Lecousse[Pont Aux Anes],Pluvial contrasté,PC,389418.0,6816599.0,67.0,105.0,,01/02/1982,31/12/2019
+J014401001,La Loysance a Saint-Ouen-La-Rouerie,Pluvial contrasté,PC,372086.0,6823437.0,82.0,50.0,,01/01/1976,31/12/2019
+J061161001,La Rance a Saint-Jouan-De-lIsle,Pluvial contrasté,PC,316691.0,6807399.0,,64.0,,22/09/1984,31/12/2019
+J062161001,La Rance a Guenroc [Rophemel],Pluvial contrasté,PC,325137.0,6813726.0,380.0,23.0,,01/01/1976,31/12/2014
+J110301001,L Arguenona Jugon-Les-Lacs,Pluvial contrasté,PC,305539.0,6824678.0,104.0,31.0,,01/01/1976,31/12/2019
+J111401001,La Rosette a Megrit,Pluvial contrasté,PC,311597.0,6820032.0,102.0,40.0,,01/01/1976,31/12/2019
+J131301001,Le Gouessant a Andel,Pluvial contrasté,PC,288833.0,6835007.0,244.0,37.0,,30/12/1979,31/12/2019
+J132401001,L Evron a Coetmieux,Pluvial contrasté,PC,286042.0,6835829.0,142.0,40.0,,11/08/1982,31/12/2019
+J151301001,Le Gouet a Saint-Julien,Pluvial contrasté,PC,269024.0,6832269.0,138.0,100.0,,30/12/1978,31/12/2019
+J171171001,Le Trieux a Saint-Pever,Pluvial contrasté,PC,248582.0,6837831.0,183.0,96.0,,16/10/1980,31/12/2019
+J172172001,Le Trieux a Saint-Clet[Moulin-De-Chateaulin],Pluvial contrasté,PC,246472.0,6861133.0,416.0,15.0,,31/10/1984,31/12/2019
+J181301001,Le Leffa Quemper-Guezennec,Pluvial contrasté,PC,253975.0,6862172.0,339.0,18.0,,01/01/1976,31/12/2019
+J202301001,Le Jaudy a Mantallot,Pluvial contrasté,PC,239202.0,6864290.0,164.0,20.0,,27/11/1981,31/12/2019
+J203401001,Le Guindy a Plouguiel,Pluvial contrasté,PC,240761.0,6871773.0,125.0,20.0,,30/07/1984,31/12/2019
+J261401002,Le Queffleuth a Plourin-Les-Morlaix[Les Trois Chenes],Pluvial contrasté,PC,196226.0,6851544.0,96.0,15.0,,14/12/1988,31/12/2019
+J272301001,La Penze a Taule [Penhoat],Pluvial contrasté,PC,190051.0,6854092.0,141.0,6.0,,01/01/1976,31/12/2019
+J332302002,L Aber Ildut a Breles [Keringar],Pluvial contrasté,PC,133013.0,6844855.0,,25.0,,26/11/1977,31/12/2019
+J351401001,La Mignonne a Irvillac [Pont Mel],Pluvial contrasté,PC,166605.0,6833993.0,,25.0,,01/01/1979,31/12/2019
+J373301001,L Hyeres a Saint-Hernin[La Gare],Pluvial contrasté,PC,206304.0,6812289.0,526.0,62.0,,01/01/1976,31/12/2019
+J421191001,L Odet a Ergue-Gaberic[Treodet],Pluvial contrasté,PC,173954.0,6790863.0,205.0,8.0,,01/01/1976,31/12/2019
+J422401001,Le Jet a Ergue-Gaberic[Kerjean],Pluvial contrasté,PC,177433.0,6788637.0,107.0,18.0,,01/01/1976,31/12/2019
+J423191100,L Odet a Quimper [Kervir Virtuelle],Pluvial contrasté,PC,172854.0,6789670.0,329.0,3.0,,01/01/1976,31/12/2019
+J431301001,Le Steir a Guengat [Ty Planche],Pluvial contrasté,PC,167883.0,6794010.0,179.0,20.0,,23/01/1984,11/05/2016
+J461401001,Le Ster Goz a Bannalec[Pont Meya],Pluvial contrasté,PC,196234.0,6777893.0,70.0,28.0,,01/01/1976,31/12/2019
+J462302001,L Aven a Pont-Aven[Voie Express],Pluvial contrasté,PC,197213.0,6775387.0,165.0,20.0,,16/04/1992,31/12/2019
+J473401001,L Inam Au Faouet [Pont Priant],Pluvial contrasté,PC,211840.0,6792357.0,118.0,72.0,,01/02/1979,31/12/2019
+J474201001,L Elle a Arzano - Ty Nadan - Aval Pont,Pluvial contrasté,PC,217218.0,6775772.0,578.0,16.0,,01/01/1976,18/05/2014
+J480301001,L Isole a Scaer [Stang Boudilin],Pluvial contrasté,PC,202997.0,6786333.0,,89.0,,08/02/1979,31/12/2019
+J490201001,La Laita a Quimperle [Virtuelle 1],Pluvial contrasté,PC,211542.0,6771726.0,832.0,,,01/01/1976,31/12/2019
+J510221001,Le Scorffa Plouay [Pont Kerlo],Pluvial contrasté,PC,220899.0,6775596.0,300.0,15.0,,07/09/1976,31/12/2019
+J621301001,L Auray [Le Loch] a Brech,Pluvial contrasté,PC,251446.0,6752790.0,179.0,19.0,,01/01/1976,02/06/2003
+J708311001,Le Chevre a La Bouexiere [Le Drugeon],Pluvial contrasté,PC,365869.0,6796505.0,153.0,43.0,,01/01/1976,31/12/2019
+J710301001,L Ille a Montreuil-Sur-Ille,Pluvial contrasté,PC,353686.0,6809796.0,103.0,55.0,,01/01/1990,31/12/2019
+J711401001,L Illet a Chasne-Sur-Illet[Pont D 106],Pluvial contrasté,PC,360634.0,6803943.0,,44.0,,21/03/1990,31/12/2019
+J721401001,La Flume a Pace [Tixue],Pluvial contrasté,PC,344991.0,6797475.0,93.0,38.0,,15/02/1978,31/12/2019
+J735301001,Le Meu a Montfort-Sur-Meu[lAbbaye],Pluvial contrasté,PC,332358.0,6792381.0,468.0,29.0,,01/01/1976,31/12/2019
+J813301001,Le Lie a La Prenessaye[Saint Sauveur Le Haut],Pluvial contrasté,PC,282585.0,6803878.0,296.0,90.0,,29/01/1982,31/12/2019
+J820231001,L Oust a Pleugriffet[La Tertraie],Pluvial contrasté,PC,279493.0,6779919.0,929.0,42.0,,08/11/1984,07/01/2015
+J843301002,La Claie a Saint-Jean-Brevelay- Ker Hervy,Pluvial contrasté,PC,273672.0,6762681.0,135.0,44.0,,01/01/1976,31/12/2019
+J850231002,L Oust a Saint-Grave [EchuseLe Guelin],Pluvial contrasté,PC,306640.0,6751119.0,2465.0,4.0,,01/11/1976,17/10/2019
+J881301001,L Arz a Molac [Le Qinquizio],Pluvial contrasté,PC,293035.0,6749231.0,148.0,22.0,,04/11/1977,31/12/2019
+K002000101,La Loire a Issarles [Pont De La Borie],Pluvio-nival,PN,782840.0,6413937.0,229.0,889.0,,01/01/1976,31/12/2011
+K010002010,La Loire a Goudet,Pluvio-nival,PN,772714.0,6421516.0,432.0,1032.0,,01/01/1977,31/12/2019
+K025302001,La Borne Occidentalea Espaly-Saint-Marcel,Pluvio-nival,PN,768069.0,6439238.0,375.0,650.0,,24/01/1984,14/09/2012
+K040301001,Le Lignon-Du-VelayAu Chambon-Sur-Lignon,Pluvio-nival,PN,802417.0,6440773.0,138.0,971.0,,01/01/1976,31/12/2019
+K045401001,La Dunieresa Sainte-Sigolene[Vaubarlet],Pluvio-nival,PN,795304.0,6457989.0,228.0,584.0,,01/01/1976,31/12/2019
+K051301001,L Ance Du Nord a Sauvessanges,Nivo-pluvial,NP,769780.0,6475990.0,189.0,790.0,,05/05/1977,31/12/2019
+K053000101,L Ance a Saint-Julien-Dance[Laprat],Nivo-pluvial,NP,773617.0,6468073.0,347.0,801.0,,01/01/1976,31/12/2019
+K055001010,La Loire a Bas En Basset,Pluvio-nival,PN,787717.0,6466873.0,3253.0,484.0,,01/01/1976,31/12/2019
+K056752001,La Semene a Saint-Didier-En-Velay[Le Crouzet],Pluvio-nival,PN,797994.0,6468957.0,134.0,720.0,,02/06/1977,31/12/2019
+K062451001,Le Bonson a Saint-Marcellin-En-Forez[Le Bled],Pluvio-nival,PN,792748.0,6486385.0,104.0,380.0,,01/01/1976,30/10/2008
+K064311001,La Mare a Saint-Marcellin-En-Forez[Verines],Pluvio-nival,PN,788270.0,6488522.0,95.0,540.0,,01/01/1976,31/12/2019
+K067331001,La Coise a Saint-Medard-En-Forez[Moulin Brule],Pluvial contrasté,PC,807167.0,6501949.0,181.0,425.0,,01/01/1976,31/12/2019
+K072530200,Le Lignon a Rory,Pluvial contrasté,PC,772517.0,6510973.0,116.0,724.0,,01/01/1976,31/12/2019
+K074401001,L Anzon a Debats-Riviere-Dorpra[Cotes],Pluvio-nival,PN,774038.0,6518616.0,181.0,410.0,,01/01/1976,31/12/2019
+K075321001,Le Lignon Du Forez a Boen,Pluvio-nival,PN,777719.0,6516686.0,371.0,470.0,,01/01/1982,31/12/2019
+K081302001,L Aix a Saint-Germain-Laval,Pluvio-nival,PN,777800.0,6526277.0,193.0,377.0,,01/01/1976,31/12/2019
+K091001011,La Loire a Villerest [Pont De Villerest],Pluvio-nival,PN,780952.0,6544535.0,6584.0,270.0,,01/01/1976,31/12/2017
+K094301001,Le Rhins a Amplepuis,Pluvial contrasté,PC,803023.0,6543348.0,114.0,400.0,,01/01/1976,31/12/2019
+K097401001,Le Gand a Neaux,Pluvial contrasté,PC,791906.0,6540145.0,85.0,360.0,,01/01/1976,31/12/2019
+K098301001,Le Rhins a Saint-Cyr-De-Favieres[Pont Mordon],Pluvial contrasté,PC,786634.0,6542888.0,427.0,208.0,,01/01/1976,31/12/2019
+K117321001,L Arconcea Montceaux-lEtoile,Pluvial contrasté,PC,780695.0,6584803.0,599.0,245.0,,01/01/1976,31/12/2019
+K118001010,La Loire a Digoin,Pluvio-nival,PN,775417.0,6597973.0,9320.0,260.0,,01/01/1976,31/12/2019
+K125181001,L Arroux a Dracy-Saint-Loup[Surmoulin],Pluvial contrasté,PC,800389.0,6656479.0,776.0,291.0,,28/02/1984,30/09/2019
+K127311001,Le Ternin a Tavernay [Pre Charmoy],Pluvial contrasté,PC,795683.0,6655320.0,257.0,299.0,,01/01/1976,31/12/2019
+K128481001,La Selle a La Celle-En-Morvan[Polroy],Pluvial contrasté,PC,790999.0,6656759.0,138.0,320.0,,01/01/1976,31/12/2019
+K132181010,L Arroux a Etang-Sur-Arroux[Pont Du Tacot],Pluvial contrasté,PC,790854.0,6639673.0,1798.0,273.0,,01/01/1976,31/12/2019
+K134181001,L Arroux a Rigny-Sur-Arroux,Pluvial contrasté,PC,779162.0,6604300.0,2277.0,237.0,,01/01/1976,31/12/2019
+K136301001,La Bourbincea Ciry-Le-Noble,Pluvial contrasté,PC,799615.0,6612420.0,343.0,265.0,,18/03/1981,31/12/2019
+K138301001,La Bourbincea Vitry-En-Charollais,Pluvial contrasté,PC,782801.0,6597475.0,819.0,237.0,,01/01/1976,31/12/2019
+K144001010,La Loire a Gilly-Sur-Loire,Pluvial contrasté,PC,758717.0,6604573.0,13001.0,215.0,,01/01/1976,31/12/2019
+K151000101,La Besbre a Chatel-Montagne,Pluvio-nival,PN,752597.0,6558763.0,135.0,456.0,,01/01/1976,31/12/2014
+K152401001,Le BarbenanAu Breuil,Pluvial contrasté,PC,753060.0,6566253.0,121.0,310.0,,01/01/1976,31/12/2019
+K172421001,La Dragne a Vandenesse,Pluvial contrasté,PC,758132.0,6645946.0,115.0,210.0,,01/01/1976,31/12/2019
+K175311001,L Alene a Cercy-La-Tour[Coueron],Pluvial contrasté,PC,751774.0,6638506.0,338.0,200.0,,01/01/1976,31/12/2019
+K191451001,L Ixeurea La Fermete,Pluvial contrasté,PC,725503.0,6651319.0,115.0,196.0,,01/01/1976,31/12/2019
+K193001010,La Loire a Nevers,Pluvial contrasté,PC,712533.0,6653726.0,17570.0,174.0,,01/01/1976,31/12/2019
+K195401001,La Nievre Darzembouya Poiseux [Poisson],Pluvial contrasté,PC,719170.0,6670457.0,224.0,208.0,,01/01/1976,31/12/2019
+K206401002,Le Langouyroua Langogne,Pluvio-nival,PN,768070.0,6403972.0,66.0,900.0,,01/01/1976,31/12/2019
+K207081010,L Allier a Langogne,Pluvio-nival,PN,767873.0,6404373.0,324.0,1000.0,,01/01/1987,31/12/2019
+K212301002,Le Chapeaurouxa Pierrefiche[Pont De Baves],Pluvio-nival,PN,755223.0,6396988.0,113.0,1136.0,,01/01/1976,31/12/2019
+K216311001,Le Grandrieu a Grandrieu,Pluvio-nival,PN,750440.0,6410215.0,72.0,1091.0,,01/01/1976,31/12/2019
+K221084201,L Allier a Monistrol-Dallier,Pluvio-nival,PN,751007.0,6429992.0,988.0,635.0,,01/01/1976,31/12/2014
+K222302001,L Ance Du Sud a Saint-Prejet-Dallier[Chambonnet],Nivo-pluvial,NP,749842.0,6422209.0,80.0,857.0,,01/01/1982,31/12/2019
+K222303001,L Ance Du Sud a Saint-Prejet-Dallier,Nivo-pluvial,NP,749260.0,6424312.0,161.0,800.0,,09/09/1983,31/12/2019
+K223403201,L Ance Du Sud a Monistrol-Dallier[Pouzas],Nivo-pluvial,NP,750208.0,6429999.0,225.0,785.0,,01/01/1976,31/12/2014
+K224082001,L Allier a Prades,Pluvio-nival,PN,746817.0,6436873.0,1344.0,780.0,,01/01/1976,01/06/2008
+K225401001,La Seuge a Saugues,Nivo-pluvial,NP,743417.0,6430356.0,114.0,930.0,,01/01/1976,31/12/2019
+K228311002,La Desges a Chanteuges,Nivo-pluvial,NP,743007.0,6440950.0,140.0,520.0,,01/01/1991,31/12/2019
+K231621001,La Cronce a Aubazat,Nivo-pluvial,NP,734485.0,6449214.0,130.0,483.0,,01/01/1976,31/12/2019
+K236301001,La Senouirea Paulhaguet[La Fridiere],Nivo-pluvial,NP,741032.0,6455453.0,155.0,538.0,,01/01/1976,31/12/2019
+K251401001,L Allanchea Joursac[Pont Du Vernet],Nivo-pluvial,NP,700509.0,6448302.0,157.0,746.0,,01/01/1976,31/12/2019
+K251402001,L Allanchea Allanche,Pluvio-nival,PN,694703.0,6458841.0,64.0,960.0,,27/06/1991,31/12/2019
+K252301001,L Alagnona Joursac[Le Vialard],Pluvio-nival,PN,702131.0,6451086.0,310.0,870.0,,01/01/1976,31/12/2019
+K259301001,L Alagnona Lempdes,Pluvio-nival,PN,720825.0,6476105.0,984.0,450.0,,02/07/1976,31/12/2019
+K264401001,L Ailloux a Manglieu [Lavaur],Pluvial contrasté,PC,727944.0,6502721.0,73.0,437.0,,01/01/1976,31/12/2019
+K265401001,La Couze Pavin a Saint-Floret,Nivo-pluvial,NP,708592.0,6494592.0,216.0,489.0,,01/01/1977,31/12/2019
+K267401001,La Couze Chambon a Montaigut-Le-Blanc[Champeix],Pluvio-nival,PN,708227.0,6498691.0,159.0,460.0,,01/01/1976,31/12/2019
+K268081001,L Allier a Vic-Le-Comte,Pluvio-nival,PN,715690.0,6506921.0,5370.0,374.0,,01/01/1976,31/12/2019
+K271401001,Le Jauron a Beauregard-lEveque[Saint Aventin],Pluvial contrasté,PC,721728.0,6523855.0,119.0,305.0,,01/01/1976,31/12/2019
+K279081001,L Allier a Limons,Pluvio-nival,PN,734617.0,6541073.0,7022.0,275.0,,01/01/1976,31/12/2019
+K282191001,La Dore a Dore-lEglise,Pluvio-nival,PN,758392.0,6476187.0,105.0,595.0,,01/01/1991,31/12/2019
+K283401001,La Dolore a Saint-Bonnet-Le-Chastel[Moulin Neuf],Nivo-pluvial,NP,749160.0,6483258.0,70.0,800.0,,01/01/1976,31/12/2019
+K287191001,La Dore a Saint-Gervais-Sous-Meymont[Maison Du Parc / Giroux-Dore],Nivo-pluvial,NP,747490.0,6510149.0,800.0,395.0,,01/01/1976,31/12/2019
+K288401001,La Faye a Olliergues [Giroux-Faye],Nivo-pluvial,NP,746203.0,6511558.0,72.0,380.0,,01/01/1976,31/12/2019
+K294401001,Le Couzon a Courpiere[Le Salet],Nivo-pluvial,NP,744045.0,6516372.0,74.0,341.0,,01/01/1976,31/12/2019
+K298191001,La Dore a Dorat,Pluvio-nival,PN,736988.0,6532518.0,1523.0,310.0,,01/06/1991,31/12/2019
+K303081001,L Allier a Saint-Yorre,Nivo-pluvial,NP,735617.0,6551373.0,8922.0,272.0,,01/01/1976,31/12/2019
+K315301001,L Andelota Loriges,Pluvial contrasté,PC,726054.0,6574675.0,210.0,245.0,,01/01/1976,31/12/2019
+K322201001,La Sioule a Pontgibaud,Pluvio-nival,PN,688275.0,6525935.0,353.0,671.0,,01/01/1976,31/12/2019
+K326401002,La Saunadea Pontaumur,Pluvial contrasté,PC,674722.0,6530146.0,112.0,536.0,,01/01/1976,31/12/2019
+K327301001,Le Sioulet a Miremont [La Prugne],Pluvio-nival,PN,677034.0,6531825.0,472.0,511.0,,01/01/1986,31/12/2019
+K329202001,La Sioule a Saint-Priest-Des-Champs[Fades-Besserve],Nivo-pluvial,NP,684210.0,6541556.0,1300.0,446.0,,01/01/1976,31/12/2014
+K337301001,La Bouble a Chareil-Cintrat,Pluvial contrasté,PC,717454.0,6573748.0,555.0,252.0,,01/01/1976,31/12/2019
+K337471001,Le BoublonLagees a Fourilles,Pluvial contrasté,PC,715337.0,6571568.0,71.0,255.0,,01/01/1976,31/12/2019
+K345081001,L Allier a Moulins,Nivo-pluvial,NP,724917.0,6606873.0,12987.0,207.0,,01/01/1976,31/12/2019
+K365081001,L Allier a Cuffy,Nivo-pluvial,NP,705317.0,6649373.0,14319.0,180.0,,01/01/1976,31/12/2019
+K409401001,Le Nohain a Saint-Martin-Sur-Nohain[Villiers],Pluvial contrasté,PC,699792.0,6695103.0,473.0,155.0,,01/01/1976,31/12/2019
+K418001201,La Loire a Gien,Pluvial contrasté,PC,672308.0,6731473.0,35654.0,128.0,,01/01/1976,31/12/2017
+K487312002,La Brenne a Villedomer [Bas-Villaumay],Pluvial contrasté,PC,541921.0,6720606.0,263.0,80.0,,01/01/1976,22/02/2005
+K514311001,La Voueize a Gouzon,Pluvial contrasté,PC,642955.0,6566582.0,144.0,369.0,,01/01/1976,31/12/2019
+K518302002,La Tardes a Evaux-Les-Bains,Pluvial contrasté,PC,657231.0,6565063.0,854.0,334.0,,01/01/1976,18/04/2008
+K520090201,Le Cher a Teillet-Argenty,Pluvial contrasté,PC,664178.0,6571400.0,1600.0,267.0,,01/01/1976,31/12/2014
+K534321001,L Oeil a Malicorne [Beaufrancon],Pluvial contrasté,PC,681130.0,6579250.0,126.0,331.0,,01/01/1976,31/12/2019
+K538302101,L Aumance a Herisson[Pont De La Roche],Pluvial contrasté,PC,675038.0,6603282.0,928.0,180.0,,01/01/1976,14/07/2008
+K562301001,L Auron Au Pondy,Pluvial contrasté,PC,673397.0,6633971.0,199.0,167.0,,01/01/1989,31/12/2019
+K633401001,La Nere a Aubigny-Sur-Nere,Pluvial contrasté,PC,657551.0,6710247.0,79.0,180.0,,01/01/1976,31/12/2019
+K637302001,La Petite Sauldre a Menetreol-Sur-Sauldre,Pluvial contrasté,PC,647717.0,6705333.0,318.0,146.0,,01/01/1976,31/03/2015
+K649251001,La Sauldre a Selles-Sur-Cher,Pluvial contrasté,PC,589318.0,6688435.0,,295.0,,01/01/1976,20/11/2014
+K720261001,L Indre a Ardentes,Pluvial contrasté,PC,610692.0,6627503.0,697.0,152.0,,01/01/1976,31/12/2019
+K731261001,L Indre a Saint-Cyran-Du-Jambot,Pluvial contrasté,PC,557698.0,6659121.0,1712.0,85.0,,01/01/1976,31/12/2019
+K741401001,La Tourmente a Villeloin-Coulange[Coulange],Pluvial contrasté,PC,566706.0,6672115.0,109.0,96.0,,01/01/1976,03/01/2016
+K743303001,L Indroisa Genille,Pluvial contrasté,PC,555850.0,6677222.0,396.0,76.0,,20/08/1977,31/12/2019
+L001061101,La Vienne a Peyrelevade[La Rigole Du Diable],Pluvio-nival,PN,621812.0,6511607.0,71.0,744.0,,01/01/1976,31/12/2014
+L031401001,La Vige a Saint-Martin-Sainte-Catherine,Pluvial contrasté,PC,589882.0,6540549.0,134.0,302.0,,01/01/1976,31/12/2019
+L056301001,La Briance a Condat-Sur-Vienne[Chambon Veyrinas],Pluvial contrasté,PC,563226.0,6518990.0,597.0,214.0,,01/01/1976,31/12/2019
+L081301001,La Glane a Saint-Junien[Le Derot],Pluvial contrasté,PC,538397.0,6536981.0,288.0,208.0,,01/01/1976,31/12/2019
+L091402001,La Gorre a Chaillac-Sur-Vienne,Pluvial contrasté,PC,536134.0,6529207.0,186.0,190.0,,01/01/1990,31/12/2019
+L320062001,La Vienne a Ingrandes,Pluvial contrasté,PC,514512.0,6644791.0,10052.0,44.0,,01/01/1976,31/12/2019
+L401071001,La Creuse a Felletin,Pluvial contrasté,PC,635376.0,6532475.0,,510.0,,01/01/1976,31/12/2019
+L403301001,La Rozeille a Moutier-Rozeille[Aubusson],Pluvial contrasté,PC,636215.0,6537264.0,186.0,440.0,,31/10/1976,31/12/2019
+L440000101,La Petite Creuse a Genouillac,Pluvial contrasté,PC,622724.0,6584637.0,558.0,273.0,,01/01/1976,31/12/2014
+L441171001,La Petite Creuse a Fresselines[Puy Rageaud],Pluvial contrasté,PC,599272.0,6588130.0,850.0,218.0,,01/01/1976,31/12/2019
+L465301001,La Bouzannea Velles [Forges],Pluvial contrasté,PC,595037.0,6619340.0,434.0,121.0,,01/01/1976,31/10/2019
+L503401001,L Ardoura Folles [Forgefer],Pluvial contrasté,PC,583719.0,6556287.0,131.0,318.0,,01/01/1976,31/12/2019
+L510181001,La Gartempe a Folles [Bessines],Pluvial contrasté,PC,579040.0,6558324.0,570.0,298.0,,01/01/1976,31/12/2019
+L513401001,La Semme a Droux,Pluvial contrasté,PC,556597.0,6562907.0,177.0,186.0,,01/01/1976,31/12/2019
+L522302001,Le Vincou a Bellac,Pluvial contrasté,PC,547192.0,6561287.0,286.0,235.0,,01/01/1976,31/12/2019
+L532301001,La Brame a Oradour-Saint-Genest,Pluvial contrasté,PC,545802.0,6574388.0,235.0,161.0,,01/01/1976,31/12/2019
+L541181001,La Gartempe a Montmorillon,Pluvial contrasté,PC,536370.0,6593650.0,1866.0,90.0,,01/01/1976,31/12/2019
+L551191001,L Anglin a Prissac,Pluvial contrasté,PC,566014.0,6601897.0,225.0,107.0,,01/01/1976,31/12/2019
+L562301001,La Benaizea Jouac,Pluvial contrasté,PC,566077.0,6585410.0,190.0,181.0,,01/01/1979,31/12/2019
+L700061001,La Vienne a Nouatre,Pluvial contrasté,PC,513672.0,6663983.0,19853.0,40.0,,01/01/1976,31/12/2019
+L800001020,La Loire a Saumur,Pluvial contrasté,PC,467516.0,6689246.0,81200.0,24.0,,01/01/1989,31/12/2019
+M001411001,L Hoenea La Mesniere [La Foulerie],Pluvial contrasté,PC,511155.0,6830587.0,76.0,158.0,,12/10/1979,31/12/2019
+M005061020,La Sarthe a Saint-Ceneri-Le-Gerei[Moulin Du Desert],Pluvial contrasté,PC,476239.0,6813887.0,908.0,121.0,,01/01/1979,31/12/2019
+M011491010,Le Merdereau a Saint-Paul-Le-Gaultier[Chiantin],Pluvial contrasté,PC,466697.0,6807970.0,118.0,114.0,,13/12/1984,31/12/2019
+M012401010,La Vaudellea Saint-Georges-Le-Gaultier,Pluvial contrasté,PC,470059.0,6803644.0,89.0,95.0,,07/10/1992,31/12/2019
+M024301000,L Orne Saosnoisea Montbizot [Moulin Neuf Cidrerie],Pluvial contrasté,PC,491708.0,6787177.0,510.0,50.0,,01/01/1988,31/12/2019
+M024301010,L Orne Saosnoisea Montbizot [Moulin Neuf],Pluvial contrasté,PC,491755.0,6787215.0,510.0,50.0,,15/05/1987,31/12/2019
+M036151010,L Huisnea Nogent-Le-Rotrou[Pont De Bois],Pluvial contrasté,PC,537920.0,6804282.0,827.0,102.0,,01/01/1976,31/12/2019
+M042151010,L Huisnea Montfort-Le-Gesnois[La Pecardiere],Pluvial contrasté,PC,506693.0,6774461.0,1890.0,56.0,,23/09/1983,31/12/2019
+M042481010,Le Narais a Saint-Mars-La-Briere,Pluvial contrasté,PC,506157.0,6770068.0,167.0,64.0,,08/07/1983,31/12/2019
+M050061010,La Sarthe a Spay [Amont],Pluvial contrasté,PC,486807.0,6760787.0,5420.0,38.0,,01/01/1976,05/08/2007
+M053501010,La Gee a Ferce-Sur-Sarthe[PlancheAugis],Pluvial contrasté,PC,472702.0,6760652.0,112.0,37.0,,30/11/1984,31/12/2019
+M063301010,L Erve a Auvers-Le-Hamon[Moulin La Roche],Pluvial contrasté,PC,448884.0,6760575.0,380.0,32.0,,01/01/1976,31/12/2019
+M068061010,La Sarthe a Saint-Denis-Danjou[Beffes],Pluvial contrasté,PC,446730.0,6749673.0,7380.0,22.0,,01/01/1976,31/12/2019
+M121301010,La Braye a Valennes[La Caboche],Pluvial contrasté,PC,537439.0,6770508.0,270.0,101.0,,01/01/1976,31/12/2019
+M131301010,La Veuve a Saint-Pierre-Du-Lorouer[Petit Brives],Pluvial contrasté,PC,515658.0,6746906.0,156.0,61.0,,06/11/1982,31/12/2019
+M135401010,L Escotaisa Saint-Paterne-Racan,Pluvial contrasté,PC,510486.0,6725664.0,67.0,62.0,,01/01/1976,31/12/2019
+M306091010,La Mayenne a Ambrieres-Les-Vallees[Cigne],Pluvial contrasté,PC,434934.0,6822122.0,828.0,100.0,,01/01/1993,31/12/2019
+M313301010,La Varenne a Saint-Fraimbault[Moulin Crinais],Pluvial contrasté,PC,428589.0,6828270.0,517.0,139.0,,02/01/1992,31/12/2019
+M322301010,La Colmont a Oisseau,Pluvial contrasté,PC,428664.0,6813079.0,245.0,101.0,,01/01/1992,31/12/2019
+M325311010,L Aron a Moulay,Pluvial contrasté,PC,431176.0,6802666.0,188.0,90.0,,01/01/1976,31/12/2019
+M332301010,L Erneea Andouille[Les Vaugeois],Pluvial contrasté,PC,419396.0,6791870.0,375.0,63.0,,01/01/1976,31/12/2019
+M334091010,La Mayenne a lHuisserie[Bonne],Pluvial contrasté,PC,421253.0,6774666.0,2890.0,41.0,,01/01/1976,31/12/2019
+M342301010,La Jouannea Force,Pluvial contrasté,PC,423869.0,6776843.0,410.0,46.0,,01/01/1976,31/12/2019
+M350401010,Le Vicoin a Nuille-Sur-Vicoin,Pluvial contrasté,PC,418134.0,6772093.0,235.0,46.0,,01/01/1976,31/12/2019
+M351401010,L Ouette a Entrammes,Pluvial contrasté,PC,423512.0,6769851.0,118.0,38.0,,01/10/1985,31/12/2019
+M360091010,La Mayenne a Chateau-Gontier,Pluvial contrasté,PC,422978.0,6753467.0,3910.0,26.0,,01/01/1976,31/12/2019
+M363091010,La Mayenne a Chambellay,Pluvial contrasté,PC,423545.0,6737373.0,4160.0,20.0,,01/01/1976,31/12/2019
+M624001000,La Loire [Totale] a Nantes [Saint Felix],Pluvial contrasté,PC,356648.0,6688914.0,111570.0,3.0,,01/01/1976,31/12/2019
+O023402001,Le Ger a Aspet [2],Nivo-pluvial,NP,520146.0,6216048.0,95.0,416.0,,01/01/1983,31/12/2019
+O029531001,La Noue a Laffite-Toupiere,Pluvial contrasté,PC,530371.0,6232345.0,120.0,291.0,,01/01/1976,31/12/2019
+O036251001,Le Salat a Soueix-Rogalle[Kercabanac],Nival,NG,553998.0,6202681.0,379.0,464.0,,01/01/1976,31/12/2019
+O038401001,L Arac a Soulan [Freychet],Nivo-pluvial,NP,555487.0,6201570.0,169.0,480.0,,01/01/1976,31/12/2019
+O055401001,L Arbas a Castelbiague[Pont De Prades],Nivo-pluvial,NP,531055.0,6218555.0,98.0,332.0,,01/01/1976,31/12/2019
+O059251001,Le Salat a Roquefort-Sur-Garonne,Nivo-pluvial,NP,535150.0,6230507.0,1570.0,270.0,,01/01/1976,31/12/2019
+O062401001,Le Volp a Montberaud[Sainte-Croix-Volvestre],Pluvial contrasté,PC,548723.0,6228996.0,91.0,274.0,,01/01/1976,31/12/2019
+O074404001,L Arize Au Mas-Dazil,Pluvial contrasté,PC,566444.0,6221856.0,215.0,280.0,,01/01/1976,31/12/2008
+O079401001,L Arize a Rieux [Volvestre],Pluvial contrasté,PC,553108.0,6239848.0,476.0,205.0,,01/01/1976,31/12/2019
+O125251001,L Ariege a Foix,Nival,NG,586417.0,6208473.0,1340.0,646.0,,01/01/1986,31/12/2018
+O143293001,L Hers a Belesta [Source De Fontestorbes],Nivo-pluvial,NP,612335.0,6199731.0,85.0,10.0,,01/01/1976,29/09/2019
+O144291002,L Hers Vif Au Peyrat,Nivo-pluvial,NP,613066.0,6206683.0,190.0,413.0,,01/01/1976,31/12/2019
+O146401001,Le Blau a Chalabre,Pluvial contrasté,PC,619580.0,6209226.0,67.0,375.0,,01/01/1976,31/12/2019
+O158461001,Le Douctouyrea Dun [Engravies],Pluvial contrasté,PC,599965.0,6216781.0,134.0,301.0,,01/01/1976,31/12/2019
+O301101001,Le Tarn Au Pont-De-Montvert[Fontchalettes],Pluvio-nival,PN,760128.0,6362779.0,67.0,905.0,,01/01/1976,31/12/2019
+O303101001,Le Tarn a Bedoues[Cocures],Pluvio-nival,PN,749322.0,6360873.0,189.0,565.0,,01/01/1976,31/12/2019
+O306401001,Le Tarnon a Florac,Pluvio-nival,PN,747695.0,6357490.0,124.0,542.0,,01/01/1976,31/12/2019
+O308432001,La Mimente a Florac,Pluvial contrasté,PC,748096.0,6357587.0,125.0,542.0,,01/01/1976,31/12/2019
+O312102002,Le Tarn a Montbrun [Pont De Montbrun],Pluvio-nival,PN,739520.0,6359458.0,621.0,480.0,,01/01/1976,31/12/2017
+O314101001,Le Tarn a Mostuejouls[La Muse],Pluvio-nival,PN,717826.0,6345755.0,925.0,388.0,,01/01/1976,31/12/2019
+O319401001,La Jonte a Meyrueis [Aval],Pluvio-nival,PN,734082.0,6342520.0,102.0,693.0,,01/01/1976,31/12/2019
+O336402101,La Dourbie a Nant [Pont De Gardies],Pluvial contrasté,PC,723191.0,6330425.0,300.0,433.0,,01/01/1976,31/12/2017
+O339403004,La Dourbie a Millau [Massebiau3],Pluvial contrasté,PC,710331.0,6333630.0,548.0,360.0,,19/10/1983,31/12/2019
+O340101002,Le Tarn a Millau,Pluvial contrasté,PC,706027.0,6332668.0,2170.0,349.0,,01/01/1976,30/05/2012
+O345431001,La Muze a Montjaux [Saint-Hippolyte],Pluvial contrasté,PC,693729.0,6331373.0,112.0,330.0,,01/01/1976,31/12/2019
+O358462001,La Sorguesa Saint-Affrique[Vendelove],Pluvial contrasté,PC,691290.0,6314610.0,280.0,350.0,,01/01/1976,29/12/2004
+O359402002,Le Dourdoua Vabres-lAbbaye[Le Poujol],Pluvial contrasté,PC,686719.0,6317546.0,656.0,,,01/01/1992,31/12/2019
+O375401001,Le Rance a Saint-Sernin-Sur-Rance,Pluvial contrasté,PC,667973.0,6309812.0,290.0,288.0,,01/01/1990,31/12/2019
+O419433003,Le Gijou a Vabre [Rocale],Pluvial contrasté,PC,652999.0,6287261.0,208.0,342.0,,01/01/1976,05/10/2010
+O470403001,Le Dadou a Paulinet[Saint-Jean-De-Jeanne],Pluvial contrasté,PC,655027.0,6302728.0,72.0,413.0,,01/01/1976,31/12/2019
+O504251002,L Aveyrona Palmas [Pont De Manson],Pluvial contrasté,PC,687733.0,6366688.0,270.0,580.0,,01/01/1976,31/12/2019
+O505501001,Le Serre a Coussergues[Resuenhe],Pluvial contrasté,PC,689846.0,6368469.0,110.0,580.0,,01/01/1976,31/12/2019
+O509252002,L Aveyrona Onet-Le-Chateau[Rodez],Pluvial contrasté,PC,669816.0,6362643.0,556.0,530.0,,01/01/1976,31/12/2019
+O519251003,L Aveyrona Villefranche-De-Rouergue[Recoules],Pluvial contrasté,PC,624651.0,6361423.0,1042.0,269.0,,01/01/1976,31/12/2019
+O528431002,La Serene a Saint-Andre-De-Najac[Canabral],Pluvial contrasté,PC,623623.0,6346047.0,103.0,305.0,,01/01/1976,31/12/2019
+O529251001,L Aveyrona Laguepie,Pluvial contrasté,PC,617875.0,6339702.0,1582.0,149.0,,01/01/1976,31/12/2019
+O531291001,Le Viaur a Arques,Pluvio-nival,PN,684151.0,6356628.0,138.0,732.0,,01/01/1976,30/12/2004
+O542402002,Le Ceor a Centres [Lestrebaldie],Pluvial contrasté,PC,652530.0,6338412.0,161.0,345.0,,01/01/1976,27/02/2013
+O546431001,Le Giffou a Saint-Just-Sur-Viaur[La Fabreguerie],Pluvial contrasté,PC,654695.0,6334598.0,175.0,360.0,,01/01/1976,31/12/2019
+O553401001,Le Lezert a Saint-Julien-Du-Puy[Port De La Besse],Pluvial contrasté,PC,635867.0,6340850.0,222.0,238.0,,01/01/1976,17/12/2003
+O568501001,La Bonnette a Saint-Antonin-Noble-Val,Pluvial contrasté,PC,599915.0,6342250.0,179.0,133.0,,01/01/1976,11/09/2012
+O614001001,La Garonne a Lamagistere,Nivo-pluvial,NP,526354.0,6338068.0,32350.0,46.0,,01/01/1976,31/12/2019
+O700151002,Le Lot a Bagnols-Les-Bains,Pluvio-nival,PN,752772.0,6378926.0,94.0,905.0,,01/01/1982,31/12/2019
+O701151001,Le Lot a Sainte-Helene,Pluvio-nival,PN,747395.0,6380969.0,189.0,802.0,,01/01/1976,31/12/2006
+O702153002,Le Lot a Mende [Aval],Pluvio-nival,PN,738895.0,6380042.0,262.0,707.0,,01/01/1983,31/12/2019
+O703501001,Le Bramont a Saint-Bauzile[Les Fonts],Pluvio-nival,PN,737453.0,6374860.0,116.0,694.0,,01/01/1976,31/12/2019
+O704000101,Le Lot a Balsieges[Bramonas],Pluvio-nival,PN,733665.0,6375891.0,465.0,663.0,,01/01/1976,31/12/2016
+O708501001,Le Coulagneta Marvejols,Pluvio-nival,PN,724739.0,6383559.0,83.0,651.0,,26/11/1976,31/12/2019
+O710151001,Le Lot a Banassac[La Mothe],Pluvio-nival,PN,715746.0,6371547.0,1160.0,519.0,,01/01/1976,31/12/2019
+O723401001,La Rimeize a Rimeize,Pluvio-nival,PN,725441.0,6407530.0,116.0,936.0,,01/01/1976,31/12/2019
+O723403001,La Rimeize a Fau-De-Peyre[Vareilles],Pluvio-nival,PN,718630.0,6405489.0,81.0,1031.0,,01/01/1976,31/12/2019
+O723403101,Le Lot a Lassouts[Castelnau],Pluvio-nival,PN,689429.0,6378262.0,1650.0,365.0,,01/01/1976,31/12/2016
+O724501001,Le Chapouilleta Rimeize [Chassignoles],Pluvio-nival,PN,723367.0,6410344.0,67.0,943.0,,01/01/1976,31/12/2019
+O726501001,La Limagnole a Fontans [Saint-Alban],Nivo-pluvial,NP,728449.0,6408803.0,76.0,908.0,,01/01/1976,31/12/2019
+O737000201,La Truyere Au Malzieu-Ville[Le Soulier],Pluvio-nival,PN,727504.0,6415205.0,,867.0,,01/01/1976,31/12/2015
+O745000301,La Lander a Saint-Georges,Pluvio-nival,PN,710085.0,6434734.0,310.0,749.0,,01/01/1976,31/12/2015
+O773000101,La Bromme a Brommat [Edf],Pluvio-nival,PN,675046.0,6414249.0,111.0,655.0,,01/01/1976,31/12/2015
+O787401001,Le Dourdoua Conques,Pluvial contrasté,PC,652445.0,6387764.0,521.0,223.0,,01/01/1976,31/12/2019
+O794402002,Le Rieu-Mort a Viviez,Pluvial contrasté,PC,637340.0,6385493.0,149.0,200.0,,01/01/1976,31/12/2019
+O811351001,Le Cele a Figeac [Merlancon],Pluvial contrasté,PC,619481.0,6388241.0,676.0,182.0,,01/01/1976,30/12/2004
+O813352001,Le Cele a Orniac [Les Amis Du Cele],Pluvial contrasté,PC,595043.0,6380952.0,1194.0,140.0,,01/01/1976,31/12/2019
+O825501001,Le Vert a Labastide-Du-Vert[Les Campagnes],Pluvial contrasté,PC,559476.0,6380650.0,117.0,99.0,,01/01/1976,31/12/2019
+O834402001,La Theze a Boussac,Pluvial contrasté,PC,542403.0,6381891.0,102.0,86.0,,01/01/1976,31/12/2019
+O839431001,La Lemance a Cuzorn,Pluvial contrasté,PC,536826.0,6384035.0,234.0,86.0,,01/01/1976,31/12/2019
+P009000201,Le Chavanon a Messeix [La Cellete],Pluvio-nival,PN,660122.0,6504891.0,362.0,625.0,,01/01/1976,31/12/2014
+P011501101,La Burande[Ou Ru De Burons] a Singles,Pluvio-nival,PN,664225.0,6493766.0,85.0,557.0,,01/01/1976,31/12/2014
+P027251002,La Rhue a Condat,Pluvio-nival,PN,681418.0,6471042.0,181.0,706.0,,01/01/1976,31/12/2019
+P036000101,La Santoire a Condat [Roche-Pointue],Pluvio-nival,PN,680515.0,6470550.0,172.0,693.0,,01/01/1976,31/12/2014
+P071401001,La Diege a Chaveroche,Nivo-pluvial,NP,642585.0,6498644.0,225.0,625.0,,01/01/1976,30/09/2019
+P088501001,Le Mars a Bassignac[Vendes],Pluvio-nival,PN,652008.0,6466594.0,117.0,366.0,,01/01/1976,31/12/2019
+P092401001,La Triouzounea Saint-Angel,Pluvial contrasté,PC,640600.0,6488270.0,79.0,625.0,,01/01/1977,31/12/2019
+P115000100,La Luzege a Maussac [Pont De Maussac],Pluvial contrasté,PC,633686.0,6485830.0,85.0,561.0,,01/01/1976,08/01/2005
+P115000101,La Luzege a Lamaziere-Basse[Pont De Bouyges],Pluvial contrasté,PC,631807.0,6476254.0,252.0,429.0,,01/01/1976,31/12/2014
+P142251001,La Maronne a Sainte-Eulalie,Pluvio-nival,PN,651642.0,6446815.0,112.0,595.0,,01/01/1976,31/12/2019
+P150000101,La Maronne a Pleaux [Enchanet],Pluvio-nival,PN,636621.0,6442745.0,513.0,370.0,,01/01/1976,31/12/2014
+P171291001,La Cere a Vic-Sur-Cere[Comblat-Le-Pont],Pluvio-nival,PN,669681.0,6429679.0,88.0,650.0,,01/01/1976,31/12/2019
+P174401003,La Jordannea Aurillac [PasserellePaul Riotte],Pluvio-nival,PN,656052.0,6424699.0,105.0,620.0,,01/01/1993,31/12/2019
+P177000101,La Cere a Sansac-De-Marmiesse,Pluvio-nival,PN,648723.0,6420464.0,350.0,554.0,,01/01/1976,31/12/2014
+P205401001,La Bave a Frayssinhes[Le Martinet],Pluvial contrasté,PC,616934.0,6418133.0,183.0,179.0,,01/01/1976,31/12/2019
+P231502001,La Borreze a Lachapelle-Auzac[Lamothe],Pluvial contrasté,PC,579420.0,6424241.0,120.0,105.0,,01/01/1976,31/12/2019
+P302000101,La Vezere a Bugeat,Pluvio-nival,PN,616229.0,6501063.0,143.0,675.0,,01/01/1976,31/12/2015
+P323401001,La Loyre a Voutezac[Pont De lAumonerie],Pluvial contrasté,PC,575795.0,6468730.0,103.0,145.0,,01/01/1976,31/12/2019
+P327401001,La Loyre a Saint-Viance[Pont De Burg],Pluvial contrasté,PC,577411.0,6458826.0,274.0,102.0,,27/12/1988,31/12/2019
+P335251001,La Correze a Correze [Pont De Neupont],Pluvial contrasté,PC,613121.0,6475911.0,168.0,465.0,,01/01/1976,08/01/2018
+P335252001,La Correze a Correze [Correze],Pluvial contrasté,PC,612418.0,6475418.0,170.0,444.0,,01/01/1990,31/12/2019
+P350251001,La Correze a Tulle [Pont Des Soldats],Pluvial contrasté,PC,604335.0,6464695.0,356.0,214.0,,01/01/1976,31/12/2019
+P392252001,La Correze a Brive-La-Gaillarde[Pont Du Buy],Pluvial contrasté,PC,585452.0,6452664.0,940.0,107.0,,01/01/1976,31/12/2019
+P392252002,La Correze a Brive-La-Gaillarde[Le Prieur],Pluvial contrasté,PC,582254.0,6452591.0,947.0,100.0,,01/01/1976,01/02/2016
+P399401001,La Maumont a Ussac [La Chanourdie],Pluvial contrasté,PC,581280.0,6455497.0,162.0,109.0,,01/01/1976,31/12/2019
+P400101001,La Vezere a Larche,Pluvial contrasté,PC,575525.0,6448351.0,2485.0,90.0,,01/01/1976,31/12/2019
+P411401001,Le Cern Au Lardin-Saint-Lazare[Rispe],Pluvial contrasté,PC,558655.0,6449990.0,98.0,89.0,,26/11/1990,31/12/2019
+P413501001,Le Coly a Condat-Sur-Vezere[Pont De Bouch],Pluvial contrasté,PC,562921.0,6446458.0,167.0,98.0,,01/01/1990,31/12/2019
+P427101001,La Vezere a Campagne,Pluvial contrasté,PC,538863.0,6424779.0,3736.0,51.0,,01/01/1976,31/12/2019
+P540401001,L Eyrauda La Force [Bitarel],Pluvial contrasté,PC,492105.0,6424467.0,74.0,32.0,,01/01/1976,03/01/2010
+P608151001,L Isle a Corgnac-Sur-lIsle,Pluvial contrasté,PC,539500.0,6477325.0,432.0,134.0,,01/01/1976,31/12/2019
+P638251001,L AuvezereAu Change [Aubarede],Pluvial contrasté,PC,533439.0,6457293.0,884.0,95.0,,01/01/1980,31/12/2019
+P643000101,Le Manoire a Saint-Laurent-Sur-Manoire[Branchet],Pluvial contrasté,PC,525714.0,6453461.0,198.0,98.0,,01/01/1976,01/01/2005
+P700151001,L Isle a Bassilac[Charrieras],Pluvial contrasté,PC,527653.0,6458341.0,1863.0,87.0,,01/01/1976,31/12/2019
+P704151001,L Isle a Perigueux,Pluvial contrasté,PC,519446.0,6456610.0,2123.0,79.0,,01/01/1976,31/12/2019
+P801251001,La Dronne a Champs-Romain[Le Manet],Pluvial contrasté,PC,524545.0,6493135.0,140.0,150.0,,01/01/1976,31/12/2019
+Q010001001,L Adour [Adour Seul] a Aste [Pont Daste],Nival,NG,468731.0,6219471.0,272.0,600.0,,01/01/1976,31/12/2019
+Q010002500,L Adour [Adour+Canal]a Aste [Pont Daste],Nival,NG,468731.0,6219471.0,272.0,600.0,,01/01/1976,31/12/2019
+Q012006002,L Adour a Tarbes,Nivo-pluvial,NP,463418.0,6241291.0,402.0,309.0,,05/12/1981,31/12/2019
+Q021401001,L Echeza Louey,Pluvial contrasté,PC,457774.0,6235244.0,90.0,333.0,,01/01/1976,31/12/2019
+Q022402001,L Echeza Borderes-Sur-lEchez,Pluvial contrasté,PC,459947.0,6244417.0,168.0,283.0,,01/01/1976,31/12/2019
+Q052252001,L Arros a Gourgue,Pluvial contrasté,PC,476907.0,6229692.0,173.0,292.0,,01/01/1976,30/05/2015
+Q550101001,Le Gave De Pau a Berenx [Pont De Berenx],Nivo-pluvial,NP,388378.0,6275273.0,2575.0,38.0,,01/01/1976,08/05/2017
+Q700291001,Le Gave Doloron a Oloron-Sainte-Marie[Oloron-Sncf],Nivo-pluvial,NP,406668.0,6239961.0,1085.0,204.0,,01/01/1976,31/12/2019
+Q732252002,Le Saison a Mauleon-Licharre[BerrogainLaruns - Cibi],Nivo-pluvial,NP,385244.0,6246330.0,480.0,129.0,,01/01/1976,11/12/2011
+Q741291001,Le Gave Doloron a Escos,Nivo-pluvial,NP,376632.0,6268177.0,2456.0,30.0,,01/01/1976,31/12/2019
+Q803251001,La Bidouzea Aicirits-Camou-Suhast[Saint-Palais],Pluvial contrasté,PC,373241.0,6256617.0,246.0,38.0,,01/01/1976,31/12/2019
+R103001001,La Tardoirea Maisonnais-Sur-Tardoire,Pluvial contrasté,PC,520444.0,6516748.0,140.0,207.0,,01/01/1976,31/12/2019
+U010401001,Le Coney a Xertigny,Pluvial contrasté,PC,945851.0,6780842.0,65.0,300.0,,01/01/1976,13/12/2019
+U012401001,Le Coney a Fontenoy-Le-Chateau,Pluvial contrasté,PC,938348.0,6768315.0,317.0,252.0,,01/01/1987,31/12/2019
+U041501001,Le Breuchina La Proiseliere-Et-Langle,Pluvio-nival,PN,961901.0,6753222.0,123.0,343.0,,01/01/1976,31/12/2019
+U044431001,La Semouse a Saint-Loup-Sur-Semouse,Pluvial contrasté,PC,944463.0,6758969.0,222.0,243.0,,01/01/1976,31/12/2019
+U047401001,La Lanterne a Fleurey-Les-Faverney,Pluvial contrasté,PC,930437.0,6743201.0,1020.0,211.0,,01/01/1976,31/12/2019
+U063501001,La Gourgeonnea Tincey-Et-Pontrebeau,Pluvial contrasté,PC,910008.0,6726588.0,140.0,203.0,,01/01/1976,31/12/2019
+U072401001,Le Salon a Denevre,Pluvial contrasté,PC,898978.0,6722186.0,390.0,199.0,,01/01/1976,31/12/2019
+U092401001,La Vingeannea Saint-Maurice-Sur-Vingeanne,Pluvial contrasté,PC,880894.0,6722541.0,398.0,232.0,,01/01/1976,31/12/2019
+U092402001,La Vingeannea Oisilly,Pluvial contrasté,PC,878446.0,6705075.0,609.0,200.0,,01/01/1976,31/12/2019
+U100401001,L Ognon a Servance [Fourguenons],Pluvio-nival,PN,974474.0,6751115.0,74.0,380.0,,01/01/1976,31/12/2019
+U103541001,Le Scey a Beveuge,Pluvial contrasté,PC,962352.0,6724439.0,179.0,269.0,,01/01/1976,31/12/2019
+U104401001,L Ognon a Chassey-Les-Montbozon[Bonnal],Pluvial contrasté,PC,952398.0,6717330.0,866.0,250.0,,01/01/1987,31/12/2019
+U105401001,L Ognon a Beaumotte-Aubertans,Pluvial contrasté,PC,939814.0,6706546.0,1250.0,229.0,,01/01/1976,31/12/2019
+U108401001,L Ognon a Pesmes,Pluvial contrasté,PC,892316.0,6691166.0,2038.0,185.0,,01/01/1976,31/12/2019
+U120401001,La Tille a Crecey-Sur-Tille,Pluvial contrasté,PC,859780.0,6719125.0,231.0,273.0,,01/01/1976,31/12/2019
+U122401001,La Tille a Arceau [Arcelot],Pluvial contrasté,PC,865206.0,6699293.0,846.0,223.0,,01/01/1976,31/12/2019
+U122402001,La Tille a Cessey-Sur-Tille,Pluvial contrasté,PC,867617.0,6689080.0,884.0,201.0,,01/01/1976,31/12/2019
+U123502001,La Norges a Genlis,Pluvial contrasté,PC,867976.0,6684380.0,266.0,196.0,,01/01/1976,31/12/2019
+U131401001,L Ouche a La Bussiere-Sur-Ouche,Pluvial contrasté,PC,830569.0,6680303.0,313.0,310.0,,01/01/1985,31/12/2019
+U132401001,L Ouche a Plombieres-Les-Dijon,Pluvial contrasté,PC,849575.0,6694330.0,651.0,243.0,,01/01/1976,31/12/2019
+U142001001,La Saone a Pagny-La-Ville[Lechatelet],Pluvial contrasté,PC,863116.0,6665236.0,11673.0,175.0,,01/01/1976,31/12/2019
+U201201001,Le Doubs a Labergement-Sainte-Marie,Pluvio-nival,PN,950193.0,6635510.0,170.0,909.0,,01/01/1976,31/12/2019
+U202201001,Le Doubs a La Cluse-Et-Mijoux[PontarlierAmont],Pluvio-nival,PN,956095.0,6647850.0,350.0,840.0,,01/01/1976,31/12/2019
+U202202001,Le Doubs a Doubs,Pluvio-nival,PN,954640.0,6652958.0,396.0,809.0,,18/06/1986,31/12/2019
+U210201001,Le Doubs a Ville-Du-Pont,Pluvio-nival,PN,964106.0,6661470.0,658.0,774.0,,08/09/1978,02/07/2013
+U221502001,Le Dessoubrea Saint-Hippolyte,Pluvio-nival,PN,986591.0,6696349.0,615.0,380.0,,01/01/1976,31/12/2019
+U234503001,La Savoureusea Belfort,Pluvio-nival,PN,989613.0,6733796.0,141.0,357.0,,01/01/1976,31/12/2019
+U234504001,La Savoureusea Vieux-Charmont,Pluvial contrasté,PC,989099.0,6720510.0,235.0,317.0,,04/06/1986,31/12/2019
+U242525001,Le Cusancina Cusance,Pluvial contrasté,PC,959018.0,6697087.0,180.0,308.0,,20/11/1986,31/12/2019
+U242526001,Le Cusancina Baume-Les-Dames,Pluvial contrasté,PC,954634.0,6698524.0,358.0,270.0,,01/01/1976,21/11/2018
+U254201001,Le Doubs a Rochefort-Sur-Nenon,Pluvio-nival,PN,894253.0,6672264.0,4970.0,201.0,,01/01/1976,31/12/2019
+U256502001,La Clauge a La Loye,Pluvial contrasté,PC,892771.0,6662584.0,116.0,203.0,,28/09/1983,31/12/2019
+U260403001,La Loue a Vuillafans,Pluvio-nival,PN,944966.0,6666732.0,478.0,350.0,,01/01/1976,31/12/2019
+U261582001,Le Lison [Source]a Nans-Sous-Sainte-Anne,Pluvio-nival,PN,928985.0,6656014.0,182.0,400.0,,29/09/1976,31/12/2019
+U261583001,Le Lison a Myon,Pluvio-nival,PN,924552.0,6663210.0,253.0,317.0,,01/01/1976,31/12/2019
+U262401001,La Loue a Chenecey-Buillon,Pluvio-nival,PN,924055.0,6675205.0,,275.0,,01/01/1976,31/12/2019
+U263401001,La Loue a Champagne-Sur-Loue,Pluvio-nival,PN,913669.0,6664203.0,1509.0,237.0,,01/01/1976,31/12/2019
+U272201001,Le Doubs a Neublans-Abergement,Pluvio-nival,PN,878870.0,6649613.0,7290.0,181.0,,01/01/1976,31/12/2019
+U321401001,La Grosne a Jalogny [Cluny],Pluvial contrasté,PC,826708.0,6590706.0,333.0,244.0,,01/01/1976,13/11/2010
+U322501001,La Guye a Sigy-Le-Chatel[Corcelles],Pluvial contrasté,PC,819858.0,6607651.0,272.0,216.0,,01/01/1976,31/12/2019
+U401401001,La Reyssouzea Montagnat,Pluvial contrasté,PC,876656.0,6566099.0,84.0,237.0,,01/01/1976,31/12/2019
+U401402001,La Reyssouzea Bourg-En-Bresse[Majornas],Pluvial contrasté,PC,871312.0,6572140.0,130.0,218.0,,01/01/1983,31/12/2019
+U423501001,Le Renon a Neuville-Les-Dames,Pluvial contrasté,PC,854056.0,6563895.0,102.0,218.0,,01/01/1976,31/12/2019
+U462401001,L Azerguesa Chatillon,Pluvial contrasté,PC,827504.0,6531849.0,336.0,206.0,,01/01/1976,31/12/2019
+U463501001,La Brevenne a Sain-Bel,Pluvial contrasté,PC,824246.0,6524683.0,219.0,236.0,,01/01/1976,31/12/2019
+U464401001,L Azerguesa Lozanne,Pluvial contrasté,PC,830887.0,6530122.0,792.0,194.0,,01/01/1976,31/12/2019
+V014000301,Le Giffre a Taninges[Pressy],Nival,NG,974249.0,6563261.0,325.0,615.0,,01/01/1976,31/12/2016
+V101501001,La Valserinea Lelex [Niaizet],Nivo-pluvial,NP,924935.0,6580073.0,85.0,846.0,,01/01/1976,31/12/2019
+V101503001,La Valserinea Chezery-Forens[Chezery],Nivo-pluvial,NP,920777.0,6572915.0,119.0,576.0,,01/01/1976,31/12/2019
+V101581001,La Semine a Chatillon-En-Michaille[Coz],Pluvio-nival,PN,916113.0,6564962.0,183.0,369.0,,01/01/1976,31/12/2019
+V123561001,L Eau Morte a Doussard,Pluvial contrasté,PC,951047.0,6525994.0,92.0,452.0,,01/01/1976,31/12/2019
+V125501001,Le Cheran a Alleves [La Charniaz],Nivo-pluvial,NP,941388.0,6518184.0,249.0,575.0,,01/01/1976,31/12/2019
+V126402301,Le Fier a Vallieres,Nivo-pluvial,NP,926369.0,6537696.0,1350.0,253.0,,01/01/1976,31/12/2015
+V131502001,La Leysse a La Motte-Servolex [Pont Du Tremblay],Pluvio-nival,PN,923809.0,6507245.0,280.0,237.0,,01/01/1980,31/12/2019
+V132502001,Le Sierroz a Aix-Les-Bains[Laffin],Pluvio-nival,PN,925682.0,6515921.0,130.0,245.0,,01/01/1978,31/12/2019
+V146431001,Le Furans a Arbignieu[Pont De Peyzieu],Pluvio-nival,PN,907403.0,6516478.0,160.0,221.0,,01/01/1976,31/12/2019
+V150401001,Le Guiers Mort a Saint-Laurent-Du-Pont,Nivo-pluvial,NP,914083.0,6479953.0,89.0,415.0,,01/01/1976,03/09/2017
+V151501001,Le Guiers Vif a Saint-Christophe-Sur-Guiers[Pont Saint-Martin],Nivo-pluvial,NP,917535.0,6486318.0,114.0,405.0,,01/01/1976,31/12/2019
+V177401001,La Bourbre a Tignieu-Jameyzieu,Pluvial contrasté,PC,867926.0,6515118.0,703.0,202.0,,01/01/1976,31/12/2019
+V202401001,La Saine a Foncine-Le-Bas,Pluvio-nival,PN,931574.0,6619983.0,95.0,774.0,,01/01/1976,30/09/2019
+V211401001,L Angillona Champagnole,Pluvio-nival,PN,918891.0,6632383.0,,530.0,,01/01/1976,31/12/2019
+V220201000,L Ain a Marigny [Chalain],Pluvio-nival,PN,911427.0,6624353.0,650.0,456.0,,01/01/1976,31/12/2017
+V232000000,L Ain a Cernon [Vouglans],Pluvio-nival,PN,904755.0,6592037.0,1120.0,329.0,,01/01/1976,31/12/2008
+V241401001,La Bienne a Saint-Claude[Chenavier],Pluvio-nival,PN,920265.0,6594701.0,216.0,423.0,,01/01/1976,27/10/2009
+V251501002,L Oignin a Maillat [Pontet],Pluvio-nival,PN,896110.0,6562735.0,92.0,495.0,,01/01/1986,31/12/2019
+V292401001,L Albarinea Saint-Rambert-En-Bugey,Pluvio-nival,PN,888935.0,6541615.0,232.0,286.0,,01/01/1976,31/12/2019
+V301502001,L Yzerona Francheville[Taffignon],Pluvial contrasté,PC,837765.0,6516575.0,129.0,180.0,,17/09/1988,31/12/2019
+V311401001,Le Gier a Rive-De-Gier,Pluvial contrasté,PC,828587.0,6494772.0,319.0,212.0,,01/01/1976,31/12/2019
+V322542002,La Vega a Pont-Eveque,Pluvial contrasté,PC,848566.0,6494402.0,88.0,173.0,,01/01/1988,31/12/2019
+V352401001,La Cance a Sarras,Pluvio-nival,PN,840261.0,6457807.0,380.0,134.0,,01/01/1976,31/12/2019
+V413000101,L Eyrieuxa Beauvene[Pont De Chervil],Pluvio-nival,PN,821561.0,6420701.0,390.0,316.0,,01/01/1976,25/12/2019
+V414521001,La Glueyre a Gluiras [Tisoneche],Pluvial contrasté,PC,820019.0,6415618.0,71.0,411.0,,01/01/1976,31/12/2019
+V421401001,La Drome a Luc-En-Diois,Pluvio-nival,PN,893864.0,6394107.0,194.0,530.0,,01/01/1976,31/12/2019
+V422501001,Le Bez a Chatillon-En-Diois,Nivo-pluvial,NP,897333.0,6402469.0,227.0,558.0,,01/01/1976,31/12/2019
+V426401001,La Drome a Saillans,Pluvio-nival,PN,874946.0,6401462.0,1150.0,263.0,,01/01/1976,31/12/2019
+V427501001,La Gervanne a Beaufort-Sur-Gervanne,Pluvio-nival,PN,869732.0,6410898.0,108.0,325.0,,01/01/1976,31/12/2019
+V441401001,Le Roubion a Soyans,Pluvial contrasté,PC,859995.0,6393798.0,186.0,264.0,,01/01/1976,31/12/2019
+V445501001,Le Jabron a Souspierre,Pluvial contrasté,PC,856308.0,6383240.0,85.0,245.0,,01/01/1976,31/12/2019
+V504661001,L Altier a Altier [La Goulette],Pluvio-nival,PN,770712.0,6373879.0,103.0,627.0,,01/01/1976,31/12/2019
+V532401001,L Ayguesa Saint-May [Pont De La Tune],Nivo-pluvial,NP,882796.0,6373223.0,473.0,382.0,,01/01/1976,19/11/2016
+V612501001,L Auzon a Mormoiron,Pluvial contrasté,PC,875144.0,6331230.0,75.0,201.0,,01/01/1976,31/12/2019
+V615502002,La Sorgue a Fontaine-De-Vaucluse[Sorgometre],Pluvial contrasté,PC,871318.0,6315538.0,1230.0,84.0,,01/01/1976,31/12/2019
+V712401001,Le Gardon De Mialet a Generargues[Roucan],Pluvial contrasté,PC,777546.0,6331663.0,240.0,140.0,,01/01/1976,14/12/2017
+V713501001,Le Gardon De Saint-Jeana Corbes [Roc Courbe],Pluvial contrasté,PC,777042.0,6331067.0,263.0,136.0,,01/01/1976,31/12/2019
+W022000201,Le Doron De Bozel a La Perriere[Vignotan],nivo-glaciaire,NG,980108.0,6489675.0,330.0,617.0,,01/01/1976,16/06/2003
+W024050000,Le Doron-De-Bellevillea Bettaix,nivo-glaciaire,NG,976117.0,6477673.0,67.0,1837.0,,01/01/1976,31/12/2010
+W030000201,L Isere a Aigueblanche,nivo-glaciaire,NG,974317.0,6494673.0,1579.0,544.0,,01/01/1976,31/12/2010
+W043050000,Le Doron a Albertville,Nival,NG,964817.0,6516273.0,273.0,585.0,,01/01/1980,31/12/2013
+W103000301,L Arc a Saussaz,nivo-glaciaire,NG,975917.0,6462973.0,946.0,1113.0,,01/01/1976,31/12/2010
+W141001001,L Isere a Grenoble,Nival,NG,917317.0,6459173.0,5688.0,211.0,,01/01/1981,31/08/2009
+W211401000,La Severaissea Villar-Loubiere,Nival,NG,948825.0,6418910.0,133.0,1023.0,,01/01/1976,31/12/2019
+W221050000,La Souloisea Infernet,Nivo-pluvial,NP,929517.0,6411773.0,205.0,1346.0,,01/01/1976,19/07/2017
+W222000101,Le Drac a Corps [Le Sautet],Nival,NG,929817.0,6417373.0,,819.0,,01/01/1976,31/12/2010
+W233521001,La Roizonnea La Valette [La Rochette],Nival,NG,926059.0,6431894.0,72.0,936.0,,31/03/1976,31/12/2019
+W271000101,La Romanche a Mizoen [Chambon Amont],nivo-glaciaire,NG,950629.0,6442772.0,220.0,1057.0,,01/01/1976,31/12/2017
+W273050001,Le Veneon Aux Etages,nivo-glaciaire,NG,953017.0,6430973.0,119.0,2151.0,,01/01/1976,03/07/2017
+W273050003,Le Veneon Au Plan-Du-Lac,nivo-glaciaire,NG,948017.0,6435973.0,237.0,1509.0,,22/07/1983,17/07/2015
+W275000201,L Eau Dolle a Allemond [La Perniere],Nival,NG,937616.0,6451477.0,172.0,713.0,,01/01/1976,31/12/2017
+W283201100,Le Drac a Fontaine,Nival,NG,911517.0,6459473.0,3596.0,211.0,,22/03/1983,31/12/2010
+W331501001,Le Meaudret a Meaudre,Nivo-pluvial,NP,899032.0,6449111.0,74.0,957.0,,01/01/1976,31/12/2019
+X001001002,La Durancea Val-Des-Pres[Les Alberts],Nival,NG,990197.0,6431741.0,207.0,1360.0,,01/01/1976,31/12/2019
+X031001001,La Durancea Embrun [La Clapiere],Nival,NG,976947.0,6389796.0,2170.0,787.0,,01/01/1976,31/12/2019
+X043401001,L Ubaye a Barcelonnette[Abattoir],Nival,NG,990876.0,6371693.0,549.0,1132.0,,28/03/1976,31/12/2019
+X045401001,L Ubaye Au Lauzet-Ubaye[Roche Rousse],Nival,NG,970552.0,6378162.0,946.0,790.0,,01/01/1976,31/12/2019
+X050551301,La Durancea Espinasses[Serre-Poncon],Nival,NG,960882.0,6380543.0,3580.0,652.0,,01/01/1976,31/12/2017
+X103402001,Le Buech a Serres [Les Chambons],Pluvio-nival,PN,915981.0,6375236.0,723.0,662.0,,01/01/1976,31/12/2014
+X113000101,La Durancea Oraison [Escale],Nival,NG,941223.0,6336557.0,6760.0,415.0,,01/01/1976,31/12/2008
+X122501001,Le Bes a La Javie [Esclangon-Peroure],Nivo-pluvial,NP,961634.0,6351865.0,165.0,805.0,,01/01/1976,31/12/2019
+X142000101,L Asse a Beynes [Chabrieres],Pluvio-nival,PN,960741.0,6329396.0,375.0,605.0,,01/01/1976,31/12/2017
+X200203001,Le Verdon a Colmars,Nival,NG,989717.0,6349173.0,156.0,1321.0,,01/01/1976,31/12/2019
+X211401001,L Issolea Saint-Andre-Les-Alpes[Mourefrey],Nivo-pluvial,NP,980909.0,6328023.0,137.0,931.0,,01/01/1976,31/12/2019
+X220202201,Le Verdon a Demandolx [Castillon],Nivo-pluvial,NP,984195.0,6315307.0,655.0,790.0,,01/01/1976,31/12/2017
+X260201001,Le Verdon a Sainte-Croix,Nivo-pluvial,NP,952417.0,6298173.0,1620.0,475.0,,01/01/1977,31/12/2018
+X300101301,La Durancea Cadarache,Nival,NG,920117.0,6294073.0,11714.0,259.0,,01/01/1976,31/12/2018
+Y065501001,Le Verdoublea Tautavel,Pluvial contrasté,PC,679053.0,6190147.0,305.0,91.0,,01/01/1976,31/12/2019
+Y082401001,La Berre a Villeseque-Des-Corbieres[Ripaud],Pluvial contrasté,PC,686459.0,6215456.0,166.0,56.0,,01/01/1976,31/12/2019
+Y110501001,Le Rebenty a Saint-Martin-Lys,Nivo-pluvial,NP,636708.0,6191002.0,241.0,373.0,,01/01/1976,31/12/2019
+Y113501001,La Salz a Cassaignes,Pluvial contrasté,PC,643417.0,6204930.0,144.0,248.0,,16/01/1982,31/12/2019
+Y122502001,Le Lauquet a Saint-Hilaire[Le Pech],Pluvial contrasté,PC,644273.0,6223602.0,173.0,147.0,,02/01/1983,14/10/2018
+Y132501001,Le Treboul a Villepinte,Pluvial contrasté,PC,626150.0,6242334.0,142.0,128.0,,01/01/1976,31/12/2019
+Y141502001,L Orbiel a Bouilhonnac[Villedubert],Pluvial contrasté,PC,653777.0,6237208.0,239.0,90.0,,15/03/1978,31/12/2019
+Y141621001,La Clamoux a Malves-En-Minervois,Pluvial contrasté,PC,654296.0,6239501.0,85.0,105.0,,01/01/1976,14/10/2018
+Y152401001,L Orbieu a Saint-Martin-Des-Puits,Pluvial contrasté,PC,664683.0,6215540.0,170.0,175.0,,01/01/1988,31/12/2019
+Y201002001,L Arre Au Vigan [La Terrisse],Pluvial contrasté,PC,752794.0,6322582.0,155.0,187.0,,01/01/1976,31/12/2019
+Y203002001,La Vis a Saint-Laurent-Le-Minier,Pluvial contrasté,PC,754735.0,6315873.0,499.0,149.0,,01/01/1976,31/12/2019
+Y210002001,L Heraulta Laroque,Pluvial contrasté,PC,759009.0,6313239.0,912.0,126.0,,01/01/1976,31/12/2019
+Y221001001,La Lergue a Lodeve,Pluvial contrasté,PC,726065.0,6292240.0,228.0,153.0,,01/01/1976,31/12/2019
+Y252002001,La Mare Au Pradal,Pluvial contrasté,PC,708987.0,6280896.0,114.0,202.0,,01/01/1976,31/12/2019
+Y254002001,Le Jaur a Olargues [Amont],Pluvial contrasté,PC,692736.0,6272842.0,226.0,160.0,,01/01/1985,31/12/2019
+Y402201001,L Arc a Meyreuil [Pont De Bayeux],Pluvial contrasté,PC,903390.0,6270151.0,303.0,165.0,,01/01/1976,31/12/2019
+Y500202001,L Argens[Source]a Seillons-Source-Dargens,Pluvial contrasté,PC,935254.0,6271341.0,135.0,270.0,,01/01/1976,31/12/2019
+Y503201001,L Argensa Chateauvert,Pluvial contrasté,PC,944858.0,6271493.0,485.0,175.0,,01/01/1976,31/12/2019
+Y510501001,Le Caramy a Vins-Sur-Caramy[Les Marcounious],Pluvial contrasté,PC,956993.0,6265395.0,215.0,172.0,,01/01/1976,31/12/2019
+Y523561001,La Nartuby a Chateaudouble[Rebouillon],Pluvial contrasté,PC,976509.0,6281210.0,111.0,224.0,,01/01/1976,13/06/2010
+Y531201001,L Argensa Roquebrune-Sur-Argens,Pluvial contrasté,PC,994075.0,6267972.0,2530.0,6.0,,01/01/1976,31/12/2019
+Y604201001,Le Var a Entrevaux [Pont-Levis],Nivo-pluvial,NP,1005749.0,6324112.0,676.0,465.0,,01/01/1976,31/12/2019
+Y624000101,Le Var a Malaussene[La Mescla],Nival,NG,1036792.0,6321146.0,1830.0,170.0,,01/01/1976,31/12/2016
+Y643401001,L EsteronAu Broc [La Clave],Pluvial contrasté,PC,1034133.0,6314076.0,451.0,131.0,,01/01/1976,31/12/2019
+Y644201001,Le Var a Nice [Pont NapoleonIii],Nivo-pluvial,NP,1038554.0,6293958.0,2820.0,3.0,,01/01/1976,01/06/2018
+Y662000301,La Roya a Breil-Sur-Roya,Nivo-pluvial,NP,1062401.0,6325692.0,461.0,211.0,,01/01/1976,31/12/2017
+Y700000201,Le Golo a Albertacce,Pluvio-nival,PN,1193000.0,6154150.0,96.0,816.0,,09/05/1979,31/12/2019
+Y862000101,Le Taravo a Zigliara [Pont Dabra],Pluvio-nival,PN,1195900.0,6097500.0,331.0,130.0,,01/01/1976,31/12/2019
+Y881000102,Le Rizzanesea Zoza,Pluvial contrasté,PC,1206300.0,6088900.0,130.0,300.0,,01/01/1976,29/04/2012
+Y902000101,Le Vecchio a Venaco [Pont De Noceta],Pluvio-nival,PN,1212700.0,6145025.0,147.0,237.0,,01/01/1976,31/12/2019
