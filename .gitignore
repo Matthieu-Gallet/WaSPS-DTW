@@ -5,5 +5,3 @@ __pycache__/
 src/dev.ipynb
 src/results/classification_dataset/*
 *.png
-src/results/regime_classification/one-shot/barycenter_grids/*.png
-src/results/regime_classification/one-shot/class_pairs/*.png

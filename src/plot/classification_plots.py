@@ -130,7 +130,6 @@ def plot_confusion_matrices(results: Dict, Y_test: np.ndarray,
         output_path.mkdir(parents=True, exist_ok=True)
         if save_pdf:
             plt.savefig(output_path / "confusion_matrices.pdf", bbox_inches='tight', dpi=300)
-        plt.savefig(output_path / "confusion_matrices.png", bbox_inches='tight', dpi=300)
     
     plt.close()
 
@@ -229,7 +228,6 @@ def plot_barycenter_with_samples(results: Dict, X_train_raw: List[np.ndarray],
         output_path.mkdir(parents=True, exist_ok=True)
         if save_pdf:
             plt.savefig(output_path / "barycenters_with_samples.pdf", bbox_inches='tight', dpi=300)
-        plt.savefig(output_path / "barycenters_with_samples.png", bbox_inches='tight', dpi=300)
     
     plt.close()
 
@@ -320,7 +318,6 @@ def plot_gamma_sensitivity(results: Dict, output_dir: str = None, save_pdf: bool
         output_path.mkdir(parents=True, exist_ok=True)
         if save_pdf:
             plt.savefig(output_path / "gamma_sensitivity.pdf", bbox_inches='tight', dpi=300)
-        plt.savefig(output_path / "gamma_sensitivity.png", bbox_inches='tight', dpi=300)
     
     plt.close()
 
@@ -407,7 +404,6 @@ def plot_sample_size_sensitivity(results: Dict, output_dir: str = None, save_pdf
         output_path.mkdir(parents=True, exist_ok=True)
         if save_pdf:
             plt.savefig(output_path / "sample_size_sensitivity.pdf", bbox_inches='tight', dpi=300)
-        plt.savefig(output_path / "sample_size_sensitivity.png", bbox_inches='tight', dpi=300)
     
     plt.close()
 
@@ -472,7 +468,6 @@ def plot_kfold_boxplots(aggregated_results: Dict, idx_to_regime: Dict[int, str],
         output_path.mkdir(parents=True, exist_ok=True)
         if save_pdf:
             plt.savefig(output_path / "kfold_boxplot.pdf", bbox_inches='tight', dpi=300)
-        plt.savefig(output_path / "kfold_boxplot.png", bbox_inches='tight', dpi=300)
     
     plt.close()
 
@@ -594,7 +589,6 @@ def plot_summary_figure(results: Dict, Y_test: np.ndarray, idx_to_regime: Dict[i
         output_path.mkdir(parents=True, exist_ok=True)
         if save_pdf:
             plt.savefig(output_path / "summary_figure.pdf", bbox_inches='tight', dpi=300)
-        plt.savefig(output_path / "summary_figure.png", bbox_inches='tight', dpi=300)
     
     plt.close()
 
@@ -774,7 +768,6 @@ def plot_class_pair_barycenters(barycenters: Dict[int, np.ndarray],
             filename = f"pair_{class1_name}_{class2_name}_{method_suffix}"
             if save_pdf:
                 plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
-            plt.savefig(output_path / f"{filename}.png", bbox_inches='tight', dpi=300)
         
         plt.close()
 
@@ -890,6 +883,5 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
             filename = f"grid_param_{param_idx}_{param_names[param_idx]}_{method_suffix}"
             if save_pdf:
                 plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
-            plt.savefig(output_path / f"{filename}.png", bbox_inches='tight', dpi=300)
         
         plt.close()
