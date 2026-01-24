@@ -116,7 +116,7 @@ def plot_confusion_matrices(results: Dict, Y_test: np.ndarray,
         
         # Add F1 score below title
         f1 = results[method_key]['f1_weighted']
-        ax.text(0.5, -0.25, f'F1={f1:.3f}', transform=ax.transAxes, 
+        ax.text(0.5, -0.35, f'F1={f1:.3f}', transform=ax.transAxes, 
                 ha='center', fontsize=8)
     
     # Add colorbar
@@ -155,12 +155,12 @@ def plot_barycenter_with_samples(results: Dict, X_train_raw: List[np.ndarray],
         idx_to_regime: Mapping from label index to regime code
         output_dir: Output directory for saving
         save_pdf: Whether to save as PDF
-        param_names: Names of parameters (default: ['α', 'β', 'λ', 'γ'])
+        param_names: Names of parameters (default: ['λ', 'β', 'γ', 'δ'])
     """
     setup_ieee_style()
     
     if param_names is None:
-        param_names = ['α', 'β', 'λ', 'γ']
+        param_names = ['λ', 'β', 'γ', 'δ']
     
     unique_classes = np.unique(Y_train)
     n_classes = len(unique_classes)
@@ -216,7 +216,7 @@ def plot_barycenter_with_samples(results: Dict, X_train_raw: List[np.ndarray],
             if class_idx == n_classes - 1:
                 # Format x-axis with months
                 ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
-                ax.tick_params(axis='x', rotation=45)
+                ax.tick_params(axis='x', rotation=0)
             else:
                 ax.set_xticklabels([])
             
@@ -240,7 +240,7 @@ def plot_barycenter_with_samples(results: Dict, X_train_raw: List[np.ndarray],
 
 def plot_gamma_sensitivity(results: Dict, output_dir: str = None, save_pdf: bool = True):
     """
-    Plot gamma sensitivity analysis results.
+    Plot gamma sensitivity analysis results with boxplots.
     
     Args:
         results: Dictionary with gamma sensitivity results (keyed by gamma values)
@@ -251,29 +251,67 @@ def plot_gamma_sensitivity(results: Dict, output_dir: str = None, save_pdf: bool
     
     # Extract gamma values and metrics from results
     gamma_values = sorted(results.keys())
-    
-    fig, ax = plt.subplots(figsize=(3.5, 2.5))
+    n_gammas = len(gamma_values)
     
     # Method names and colors
     methods = [
-        ('euclidean_raw', 'Soft-DTW Euclidean (Raw)', 'tab:blue', 'o'),
-        ('euclidean_params', 'Soft-DTW Euclidean (Params)', 'tab:orange', 's'),
-        ('wasserstein_params', 'Soft-DTW Wasserstein (Params)', 'tab:green', '^')
+        ('euclidean_raw', 'Soft-DTW Euclidean (Raw)', 'tab:blue'),
+        ('euclidean_params', 'Soft-DTW Euclidean (Params)', 'tab:orange'),
+        ('wasserstein_params', 'Soft-DTW Wasserstein (Params)', 'tab:green')
     ]
     
-    for method_key, method_name, color, marker in methods:
-        f1_means = [results[gamma][method_key]['f1_weighted_mean'] for gamma in gamma_values]
-        f1_stds = [results[gamma][method_key]['f1_weighted_std'] for gamma in gamma_values]
-        
-        ax.errorbar(gamma_values, f1_means, yerr=f1_stds, marker=marker, color=color, 
-                   label=method_name, markersize=4, linewidth=1, capsize=3, capthick=0.5)
+    fig, ax = plt.subplots(figsize=(7, 2.5))
     
-    ax.set_xscale('log')
+    # Prepare data for boxplots - organize by gamma first, then method
+    positions = []
+    data_to_plot = []
+    colors_list = []
+    
+    for gamma_idx, gamma in enumerate(gamma_values):
+        for method_idx, (method_key, method_name, color) in enumerate(methods):
+            # Get all F1 scores for this gamma and method
+            if 'all_f1_weighted' in results[gamma][method_key]:
+                f1_scores = results[gamma][method_key]['all_f1_weighted']
+            else:
+                # Fallback if all scores not available
+                f1_scores = [results[gamma][method_key]['f1_weighted_mean']]
+            
+            pos = gamma_idx * (len(methods) + 1) + method_idx
+            positions.append(pos)
+            data_to_plot.append(f1_scores)
+            colors_list.append(color)
+    
+    # Create boxplots
+    bp = ax.boxplot(data_to_plot, positions=positions, widths=0.6, patch_artist=True,
+                    showfliers=False, medianprops={'linewidth': 1.5, 'color': 'black'})
+    
+    # Color the boxes
+    for patch, color in zip(bp['boxes'], colors_list):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+    
+    # Set x-axis
+    center_positions = [i * (len(methods) + 1) + 1 for i in range(n_gammas)]
+    ax.set_xticks(center_positions)
+    ax.set_xticklabels([f'{g:.0e}' if g < 0.1 or g > 10 else f'{g:.1f}' for g in gamma_values])
     ax.set_xlabel('Gamma (γ)')
     ax.set_ylabel('F1 Score (weighted)')
-    ax.legend(loc='lower right', fontsize=7)
-    ax.grid(True, alpha=0.3)
-    ax.set_ylim(0, 1)
+    ax.grid(True, alpha=0.3, axis='y')
+    
+    # Calculate dynamic ylim based on data
+    all_f1_values = []
+    for data in data_to_plot:
+        all_f1_values.extend(data)
+    f1_min = min(all_f1_values)
+    f1_max = max(all_f1_values)
+    ax.set_ylim(0.75 * f1_min, 1.25 * f1_max)
+    
+    # Add legend horizontally below the figure
+    legend_handles = [plt.Rectangle((0,0),1,1, facecolor=color, alpha=0.7) 
+                     for _, _, color in methods]
+    legend_labels = [name for _, name, _ in methods]
+    ax.legend(legend_handles, legend_labels, loc='upper center', 
+             bbox_to_anchor=(0.5, -0.20), ncol=3, fontsize=7, frameon=False)
     
     plt.tight_layout()
     
@@ -289,7 +327,7 @@ def plot_gamma_sensitivity(results: Dict, output_dir: str = None, save_pdf: bool
 
 def plot_sample_size_sensitivity(results: Dict, output_dir: str = None, save_pdf: bool = True):
     """
-    Plot sample size sensitivity analysis results with error bars.
+    Plot sample size sensitivity analysis results with boxplots.
     
     Args:
         results: Dictionary with sample size sensitivity results (keyed by sample sizes)
@@ -300,29 +338,67 @@ def plot_sample_size_sensitivity(results: Dict, output_dir: str = None, save_pdf
     
     # Extract sample sizes and metrics from results
     sample_sizes = sorted(results.keys())
-    
-    fig, ax = plt.subplots(figsize=(3.5, 2.5))
+    n_sizes = len(sample_sizes)
     
     # Method names and colors
     methods = [
-        ('euclidean_raw', 'Soft-DTW Euclidean (Raw)', 'tab:blue', 'o'),
-        ('euclidean_params', 'Soft-DTW Euclidean (Params)', 'tab:orange', 's'),
-        ('wasserstein_params', 'Soft-DTW Wasserstein (Params)', 'tab:green', '^')
+        ('euclidean_raw', 'Soft-DTW Euclidean (Raw)', 'tab:blue'),
+        ('euclidean_params', 'Soft-DTW Euclidean (Params)', 'tab:orange'),
+        ('wasserstein_params', 'Soft-DTW Wasserstein (Params)', 'tab:green')
     ]
     
-    for method_key, method_name, color, marker in methods:
-        f1_means = [results[size][method_key]['f1_weighted_mean'] for size in sample_sizes]
-        f1_stds = [results[size][method_key]['f1_weighted_std'] for size in sample_sizes]
-        
-        ax.errorbar(sample_sizes, f1_means, yerr=f1_stds, marker=marker, 
-                   color=color, label=method_name, markersize=4, linewidth=1,
-                   capsize=3, capthick=0.5)
+    fig, ax = plt.subplots(figsize=(7, 2.5))
     
+    # Prepare data for boxplots - organize by sample size first, then method
+    positions = []
+    data_to_plot = []
+    colors_list = []
+    
+    for size_idx, size in enumerate(sample_sizes):
+        for method_idx, (method_key, method_name, color) in enumerate(methods):
+            # Get all F1 scores for this size and method
+            if 'all_f1_weighted' in results[size][method_key]:
+                f1_scores = results[size][method_key]['all_f1_weighted']
+            else:
+                # Fallback if all scores not available
+                f1_scores = [results[size][method_key]['f1_weighted_mean']]
+            
+            pos = size_idx * (len(methods) + 1) + method_idx
+            positions.append(pos)
+            data_to_plot.append(f1_scores)
+            colors_list.append(color)
+    
+    # Create boxplots
+    bp = ax.boxplot(data_to_plot, positions=positions, widths=0.6, patch_artist=True,
+                    showfliers=False, medianprops={'linewidth': 1.5, 'color': 'black'})
+    
+    # Color the boxes
+    for patch, color in zip(bp['boxes'], colors_list):
+        patch.set_facecolor(color)
+        patch.set_alpha(0.7)
+    
+    # Set x-axis
+    center_positions = [i * (len(methods) + 1) + 1 for i in range(n_sizes)]
+    ax.set_xticks(center_positions)
+    ax.set_xticklabels([f'{s:.2f}' if s < 1 else f'{int(s)}' for s in sample_sizes])
     ax.set_xlabel('Training Sample Fraction')
     ax.set_ylabel('F1 Score (weighted)')
-    ax.legend(loc='lower right', fontsize=7)
-    ax.grid(True, alpha=0.3)
-    ax.set_ylim(0, 1)
+    ax.grid(True, alpha=0.3, axis='y')
+    
+    # Calculate dynamic ylim based on data
+    all_f1_values = []
+    for data in data_to_plot:
+        all_f1_values.extend(data)
+    f1_min = min(all_f1_values)
+    f1_max = max(all_f1_values)
+    ax.set_ylim(0.75 * f1_min, 1.25 * f1_max)
+    
+    # Add legend horizontally below the figure
+    legend_handles = [plt.Rectangle((0,0),1,1, facecolor=color, alpha=0.7) 
+                     for _, _, color in methods]
+    legend_labels = [name for _, name, _ in methods]
+    ax.legend(legend_handles, legend_labels, loc='upper center', 
+             bbox_to_anchor=(0.5, -0.20), ncol=3, fontsize=7, frameon=False)
     
     plt.tight_layout()
     
@@ -553,13 +629,13 @@ def plot_class_pair_barycenters(barycenters: Dict[int, np.ndarray],
         output_dir: Output directory for saving
         save_pdf: Whether to save as PDF
         n_samples: Number of samples to plot per class (default: 10)
-        param_names: Names of parameters (default: ['α', 'β', 'λ', 'γ'])
+        param_names: Names of parameters (default: ['λ', 'β', 'γ', 'δ'])
         is_raw_data: Whether data is raw (True) or parameters (False)
     """
     setup_ieee_style()
     
     if param_names is None:
-        param_names = ['α', 'β', 'λ', 'γ']
+        param_names = ['λ', 'β', 'γ', 'δ']
     
     unique_classes = sorted(barycenters.keys())
     n_classes = len(unique_classes)
@@ -655,7 +731,7 @@ def plot_class_pair_barycenters(barycenters: Dict[int, np.ndarray],
                 if col_idx == 0:
                     ax.set_ylabel('Discharge (mean)')
                 ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
-                ax.tick_params(axis='x', rotation=45)
+                ax.tick_params(axis='x', rotation=0)
                 ax.grid(True, alpha=0.3)
                 ax.legend(loc='upper right', fontsize=7)
                 
@@ -682,7 +758,7 @@ def plot_class_pair_barycenters(barycenters: Dict[int, np.ndarray],
                     if param_idx == n_features - 1:
                         ax.set_xlabel('Date')
                         ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
-                        ax.tick_params(axis='x', rotation=45)
+                        ax.tick_params(axis='x', rotation=0)
                     else:
                         ax.set_xticklabels([])
                     
@@ -693,7 +769,9 @@ def plot_class_pair_barycenters(barycenters: Dict[int, np.ndarray],
         plt.tight_layout()
         
         if output_dir:
-            filename = f"pair_{class1_name}_{class2_name}"
+            # Clean method name for filename
+            method_suffix = method_name.replace(' ', '_').replace('(', '').replace(')', '').replace('-', '_')
+            filename = f"pair_{class1_name}_{class2_name}_{method_suffix}"
             if save_pdf:
                 plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
             plt.savefig(output_path / f"{filename}.png", bbox_inches='tight', dpi=300)
@@ -725,12 +803,12 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
         output_dir: Output directory for saving
         save_pdf: Whether to save as PDF
         n_samples: Number of samples to plot per class (default: 10)
-        param_names: Names of parameters (default: ['α', 'β', 'λ', 'γ'])
+        param_names: Names of parameters (default: ['λ', 'β', 'γ', 'δ'])
     """
     setup_ieee_style()
     
     if param_names is None:
-        param_names = ['α', 'β', 'λ', 'γ']
+        param_names = ['λ', 'β', 'γ', 'δ']
     
     unique_classes = sorted(barycenters.keys())
     n_classes = len(unique_classes)
@@ -793,7 +871,7 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
                 ax.set_ylabel(param_names[param_idx], fontsize=9)
             if row == n_rows - 1:
                 ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
-                ax.tick_params(axis='x', rotation=45)
+                ax.tick_params(axis='x', rotation=0)
             else:
                 ax.set_xticklabels([])
             ax.grid(True, alpha=0.3)
@@ -807,7 +885,9 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
         plt.tight_layout()
         
         if output_dir:
-            filename = f"grid_param_{param_idx}_{param_names[param_idx]}"
+            # Clean method name for filename
+            method_suffix = method_name.replace(' ', '_').replace('(', '').replace(')', '').replace('-', '_')
+            filename = f"grid_param_{param_idx}_{param_names[param_idx]}_{method_suffix}"
             if save_pdf:
                 plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
             plt.savefig(output_path / f"{filename}.png", bbox_inches='tight', dpi=300)

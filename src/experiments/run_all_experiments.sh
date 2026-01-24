@@ -7,8 +7,8 @@ source /home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/
 
 # Variables de sélection des classifications
 classif1=True  # one-shot
-classif2=True  # kfold
-classif3=True  # gamma-sens
+classif2=False  # kfold
+classif3=False  # gamma-sens
 classif4=True  # sample-sens
 
 # Variables de sélection des simulations
