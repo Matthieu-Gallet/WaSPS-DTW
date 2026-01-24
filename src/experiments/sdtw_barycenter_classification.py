@@ -28,20 +28,35 @@ from sklearn.model_selection import train_test_split
 parent_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(parent_dir))
 
-from classification import (
+# Data loading and preprocessing
+from dataloader import (
     load_classification_dataset,
     preprocess_samples,
-    estimate_parameters_for_samples,
+    estimate_parameters_for_samples
+)
+
+# Evaluation functions
+from experiments.classification_evaluation import (
     evaluate_classification,
     print_detailed_results,
     save_results_to_csv,
-    run_kfold_classification,
+    run_kfold_classification
+)
+
+# Sensitivity analysis
+from experiments.classification_sensitivity import (
     run_gamma_sensitivity_analysis,
-    run_sample_size_sensitivity_analysis,
+    run_sample_size_sensitivity_analysis
+)
+
+# Visualization
+from plot import (
     plot_confusion_matrices,
     plot_barycenter_with_samples,
     plot_gamma_sensitivity,
-    plot_sample_size_sensitivity
+    plot_sample_size_sensitivity,
+    plot_class_pair_barycenters,
+    plot_all_class_barycenters_grid
 )
 
 
@@ -109,13 +124,13 @@ Examples:
     
     # Gamma sensitivity parameters
     parser.add_argument(
-        "--gamma-values", type=str, default="0.1,0.5,1.0,2.0,5.0,10.0",
+        "--gamma-values", type=str, default="0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0",
         help="Comma-separated gamma values for sensitivity analysis"
     )
     
     # Sample size sensitivity parameters
     parser.add_argument(
-        "--sample-sizes", type=str, default="0.2,0.4,0.6,0.8,1.0",
+        "--sample-sizes", type=str, default="0.05,0.1,0.2,0.4,0.6,0.8,1.0",
         help="Comma-separated sample sizes (fractions) for sensitivity analysis"
     )
     
@@ -125,15 +140,15 @@ Examples:
         help="Soft-DTW regularization parameter (for one-shot and kfold modes)"
     )
     parser.add_argument(
-        "--max-time-steps", type=int, default=100,
+        "--max-time-steps", type=int, default=250,
         help="Maximum number of time steps to use"
     )
     parser.add_argument(
-        "--sgd-epochs", type=int, default=100,
+        "--sgd-epochs", type=int, default=250,
         help="Number of epochs for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
-        "--sgd-lr", type=float, default=0.05,
+        "--sgd-lr", type=float, default=0.075,
         help="Learning rate for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
@@ -147,7 +162,7 @@ Examples:
         help="Generate barycenter plots with training samples"
     )
     parser.add_argument(
-        "--n-samples-plot", type=int, default=10,
+        "--n-samples-plot", type=int, default=20,
         help="Number of samples per class to plot with barycenters"
     )
     
@@ -250,13 +265,36 @@ Examples:
                 ('euclidean_params', 'Soft-DTW Euclidean (Parameters)', X_train_params, False),
                 ('wasserstein_params', 'Soft-DTW Wasserstein (Parameters)', X_train_params, False)
             ]
+            
+            # Generate class pair plots (A4 format, 2x1 layout)
+            print("  Generating class pair barycenter plots...")
             for method_key, method_name, train_data, is_raw in methods:
-                plot_barycenter_with_samples(
-                    results[method_key]['barycenters'], train_data, Y_train,
-                    metadata['idx_to_regime'], method_name, output_dir,
-                    n_samples_per_class=args.n_samples_plot,
-                    time_coords=time_coords, is_raw_data=is_raw
+                plot_class_pair_barycenters(
+                    barycenters=results[method_key]['barycenters'],
+                    X_train=train_data,
+                    Y_train=Y_train,
+                    idx_to_regime=metadata['idx_to_regime'],
+                    method_name=method_name,
+                    output_dir=output_dir,
+                    save_pdf=True,
+                    n_samples=args.n_samples_plot,
+                    is_raw_data=is_raw
                 )
+            
+            # Generate grid plots (all classes, one figure per parameter)
+            print("  Generating grid barycenter plots...")
+            for method_key, method_name, train_data, is_raw in methods:
+                if not is_raw:  # Only for parameter-based methods
+                    plot_all_class_barycenters_grid(
+                        barycenters=results[method_key]['barycenters'],
+                        X_train=train_data,
+                        Y_train=Y_train,
+                        idx_to_regime=metadata['idx_to_regime'],
+                        method_name=method_name,
+                        output_dir=output_dir,
+                        save_pdf=True,
+                        n_samples=args.n_samples_plot
+                    )
         
         # Print summary
         print("\n" + "=" * 80)
