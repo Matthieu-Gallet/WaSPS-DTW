@@ -5,3 +5,6 @@ __pycache__/
 src/dev.ipynb
 src/results/classification_dataset/*
 *.png
+src/results/*
+.old/
+.github/

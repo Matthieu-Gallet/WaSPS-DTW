@@ -7,15 +7,15 @@ source /home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/
 
 # Variables de sélection des classifications
 classif1=True  # one-shot
-classif2=False  # kfold
+classif2=True  # kfold
 classif3=False  # gamma-sens
-classif4=True  # sample-sens
+classif4=False # sample-sens
 
 # Variables de sélection des simulations
-simu1=True  # barycenter_rmse_analysis.py
-simu2=True  # geographic_barycenter.py
-simu3=True  # simu_complex.py
-simu4=True  # simu_simple.py
+simu1=False  # barycenter_rmse_analysis.py
+simu2=False  # geographic_barycenter.py
+simu3=False  # simu_complex.py
+simu4=False  # simu_simple.py
 
 # Classifications conditionnelles
 if [ "$classif1" = "True" ]; then

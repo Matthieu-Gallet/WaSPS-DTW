@@ -89,12 +89,12 @@ Examples:
     # Data arguments
     parser.add_argument(
         "--data-dir", type=str,
-        default=str(Path(__file__).parent.parent / "results" / "classification_dataset"),
+        default=str(Path(__file__).parent.parent / "results" / "classification_dataset" ),
         help="Directory containing the classification dataset"
     )
     parser.add_argument(
         "--output-dir", type=str,
-        default=str(Path(__file__).parent.parent / "results" / "regime_classification"),
+        default=str(Path(__file__).parent.parent / "results" / "regime_classification" / "balanced"),
         help="Output directory for results"
     )
     parser.add_argument(
@@ -136,15 +136,15 @@ Examples:
     
     # General parameters
     parser.add_argument(
-        "--gamma", type=float, default=1.0,
+        "--gamma", type=float, default=10.0,
         help="Soft-DTW regularization parameter (for one-shot and kfold modes)"
     )
     parser.add_argument(
-        "--max-time-steps", type=int, default=250,
+        "--max-time-steps", type=int, default=400,
         help="Maximum number of time steps to use"
     )
     parser.add_argument(
-        "--sgd-epochs", type=int, default=250,
+        "--sgd-epochs", type=int, default=400,
         help="Number of epochs for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
