@@ -3,12 +3,6 @@ MLP predictor training with SGD for time series prediction using Soft-DTW.
 """
 
 import numpy as np
-import sys
-from pathlib import Path
-
-# Add parent directory for sdtw access
-parent_dir = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(parent_dir))
 
 from sdtw import SoftDTW
 from sdtw.distance import SquaredEuclidean, WassersteinDistance

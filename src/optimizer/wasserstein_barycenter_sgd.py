@@ -4,27 +4,18 @@ SGD-based barycenter computation for Soft-DTW with Wasserstein distance.
 
 import numpy as np
 import time as time_module
-import sys
-from pathlib import Path
-
-# Add parent directory for sdtw access
-parent_dir = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(parent_dir))
 
 from sdtw import SoftDTW
 from sdtw.distance import WassersteinDistance
-
-# Import estimators
-import sys
-sys.path.insert(0, str(parent_dir / 'src'))
-from estimator import MLE, LogCumulant
+from src.estimator import MLE, LogCumulant
 
 
 def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
                    num_epochs=100, batch_size=1, tol=1e-6, verbose=True,
                    lr_decay=0.95, grad_clip=10.0, distribution="exponential",
                    use_softplus=False, barycenter_init_method='mean_lambda', warmup_epochs=10, seed=123,
-                   estimator_method='log_cumulant', X_is_params=False):
+                   estimator_method='log_cumulant', X_is_params=False,
+                   lambda_min=1e-3):
     """
     Simple Stochastic Gradient Descent for Soft-DTW barycenter computation.
 
@@ -63,6 +54,9 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
         Parameter estimation method: 'log_cumulant' (default) or 'mle'
     X_is_params : bool
         If True, X already contains parameters (skip estimation). Default False.
+    lambda_min : float
+        Minimum allowed lambda value; prevents barycenter from collapsing toward
+        zero during optimization (Wasserstein cost diverges as lambda → 0).
 
     Returns
     -------
@@ -131,7 +125,6 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
     elif barycenter_init_method == 'mean_lambda':
         # Compute mean of all lambda series, handling different lengths
         barycenter_init = np.mean(np.array([x.flatten() for x in X_params_list]), axis=0).reshape(-1, 1)
-        print(f"  [DEBUG] Barycenter init (mean_lambda): shape={barycenter_init.shape}")
 
     # Initialize barycenter - choose parameterization
     Z_init = barycenter_init.copy().astype(np.float64)
@@ -232,6 +225,9 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
 
                 # Update in transformed space
                 transformed_Z -= current_lr * G_transformed
+                # Prevent lambda from collapsing: clip z so softplus(z) >= lambda_min
+                z_min = np.log(np.expm1(max(lambda_min, 1e-8)))
+                transformed_Z = np.maximum(transformed_Z, z_min)
             else:
                 # Direct update with clipping
                 grad_norm = np.linalg.norm(G)

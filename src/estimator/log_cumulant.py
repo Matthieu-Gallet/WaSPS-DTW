@@ -6,14 +6,7 @@ Automatically detects if input is a single sample set or a time series (2D).
 """
 
 import numpy as np
-import sys
-from pathlib import Path
 
-# Add parent directory for sdtw access
-parent_dir = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(parent_dir))
-
-# Import Cython implementation (required)
 from sdtw.wasserstein_fast import estimate_exponential_fast as _estimate_exponential_cython
 
 
