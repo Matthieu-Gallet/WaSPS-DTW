@@ -6,4 +6,9 @@ scikit-learn
 matplotlib
 xarray
 netcdf4
-chainer
+zarr<3
+tqdm
+pyyaml
+seaborn
+tikzplotlib
+pyproj

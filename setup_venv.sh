@@ -1,51 +1,41 @@
 #!/bin/bash
+# Set up the virtual environment and build the sdtw Cython extensions.
+#
+# Usage: bash setup_venv.sh
+#
+# After running this script, create scripts/env.sh from scripts/env.sh.example
+# and fill in the machine-specific paths before running any experiments.
 
-# Script pour créer un environnement virtuel Python et installer les dépendances
+set -euo pipefail
 
-# Nom de l'environnement virtuel
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_NAME="venv"
 
-# Créer l'environnement virtuel
-echo "Création de l'environnement virtuel '$VENV_NAME'..."
-python3 -m venv $VENV_NAME
+echo "=== Creating virtual environment '$VENV_NAME' ==="
+python3 -m venv "$VENV_NAME"
+source "$VENV_NAME/bin/activate"
 
-# Activer l'environnement virtuel
-echo "Activation de l'environnement virtuel..."
-source $VENV_NAME/bin/activate
-
-# Mettre à jour pip
-echo "Mise à jour de pip..."
+echo "=== Upgrading pip ==="
 pip install --upgrade pip
 
-# Installer les dépendances depuis requirements.txt
-echo "Installation des dépendances..."
+echo "=== Installing Python dependencies ==="
 pip install -r requirements.txt
 
-# Installer les dépendances supplémentaires pour soft-dtw
-echo "Installation des dépendances supplémentaires pour soft-dtw..."
-pip install cython nose pytest
-
-# Cloner et installer soft-dtw
-echo "Installation de soft-dtw..."
-if [ ! -d "soft-dtw" ]; then
-    git clone https://github.com/mblondel/soft-dtw.git
-fi
-cd soft-dtw
+echo "=== Building sdtw Cython extensions ==="
+cd "$PROJECT_ROOT/lib"
 python setup.py build_ext --inplace
-python setup.py install
-cd ..
+cd "$PROJECT_ROOT"
 
 echo ""
-echo "=== Installation terminée ==="
-echo "Pour utiliser soft-dtw dans vos scripts Python, ajoutez cette ligne au début :"
-echo "import sys; sys.path.insert(0, '$PWD/soft-dtw')"
+echo "=== Setup complete ==="
 echo ""
-echo "Ou activez l'environnement virtuel avec : source venv/bin/activate"
-echo "Puis configurez PYTHONPATH avec : export PYTHONPATH=\"$PWD/soft-dtw:\$PYTHONPATH\""
+echo "Next steps:"
+echo "  1. Copy scripts/env.sh.example to scripts/env.sh and fill in your paths."
+echo "  2. Run experiments via: bash scripts/run_all_experiments.sh"
 echo ""
-echo "Test de l'installation :"
-echo "  source venv/bin/activate"
-echo "  export PYTHONPATH=\"$PWD/soft-dtw:\$PYTHONPATH\""
-echo "  cd soft-dtw && python -m pytest sdtw/tests/test_soft_dtw.py sdtw/tests/test_path.py -v"
+echo "To import from the project in a Python session:"
+echo "  source $PROJECT_ROOT/venv/bin/activate"
+echo "  export PYTHONPATH=\"$PROJECT_ROOT:$PROJECT_ROOT/lib:\$PYTHONPATH\""
 echo ""
-echo "Note: Le test test_chainer_func.py peut échouer à cause d'incompatibilités avec NumPy 2.0"
+echo "To run the sdtw unit tests:"
+echo "  cd $PROJECT_ROOT/lib && python -m pytest sdtw/tests/ -v"
