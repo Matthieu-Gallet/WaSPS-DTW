@@ -8,6 +8,10 @@ dist/
 # Cython build artefacts
 lib/sdtw/**/*.c
 lib/sdtw/**/*.so
+lib/builds
+
+# Markdown note files.
+*.md
 
 # Virtual environment
 venv/
@@ -28,3 +32,7 @@ results/
 # Data files
 *.nc
 *.zarr/
+data/
+
+# System files
+*.DS_Store
