@@ -17,7 +17,8 @@ sys.path.insert(0, str(parent_dir))
 from sdtw.barycenter import sdtw_barycenter
 from sdtw import SoftDTW
 from sdtw.distance import SquaredEuclidean, WassersteinDistance
-from optimizer import sgd_barycenter
+# Lazy import to avoid circular dependency (optimizer -> sdtw -> classification_methods -> optimizer)
+# sgd_barycenter is imported inside the function that uses it
 
 
 # =============================================================================
@@ -96,6 +97,7 @@ def compute_barycenter_wasserstein_sgd(params_list: List[np.ndarray], gamma: flo
         Barycenter parameters array with shape (T, 1)
     """
     # SGD barycenter expects parameters directly
+    from optimizer.wasserstein_barycenter_sgd import sgd_barycenter  # lazy import
     barycenter, _ = sgd_barycenter(
         params_list, gamma=gamma, barycenter_init_method='mean_lambda',
         learning_rate=learning_rate, num_epochs=num_epochs, batch_size=batch_size,

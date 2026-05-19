@@ -13,6 +13,12 @@ from .classification_loader import (
     preprocess_samples,
     estimate_parameters_for_samples
 )
+from .cpazmal_loader import (
+    MLDatasetLoader,
+    download_cpazmal,
+    windows_to_time_series,
+    extract_time_series,
+)
 
 __all__ = [
     'load_data',
@@ -20,8 +26,13 @@ __all__ = [
     'extract_multiple_windows_around_position',
     'split_train_test',
     'create_sliding_windows',
-    # Classification
+    # Classification (UCR-style)
     'load_classification_dataset',
     'preprocess_samples',
-    'estimate_parameters_for_samples'
+    'estimate_parameters_for_samples',
+    # CPAZMaL SAR dataset
+    'MLDatasetLoader',
+    'download_cpazmal',
+    'windows_to_time_series',
+    'extract_time_series',
 ]

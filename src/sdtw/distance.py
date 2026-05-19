@@ -188,17 +188,17 @@ class WassersteinDistance(object):
     
     def jacobian_product(self, E):
         """
-        Compute Jacobian product for Wasserstein distances.
+        Compute Jacobian product for Wasserstein distances w.r.t. X parameters.
         
         Parameters
         ----------
         E : array, shape = [m, n]
-            Input matrix
+            Input matrix (gradient w.r.t. distance matrix from SoftDTW backward)
             
         Returns
         -------
-        G : array, shape = [m, d]
-            Jacobian product where d=1 for exponential
+        G : array, shape = [m, 1]
+            Jacobian product dL/dλ_x, where d=1 for exponential.
             
         Notes
         -----
@@ -207,7 +207,6 @@ class WassersteinDistance(object):
         """
         E = np.asarray(E, dtype=np.float64)
         
-        # Estimate parameters for X and Y
         if self.distribution == 'exponential':
             G = np.zeros((self.X.shape[0], 1), dtype=np.float64)
     
@@ -215,7 +214,42 @@ class WassersteinDistance(object):
         self._jacobian_func(self.X_params_2d, self.Y_params_2d, E, G)
         
         return G
-    
+
+    def jacobian_product_Y(self, E):
+        """
+        Compute Jacobian product for Wasserstein distances w.r.t. Y parameters.
+
+        This is the counterpart of `jacobian_product` but computes dL/dλ_y
+        (gradient with respect to the second argument, e.g. a shapelet).
+
+        For exponential W2²(λ_x, λ_y) = 2*(λ_x-λ_y)²/(λ_x²λ_y²) = 2*(1/λ_x - 1/λ_y)²:
+            ∂W2²/∂λ_y = 4*(1/λ_x - 1/λ_y) / λ_y²
+
+        So:  G_Y[j] = Σ_i E[i,j] * 4*(1/λ_x_i - 1/λ_y_j) / λ_y_j²
+
+        Parameters
+        ----------
+        E : array, shape = [m, n]
+            Gradient w.r.t. the distance matrix (from SoftDTW backward pass).
+
+        Returns
+        -------
+        G_Y : array, shape = [n, 1]
+            Jacobian product dL/dλ_y.
+        """
+        E = np.asarray(E, dtype=np.float64)
+
+        lambda_x = self.X_params_2d.flatten()   # (m,)
+        lambda_y = self.Y_params_2d.flatten()   # (n,)
+
+        # diff[i, j] = 1/λ_x[i] - 1/λ_y[j]
+        diff = (1.0 / lambda_x)[:, None] - (1.0 / lambda_y)[None, :]  # (m, n)
+
+        # G_Y[j] = Σ_i E[i,j] * 4 * diff[i,j] / λ_y[j]²
+        G_Y = np.sum(E * 4.0 * diff / (lambda_y[None, :] ** 2), axis=0)  # (n,)
+
+        return G_Y.reshape(-1, 1)
+
     def __repr__(self):
         return (f"WassersteinDistance(distribution='{self.distribution}', "
                 f"squared=True)")
