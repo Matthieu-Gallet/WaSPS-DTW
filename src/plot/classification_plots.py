@@ -53,6 +53,56 @@ def setup_ieee_style():
 
 
 # =============================================================================
+# Hydro-regime name mapping and plot constants
+# =============================================================================
+
+REGIMES = {
+    "Pluvial modérément contrasté": {"code": "PM"},
+    "Pluvial contrasté":             {"code": "PC"},
+    "Pluvio-nival":                  {"code": "PN"},
+    "Nivo-pluvial":                  {"code": "NP"},
+    "Nival & nivo-glaciaire":        {"code": "NN"},
+    "Nival":                         {"code": "NG"},
+    "nivo-glaciaire":                {"code": "NG"},
+}
+
+# First-match reverse map: short code → full French name
+_CODE_TO_NAME: Dict[str, str] = {}
+for _regime_name, _regime_info in REGIMES.items():
+    _code = _regime_info["code"]
+    if _code not in _CODE_TO_NAME:
+        _CODE_TO_NAME[_code] = _regime_name
+
+# English names used in publication figures
+_CODE_TO_NAME_EN: Dict[str, str] = {
+    "PM": "Moderately contrasted pluvial",
+    "PC": "Contrasted pluvial",
+    "PN": "Pluvio-nival",
+    "NP": "Nivo-pluvial",
+    "NN": "Nival & nivo-glacial",
+    "NG": "Nival",
+}
+
+# Methods displayed in class-pair plots (in order)
+_PAIR_METHODS = ['euclidean_raw', 'euclidean_params', 'wasserstein_params']
+
+_METHOD_COLORS = {
+    'euclidean_raw':      '#1f77b4',  # blue
+    'euclidean_params':   '#ff7f0e',  # orange
+    'wasserstein_params': '#2ca02c',  # green
+}
+
+_METHOD_LABELS = {
+    'euclidean_raw':      'Euclidean (Raw Data)',
+    'euclidean_params':   'Euclidean (Parameters)',
+    'wasserstein_params': 'Wasserstein (Parameters)',
+}
+
+# Up to 20 distinct class colours
+_CLASS_PALETTE = list(plt.cm.tab20.colors)
+
+
+# =============================================================================
 # Confusion matrix plots
 # =============================================================================
 
@@ -597,178 +647,169 @@ def plot_summary_figure(results: Dict, Y_test: np.ndarray, idx_to_regime: Dict[i
 # Class pair barycenter plots (A4 format)
 # =============================================================================
 
-def plot_class_pair_barycenters(barycenters: Dict[int, np.ndarray],
-                                 X_train: List[np.ndarray],
+def plot_class_pair_barycenters(barycenters_by_method: Dict[str, Dict[int, np.ndarray]],
+                                 X_train_raw: List[np.ndarray],
+                                 X_train_params: List[np.ndarray],
                                  Y_train: np.ndarray,
                                  idx_to_regime: Dict[int, str],
-                                 method_name: str,
                                  output_dir: str = None,
                                  save_pdf: bool = True,
-                                 n_samples: int = 10,
-                                 param_names: List[str] = None,
-                                 is_raw_data: bool = False):
+                                 n_samples: int = 10):
     """
-    Plot barycenters with training samples for each pair of classes.
-    
-    Each figure shows 2 classes side by side (2x1 horizontal layout) with
-    10 training samples and the barycenter. Figures are sized for A4 width
-    and 1/5 A4 height.
-    
+    Plot barycenters of all methods with training samples for each pair of classes.
+
+    One figure per class pair, with 2 side-by-side subplots (shared x and y axes).
+    Background traces show parameter-based series (1/λ = discharge) coloured by class.
+    Three barycenter curves are overlaid — one per method — with distinct thick lines.
+    ``euclidean_raw`` barycenters are inverted (1/mean_spatial) before display.
+
+    A horizontal legend listing the three barycenter methods is placed below both
+    subplots.
+
     Args:
-        barycenters: Dictionary mapping class labels to barycenters
-        X_train: Training samples (list of arrays)
-        Y_train: Training labels
-        idx_to_regime: Mapping from label index to regime code
-        method_name: Name of the method for the title
-        output_dir: Output directory for saving
-        save_pdf: Whether to save as PDF
-        n_samples: Number of samples to plot per class (default: 10)
-        param_names: Names of parameters (default: ['λ', 'β', 'γ', 'δ'])
-        is_raw_data: Whether data is raw (True) or parameters (False)
+        barycenters_by_method: Dict {method_key: {class_label: barycenter}}.
+            Accepted keys: 'euclidean_raw' (shape T×W²), 'euclidean_params' (T×1),
+            'wasserstein_params' (T×1).
+        X_train_raw: List of raw training arrays, each shape (T, W²).
+        X_train_params: List of parameter training arrays, each shape (T, 1).
+        Y_train: Integer class labels for every training sample.
+        idx_to_regime: {class_label: regime_code}, e.g. {0: 'PM', 1: 'PC'}.
+        output_dir: Base output directory; figures saved under ``<output_dir>/class_pairs/``.
+        save_pdf: Whether to also save a PDF (PNG is always saved when output_dir is set).
+        n_samples: Number of sample traces to draw per class.
     """
     setup_ieee_style()
-    
-    if param_names is None:
-        param_names = ['λ', 'β', 'γ', 'δ']
-    
-    unique_classes = sorted(barycenters.keys())
-    n_classes = len(unique_classes)
-    
-    # Determine number of parameters/features
-    sample_shape = X_train[0].shape
-    if is_raw_data:
-        # Raw data: shape is (T, D, W, W) - flatten spatial dims
-        n_features = 1  # We'll plot mean across spatial dimensions
-    else:
-        # Parameters: shape is (T, n_params)
-        n_features = sample_shape[1] if len(sample_shape) > 1 else 1
-    
-    # A4 dimensions: 210mm x 297mm
-    # Width: 210mm ≈ 8.27 inches
-    # Height: 1/5 of 297mm ≈ 59mm ≈ 2.33 inches
-    fig_width = 8.27  # A4 width in inches
-    fig_height = 2.33  # 1/5 A4 height in inches
-    
-    # Create time axis for 2019
-    T = X_train[0].shape[0]
+
+    all_classes = sorted(next(iter(barycenters_by_method.values())).keys())
+    T = X_train_params[0].shape[0]
     time_axis = pd.date_range(start='2019-01-01', periods=T, freq='D')
-    
-    # Generate all pairs of classes
-    from itertools import combinations
-    class_pairs = list(combinations(unique_classes, 2))
-    
-    # Also add each class paired with itself for completeness
-    # Actually, user asked for pairs, so we'll do combinations
-    
-    # Colors for samples and barycenter
-    colors = plt.cm.tab10(np.linspace(0, 1, 10))
-    
+
     if output_dir:
         output_path = Path(output_dir) / "class_pairs"
         output_path.mkdir(parents=True, exist_ok=True)
-    
-    # Fix seed for consistent sample selection across methods
-    np.random.seed(42)
-    
-    for pair_idx, (class1, class2) in enumerate(class_pairs):
-        class1_name = idx_to_regime[class1]
-        class2_name = idx_to_regime[class2]
-        
-        # Create figure with 2 subplots side by side
-        if is_raw_data:
-            fig, axes = plt.subplots(1, 2, figsize=(fig_width, fig_height))
+
+    from itertools import combinations
+    class_pairs = list(combinations(all_classes, 2))
+
+    # A4 width, 25% shorter than previous tall layout
+    fig_width = 8.27
+    fig_height = 2.7
+
+    for class1, class2 in class_pairs:
+        code1 = idx_to_regime.get(class1, str(class1))
+        code2 = idx_to_regime.get(class2, str(class2))
+        name1 = _CODE_TO_NAME_EN.get(code1, code1)
+        name2 = _CODE_TO_NAME_EN.get(code2, code2)
+
+        # --- Pre-compute y limits from displayed samples (both classes) ---
+        y_sample_vals = []
+        for cl in [class1, class2]:
+            cl_idx = [i for i in range(len(X_train_params)) if Y_train[i] == cl]
+            rng_pre = np.random.RandomState(42 + cl)
+            rng_pre.shuffle(cl_idx)
+            for idx in cl_idx[:n_samples]:
+                s = X_train_params[idx]
+                vals = 1.0 / np.maximum(s[:, 0], 1e-10)
+                y_sample_vals.append(vals)
+        if y_sample_vals:
+            all_sv = np.concatenate(y_sample_vals)
+            pos = all_sv[all_sv > 0]
+            y_lo = float(np.nanpercentile(pos, 1)) * 0.85
+            y_hi = float(np.nanpercentile(pos, 99)) * 1.15
+            y_lo = max(y_lo, 1e-3)   # floor for log scale
         else:
-            # For parameters, we need n_features rows
-            fig, axes = plt.subplots(n_features, 2, figsize=(fig_width, fig_height * n_features))
-            if n_features == 1:
-                axes = axes.reshape(1, 2)
-        
-        for col_idx, (class_label, class_name) in enumerate([(class1, class1_name), (class2, class2_name)]):
-            # Get samples for this class
-            class_indices = [i for i in range(len(X_train)) if Y_train[i] == class_label]
-            # Use seed based on class label for reproducibility
+            y_lo, y_hi = 0.1, 1000.0
+
+        # Adaptive sample style
+        _lw_sp = max(0.2, 0.7 * (5.0 / max(n_samples, 5)) ** 0.3)
+        _al_sp = max(0.10, 0.5 * (5.0 / max(n_samples, 5)) ** 0.5)
+
+        fig, axes = plt.subplots(1, 2, figsize=(fig_width, fig_height),
+                                 sharex=True, sharey=True)
+        fig.subplots_adjust(bottom=0.30, top=0.91, wspace=0.04, left=0.10, right=0.99)
+
+        for col_idx, (class_label, class_name) in enumerate([
+            (class1, name1),
+            (class2, name2),
+        ]):
+            ax = axes[col_idx]
+
+            # --- Background sample traces (params → 1/λ = discharge) in black ---
+            class_indices = [
+                i for i in range(len(X_train_params)) if Y_train[i] == class_label
+            ]
             rng = np.random.RandomState(42 + class_label)
             rng.shuffle(class_indices)
-            selected_indices = class_indices[:n_samples]
-            
-            barycenter = barycenters[class_label]
-            
-            if is_raw_data:
-                # Raw data: plot mean across spatial dimensions
-                ax = axes[col_idx]
-                
-                # Plot training samples
-                for i, idx in enumerate(selected_indices):
-                    sample = X_train[idx]
-                    # Mean across spatial dimensions
-                    # If shape is (T, D, W, W), mean over (1,2,3)
-                    # If shape is (T, D), mean over (1,)
-                    if sample.ndim == 4:
-                        sample_mean = np.mean(sample, axis=(1, 2, 3))
-                    elif sample.ndim == 2:
-                        sample_mean = np.mean(sample, axis=1)
+            for idx in class_indices[:n_samples]:
+                s = X_train_params[idx]   # (T, 1)
+                ax.plot(time_axis, 1.0 / np.maximum(s[:, 0], 1e-10),
+                        color='black', alpha=_al_sp, linewidth=_lw_sp)
+
+            # --- Barycenter curves (one per method) ---
+            for method_key in _PAIR_METHODS:
+                if method_key not in barycenters_by_method:
+                    continue
+                bary = barycenters_by_method[method_key].get(class_label)
+                if bary is None:
+                    continue
+
+                if method_key == 'euclidean_raw':
+                    # SAR amplitude ~ Exp(λ) → mean amplitude = 1/λ = discharge (no inversion)
+                    if bary.ndim > 1:
+                        b = np.mean(bary, axis=tuple(range(1, bary.ndim)))
                     else:
-                        sample_mean = sample.flatten()
-                    ax.semilogy(time_axis, sample_mean, color=colors[i % len(colors)], 
-                           alpha=0.4, linewidth=0.8)
-                
-                # Plot barycenter
-                if barycenter.ndim > 1:
-                    barycenter_mean = np.mean(barycenter, axis=tuple(range(1, barycenter.ndim)))
+                        b = bary.ravel()
+                    b_plot = np.maximum(b, 1e-10)
                 else:
-                    barycenter_mean = barycenter
-                ax.semilogy(time_axis, barycenter_mean, color='black', linewidth=2, 
-                       label='Barycenter')
-                
-                ax.set_title(f'{class_name}', fontsize=8, fontweight='bold')
-                ax.set_xlabel('Date')
-                if col_idx == 0:
-                    ax.set_ylabel('Discharge (mean)')
-                ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
-                ax.tick_params(axis='x', rotation=0)
-                ax.grid(True, alpha=0.3)
-                ax.legend(loc='upper right', fontsize=7)
-                
-            else:
-                # Parameters: plot each parameter in a separate row
-                for param_idx in range(n_features):
-                    ax = axes[param_idx, col_idx]
-                    
-                    # Plot training samples
-                    for i, idx in enumerate(selected_indices):
-                        sample = X_train[idx]
-                        ax.semilogy(time_axis, sample[:, param_idx], 
-                               color=colors[i % len(colors)], alpha=0.4, linewidth=0.8)
-                    
-                    # Plot barycenter
-                    ax.semilogy(time_axis, barycenter[:, param_idx], color='black', 
-                           linewidth=2, label='Barycenter')
-                    
-                    # Labels
-                    if param_idx == 0:
-                        ax.set_title(f'{class_name}', fontsize=8, fontweight='bold')
-                    if col_idx == 0:
-                        ax.set_ylabel(param_names[param_idx], fontsize=9)
-                    if param_idx == n_features - 1:
-                        ax.set_xlabel('Date')
-                        ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
-                        ax.tick_params(axis='x', rotation=0)
-                    else:
-                        ax.set_xticklabels([])
-                    
-                    ax.grid(True, alpha=0.3)
-                    if param_idx == 0 and col_idx == 1:
-                        ax.legend(loc='upper right', fontsize=7)
-        
-        plt.tight_layout()
-        
+                    # Parameters: rate λ → 1/λ = discharge
+                    b_plot = 1.0 / np.maximum(bary[:, 0], 1e-10)
+
+                ax.plot(time_axis, b_plot,
+                        color=_METHOD_COLORS[method_key],
+                        linewidth=1.2,
+                        zorder=5)
+
+            ax.set_yscale('log')
+            ax.set_ylim(y_lo, y_hi)
+            ax.set_title(class_name, fontsize=8, fontweight='bold')
+            ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
+            ax.tick_params(axis='x', rotation=0, labelsize=7)
+            ax.tick_params(axis='y', labelsize=7)
+            ax.grid(True, alpha=0.3)
+
+            if col_idx == 0:
+                ax.set_ylabel(r'$\lambda\,(m^3/s)$', fontsize=8)
+
+        # Shared x-label — positioned below x-tick labels, above legend
+        fig.text(0.54, 0.19, 'Time', ha='center', va='center', fontsize=8)
+
+        # Horizontal legend: barycenter methods + samples entry
+        legend_handles = [
+            plt.Line2D([0], [0],
+                       color=_METHOD_COLORS[m],
+                       linewidth=1.2,
+                       label=_METHOD_LABELS[m])
+            for m in _PAIR_METHODS
+            if m in barycenters_by_method
+        ]
+        legend_handles.append(
+            plt.Line2D([0], [0], color='black', lw=0.8, alpha=0.5, label='Samples')
+        )
+        fig.legend(
+            handles=legend_handles,
+            loc='lower center',
+            ncol=len(legend_handles),
+            fontsize=6.5,
+            bbox_to_anchor=(0.5, 0.05),
+            frameon=True,
+        )
+
         if output_dir:
-            # Clean method name for filename
-            method_suffix = method_name.replace(' ', '_').replace('(', '').replace(')', '').replace('-', '_')
-            filename = f"pair_{class1_name}_{class2_name}_{method_suffix}"
+            filename = f"pair_{code1}_{code2}"
             if save_pdf:
                 plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
-        
+            plt.savefig(output_path / f"{filename}.png", bbox_inches='tight', dpi=150)
+
         plt.close()
 
 
@@ -780,7 +821,8 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
                                      output_dir: str = None,
                                      save_pdf: bool = True,
                                      n_samples: int = 10,
-                                     param_names: List[str] = None):
+                                     param_names: List[str] = None,
+                                     is_raw: bool = False):
     """
     Plot all class barycenters in a grid layout with training samples.
     
@@ -788,28 +830,37 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
     Each figure is A4 width and 1/5 A4 height per row of classes.
     
     Args:
-        barycenters: Dictionary mapping class labels to barycenters
-        X_train: Training samples (list of parameter arrays)
-        Y_train: Training labels
-        idx_to_regime: Mapping from label index to regime code
-        method_name: Name of the method for the title
-        output_dir: Output directory for saving
-        save_pdf: Whether to save as PDF
-        n_samples: Number of samples to plot per class (default: 10)
-        param_names: Names of parameters (default: ['λ', 'β', 'γ', 'δ'])
+        barycenters: Dictionary mapping class labels to barycenters.
+        X_train: Training samples (list of arrays), shape (T, n_features) each.
+        Y_train: Training labels.
+        idx_to_regime: Mapping from label index to regime code.
+        method_name: Name of the method for the title.
+        output_dir: Output directory for saving.
+        save_pdf: Whether to save as PDF.
+        n_samples: Number of samples to plot per class (default: 10).
+        param_names: Names of parameters (default: ['λ', 'β', 'γ', 'δ']).
+        is_raw: If True, X_train contains raw spatial data (T × W²); the spatial
+            mean is computed and inverted (1/mean) to convert to discharge units.
+            Only one figure is produced in this case.
     """
     setup_ieee_style()
     
-    if param_names is None:
-        param_names = ['λ', 'β', 'γ', 'δ']
-    
     unique_classes = sorted(barycenters.keys())
     n_classes = len(unique_classes)
-    n_params = X_train[0].shape[1] if len(X_train[0].shape) > 1 else 1
     
-    # A4 dimensions
-    fig_width = 8.27  # A4 width in inches
-    row_height = 2.33  # 1/5 A4 height per row
+    if is_raw:
+        # For raw data: collapse spatial dimension → 1 virtual "parameter"
+        n_params = 1
+        effective_param_names = [r'$1/\lambda\,(m^3/s)$']
+    else:
+        if param_names is None:
+            param_names = ['λ', 'β', 'γ', 'δ']
+        n_params = X_train[0].shape[1] if len(X_train[0].shape) > 1 else 1
+        effective_param_names = param_names
+    
+    # A4 dimensions — 25% shorter rows than original
+    fig_width = 8.27
+    row_height = 1.75  # was 2.33
     
     # Create time axis for 2019
     T = X_train[0].shape[0]
@@ -822,14 +873,32 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
         output_path = Path(output_dir) / "barycenter_grids"
         output_path.mkdir(parents=True, exist_ok=True)
     
-    # Fix seed for consistent sample selection across methods
-    np.random.seed(42)
-    
     # Number of rows needed (2 classes per row)
     n_rows = (n_classes + 1) // 2
     
+    # Adaptive sample style based on count
+    _lw_s = max(0.2, 0.7 * (5.0 / max(n_samples, 5)) ** 0.3)
+    _al_s = max(0.10, 0.5 * (5.0 / max(n_samples, 5)) ** 0.5)
+
+    # Pre-compute global y limits per parameter from all sample series
+    # All values are converted to 1/λ = discharge space
+    ylim_per_param = {}
+    for param_idx in range(n_params):
+        all_sample_vals = []
+        for sample in X_train:
+            if is_raw:
+                y = np.maximum(np.mean(sample, axis=1), 1e-10)   # amplitude ≈ 1/λ
+            else:
+                y = 1.0 / np.maximum(sample[:, param_idx], 1e-10)  # λ → 1/λ
+            all_sample_vals.append(y)
+        sv = np.concatenate(all_sample_vals)
+        pos = sv[sv > 0]
+        ylim_per_param[param_idx] = (max(float(np.nanpercentile(pos, 1)) * 0.85, 1e-3),
+                                     float(np.nanpercentile(pos, 99)) * 1.15)
+
     # Create one figure per parameter
     for param_idx in range(n_params):
+        y_lo, y_hi = ylim_per_param[param_idx]
         fig, axes = plt.subplots(n_rows, 2, figsize=(fig_width, row_height * n_rows))
         if n_rows == 1:
             axes = axes.reshape(1, -1)
@@ -843,25 +912,33 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
             
             # Get samples for this class
             class_indices = [i for i in range(len(X_train)) if Y_train[i] == class_label]
-            # Use seed based on class label for reproducibility
             rng = np.random.RandomState(42 + class_label)
             rng.shuffle(class_indices)
             selected_indices = class_indices[:n_samples]
             
-            # Plot training samples
+            # Plot training samples — all in 1/λ = discharge space
             for i, idx in enumerate(selected_indices):
                 sample = X_train[idx]
-                ax.semilogy(time_axis, sample[:, param_idx], 
-                       color=colors[i % len(colors)], alpha=0.4, linewidth=0.8)
+                if is_raw:
+                    y = np.maximum(np.mean(sample, axis=1), 1e-10)       # amplitude ≈ 1/λ
+                else:
+                    y = 1.0 / np.maximum(sample[:, param_idx], 1e-10)    # λ → 1/λ
+                ax.semilogy(time_axis, y,
+                            color='black', alpha=_al_s, linewidth=_lw_s)
             
-            # Plot barycenter
+            # Plot barycenter — all in 1/λ = discharge space
             barycenter = barycenters[class_label]
-            ax.semilogy(time_axis, barycenter[:, param_idx], color='black', 
-                   linewidth=2, label='Barycenter')
+            if is_raw:
+                b_vals = barycenter if barycenter.ndim == 1 else np.mean(barycenter, axis=1)
+                b_plot = np.maximum(b_vals, 1e-10)                        # amplitude ≈ 1/λ
+            else:
+                b_plot = 1.0 / np.maximum(barycenter[:, param_idx], 1e-10)  # λ → 1/λ
+            ax.semilogy(time_axis, b_plot, color='black', linewidth=2, label='Barycenter')
             
+            ax.set_ylim(y_lo, y_hi)
             ax.set_title(f'{class_name}', fontsize=8, fontweight='bold')
             if col == 0:
-                ax.set_ylabel(param_names[param_idx], fontsize=9)
+                ax.set_ylabel(effective_param_names[param_idx], fontsize=9)
             if row == n_rows - 1:
                 ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
                 ax.tick_params(axis='x', rotation=0)
@@ -878,9 +955,12 @@ def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
         plt.tight_layout()
         
         if output_dir:
-            # Clean method name for filename
             method_suffix = method_name.replace(' ', '_').replace('(', '').replace(')', '').replace('-', '_')
-            filename = f"grid_param_{param_idx}_{param_names[param_idx]}_{method_suffix}"
+            if is_raw:
+                pname = 'discharge'
+            else:
+                pname = effective_param_names[param_idx].replace('$', '').replace('/', '_').replace(' ', '')
+            filename = f"grid_param_{param_idx}_{pname}_{method_suffix}"
             if save_pdf:
                 plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
         

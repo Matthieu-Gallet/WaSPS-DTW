@@ -19,6 +19,7 @@ Date: 2026-01-22
 
 import argparse
 import numpy as np
+import pickle
 import time
 import sys
 from pathlib import Path
@@ -246,6 +247,18 @@ Examples:
         print(f"\n[4/4] Saving results...")
         save_results_to_csv(results, output_dir)
         plot_confusion_matrices(results, Y_test, metadata['idx_to_regime'], output_dir)
+
+        # Save full experiment data to pickle for replotting without re-running
+        pkl_path = Path(output_dir) / "experiment_data.pkl"
+        with open(pkl_path, 'wb') as f:
+            pickle.dump({
+                'results': results,
+                'X_train_raw': X_train_raw,
+                'X_train_params': X_train_params,
+                'Y_train': Y_train,
+                'idx_to_regime': metadata['idx_to_regime'],
+            }, f)
+        print(f"  Experiment data saved to: {pkl_path}")
         
         # Plot barycenters if requested
         if args.plot_barycenters:
@@ -265,21 +278,24 @@ Examples:
                 ('euclidean_params', 'Soft-DTW Euclidean (Parameters)', X_train_params, False),
                 ('wasserstein_params', 'Soft-DTW Wasserstein (Parameters)', X_train_params, False)
             ]
-            
-            # Generate class pair plots (A4 format, 2x1 layout)
+
+            # Generate class pair plots (A4 format, one figure per pair, all methods overlaid)
             print("  Generating class pair barycenter plots...")
-            for method_key, method_name, train_data, is_raw in methods:
-                plot_class_pair_barycenters(
-                    barycenters=results[method_key]['barycenters'],
-                    X_train=train_data,
-                    Y_train=Y_train,
-                    idx_to_regime=metadata['idx_to_regime'],
-                    method_name=method_name,
-                    output_dir=output_dir,
-                    save_pdf=True,
-                    n_samples=args.n_samples_plot,
-                    is_raw_data=is_raw
-                )
+            barycenters_by_method = {
+                method_key: results[method_key]['barycenters']
+                for method_key, _, _, _ in methods
+                if method_key in results
+            }
+            plot_class_pair_barycenters(
+                barycenters_by_method=barycenters_by_method,
+                X_train_raw=X_train_raw,
+                X_train_params=X_train_params,
+                Y_train=Y_train,
+                idx_to_regime=metadata['idx_to_regime'],
+                output_dir=output_dir,
+                save_pdf=True,
+                n_samples=args.n_samples_plot,
+            )
             
             # Generate grid plots (all classes, one figure per parameter)
             print("  Generating grid barycenter plots...")
