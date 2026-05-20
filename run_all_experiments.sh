@@ -7,10 +7,9 @@ source /home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/
 
 # Variables de sélection des classifications
 classif1=True  # one-shot
-classif2=False  # kfold
+classif2=True  # kfold
 classif3=False  # gamma-sens
 classif4=False # sample-sens
-
 
 # Classifications conditionnelles
 if [ "$classif1" = "True" ]; then

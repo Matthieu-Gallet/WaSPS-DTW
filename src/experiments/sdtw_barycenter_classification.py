@@ -53,7 +53,6 @@ from experiments.classification_sensitivity import (
 # Visualization
 from plot import (
     plot_confusion_matrices,
-    plot_barycenter_with_samples,
     plot_gamma_sensitivity,
     plot_sample_size_sensitivity,
     plot_class_pair_barycenters,
