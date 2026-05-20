@@ -7,15 +7,10 @@ source /home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/
 
 # Variables de sélection des classifications
 classif1=True  # one-shot
-classif2=True  # kfold
+classif2=False  # kfold
 classif3=False  # gamma-sens
 classif4=False # sample-sens
 
-# Variables de sélection des simulations
-simu1=False  # barycenter_rmse_analysis.py
-simu2=False  # geographic_barycenter.py
-simu3=False  # simu_complex.py
-simu4=False  # simu_simple.py
 
 # Classifications conditionnelles
 if [ "$classif1" = "True" ]; then
@@ -36,27 +31,6 @@ fi
 if [ "$classif4" = "True" ]; then
     echo "Lancement du mode sample-sens..."
     python src/experiments/sdtw_barycenter_classification.py --mode sample-sens --sample-sizes 0.05,0.1,0.2,0.4,0.6,0.8,1.0 --n-splits 5
-fi
-
-# Simulations conditionnelles
-if [ "$simu1" = "True" ]; then
-    echo "Lancement de la simulation 1 : barycenter_rmse_analysis.py..."
-    python src/experiments/barycenter_rmse_analysis.py
-fi
-
-if [ "$simu2" = "True" ]; then
-    echo "Lancement de la simulation 2 : geographic_barycenter.py..."
-    python src/experiments/geographic_barycenter.py
-fi
-
-if [ "$simu3" = "True" ]; then
-    echo "Lancement de la simulation 3 : simu_complex.py..."
-    python src/experiments/simu_complex.py
-fi
-
-if [ "$simu4" = "True" ]; then
-    echo "Lancement de la simulation 4 : simu_simple.py..."
-    python src/experiments/simu_simple.py
 fi
 
 echo "Toutes les expériences sont terminées. Résultats dans results/regime_classification/ et autres dossiers results/"

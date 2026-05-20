@@ -29,7 +29,7 @@ REGIMES = {
     "Pluvio-nival": {"code": "PN"},
     "Nivo-pluvial": {"code": "NP"},
     "Nival & nivo-glaciaire": {"code": "NN"},
-    "Nival": {"code": "NG"},
+    "Nival": {"code": "NV"},
     "nivo-glaciaire": {"code": "NG"},
 }
 
