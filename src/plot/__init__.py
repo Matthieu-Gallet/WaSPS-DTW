@@ -8,13 +8,13 @@ This module provides visualization functions for:
 - Classification results visualization
 """
 
-from .barycenter_plots import (
-    plot_with_correspondences,
-    plot_multiple_series,
-    create_barycenter_comparison_figure
-)
-from .series_plots import plot_zone, create_geographic_barycenter_figures
-from .prediction_plots import plot_predictions, plot_losses
+# from .barycenter_plots import (
+#     plot_with_correspondences,
+#     plot_multiple_series,
+#     create_barycenter_comparison_figure
+# )
+# from .series_plots import plot_zone, create_geographic_barycenter_figures
+# from .prediction_plots import plot_predictions, plot_losses
 from .classification_plots import (
     setup_ieee_style,
     plot_confusion_matrices,

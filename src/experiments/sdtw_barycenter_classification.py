@@ -33,7 +33,8 @@ sys.path.insert(0, str(parent_dir))
 from dataloader import (
     load_classification_dataset,
     preprocess_samples,
-    estimate_parameters_for_samples
+    estimate_parameters_for_samples,
+    load_class_thresholds,
 )
 
 # Evaluation functions
@@ -91,6 +92,11 @@ Examples:
         "--data-dir", type=str,
         default=str(Path(__file__).parent.parent / "results" / "classification_dataset" ),
         help="Directory containing the classification dataset"
+    )
+    parser.add_argument(
+        "--ks-summary-path", type=str,
+        default=str(Path(__file__).parent.parent / "data_generator" / "Explore_2_dataset" / "ks_summary.csv"),
+        help="Path to ks_summary.csv for per-class thresholds (optional)"
     )
     parser.add_argument(
         "--output-dir", type=str,
@@ -195,8 +201,20 @@ Examples:
     print(f"\n[2/4] Preprocessing data (max_time_steps={args.max_time_steps})...")
     print("  Preprocessing raw data...")
     X_raw = preprocess_samples(X, args.max_time_steps)
+
+    # Load per-class thresholds if ks_summary available
+    class_thresholds = None
+    ks_path = Path(args.ks_summary_path)
+    if ks_path.exists():
+        ws = metadata.get("window_size", 0)
+        tw = metadata.get("time_window", 0)
+        class_thresholds = load_class_thresholds(str(ks_path), ws, tw, metadata["idx_to_regime"])
+        print(f"  Thresholds loaded from {ks_path.name} (ws={ws}, tw={tw}): {class_thresholds}")
+    else:
+        print(f"  No ks_summary found at {ks_path}, using threshold=0 for all classes.")
+
     print("  Estimating parameters...")
-    X_params = estimate_parameters_for_samples(X, args.max_time_steps)
+    X_params = estimate_parameters_for_samples(X, args.max_time_steps, Y=Y, class_thresholds=class_thresholds)
     print(f"  Raw sample shape: {X_raw[0].shape}")
     print(f"  Params sample shape: {X_params[0].shape}")
     

@@ -15,7 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import pandas as pd
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union, Sequence, Mapping
 from pathlib import Path
 from sklearn.metrics import confusion_matrix
 import warnings
@@ -654,161 +654,155 @@ def plot_class_pair_barycenters(barycenters_by_method: Dict[str, Dict[int, np.nd
                                  idx_to_regime: Dict[int, str],
                                  output_dir: str = None,
                                  save_pdf: bool = True,
-                                 n_samples: int = 10):
+                                 n_samples: int = 10,
+                                 show_legend: Union[bool, Sequence[bool], Mapping[Union[int, str], bool]] = True):
     """
-    Plot barycenters of all methods with training samples for each pair of classes.
+    Plot one figure per class (all methods overlaid) with training sample traces.
 
-    One figure per class pair, with 2 side-by-side subplots (shared x and y axes).
-    Background traces show parameter-based series (1/λ = discharge) coloured by class.
-    Three barycenter curves are overlaid — one per method — with distinct thick lines.
-    ``euclidean_raw`` barycenters are inverted (1/mean_spatial) before display.
+    This function keeps its historical name for backward compatibility, but now
+    creates individual class figures instead of class-pair figures.
 
-    A horizontal legend listing the three barycenter methods is placed below both
-    subplots.
+    Figures are saved under ``<output_dir>/class_pairs/`` and exported in PDF
+    only when ``save_pdf`` is True.
 
     Args:
         barycenters_by_method: Dict {method_key: {class_label: barycenter}}.
-            Accepted keys: 'euclidean_raw' (shape T×W²), 'euclidean_params' (T×1),
-            'wasserstein_params' (T×1).
-        X_train_raw: List of raw training arrays, each shape (T, W²).
+        X_train_raw: Unused (kept for API compatibility).
         X_train_params: List of parameter training arrays, each shape (T, 1).
         Y_train: Integer class labels for every training sample.
         idx_to_regime: {class_label: regime_code}, e.g. {0: 'PM', 1: 'PC'}.
         output_dir: Base output directory; figures saved under ``<output_dir>/class_pairs/``.
-        save_pdf: Whether to also save a PDF (PNG is always saved when output_dir is set).
+        save_pdf: Whether to save figures as PDF.
         n_samples: Number of sample traces to draw per class.
+        show_legend: Legend visibility control.
+            - bool: same value for all classes.
+            - Sequence[bool]: one flag per class (ordered by sorted class labels).
+            - Mapping[int|str, bool]: keyed by class label or regime code.
     """
     setup_ieee_style()
+
+    def _sanitize_filename(text: str) -> str:
+        safe = ''.join(ch if (ch.isalnum() or ch in ['_', '-']) else '_' for ch in text.strip())
+        while '__' in safe:
+            safe = safe.replace('__', '_')
+        return safe.strip('_') or 'class'
 
     all_classes = sorted(next(iter(barycenters_by_method.values())).keys())
     T = X_train_params[0].shape[0]
     time_axis = pd.date_range(start='2019-01-01', periods=T, freq='D')
 
+    legend_map = None
+    legend_seq = None
+    if isinstance(show_legend, Mapping):
+        legend_map = dict(show_legend)
+    elif isinstance(show_legend, (list, tuple, np.ndarray)) and not isinstance(show_legend, (str, bytes)):
+        legend_seq = [bool(v) for v in show_legend]
+
     if output_dir:
         output_path = Path(output_dir) / "class_pairs"
         output_path.mkdir(parents=True, exist_ok=True)
 
-    from itertools import combinations
-    class_pairs = list(combinations(all_classes, 2))
+    fig_width = 8./3.
+    fig_height = 4./3.
 
-    # A4 width, 25% shorter than previous tall layout
-    fig_width = 8.27
-    fig_height = 2.7
+    for class_label in all_classes:
+        code = idx_to_regime.get(class_label, str(class_label))
+        class_name = _CODE_TO_NAME_EN.get(code, code)
 
-    for class1, class2 in class_pairs:
-        code1 = idx_to_regime.get(class1, str(class1))
-        code2 = idx_to_regime.get(class2, str(class2))
-        name1 = _CODE_TO_NAME_EN.get(code1, code1)
-        name2 = _CODE_TO_NAME_EN.get(code2, code2)
+        if legend_map is not None:
+            class_show_legend = bool(
+                legend_map.get(class_label, legend_map.get(str(class_label), legend_map.get(code, True)))
+            )
+        elif legend_seq is not None:
+            class_pos = all_classes.index(class_label)
+            class_show_legend = legend_seq[class_pos] if class_pos < len(legend_seq) else True
+        else:
+            class_show_legend = bool(show_legend)
 
-        # --- Pre-compute y limits from displayed samples (both classes) ---
+        class_indices = [i for i in range(len(X_train_params)) if Y_train[i] == class_label]
+        rng_pre = np.random.RandomState(42 + class_label)
+        rng_pre.shuffle(class_indices)
+
         y_sample_vals = []
-        for cl in [class1, class2]:
-            cl_idx = [i for i in range(len(X_train_params)) if Y_train[i] == cl]
-            rng_pre = np.random.RandomState(42 + cl)
-            rng_pre.shuffle(cl_idx)
-            for idx in cl_idx[:n_samples]:
-                s = X_train_params[idx]
-                vals = 1.0 / np.maximum(s[:, 0], 1e-10)
-                y_sample_vals.append(vals)
+        for idx in class_indices[:n_samples]:
+            s = X_train_params[idx]
+            vals = 1.0 / np.maximum(s[:, 0], 1e-10)
+            y_sample_vals.append(vals)
+
         if y_sample_vals:
             all_sv = np.concatenate(y_sample_vals)
             pos = all_sv[all_sv > 0]
             y_lo = float(np.nanpercentile(pos, 1)) * 0.85
             y_hi = float(np.nanpercentile(pos, 99)) * 1.15
-            y_lo = max(y_lo, 1e-3)   # floor for log scale
+            y_lo = max(y_lo, 1e-3)
         else:
             y_lo, y_hi = 0.1, 1000.0
 
-        # Adaptive sample style
-        _lw_sp = max(0.2, 0.7 * (5.0 / max(n_samples, 5)) ** 0.3)
-        _al_sp = max(0.10, 0.5 * (5.0 / max(n_samples, 5)) ** 0.5)
+        _lw_sp = min(0.2, 0.7 * (5.0 / max(n_samples, 5)) ** 0.23)
+        _al_sp = min(0.10, 0.5 * (5.0 / max(n_samples, 5)) ** 0.65)
 
-        fig, axes = plt.subplots(1, 2, figsize=(fig_width, fig_height),
-                                 sharex=True, sharey=True)
-        fig.subplots_adjust(bottom=0.30, top=0.91, wspace=0.04, left=0.10, right=0.99)
+        fig, ax = plt.subplots(1, 1, figsize=(fig_width, fig_height))
+        fig.subplots_adjust(bottom=0.28 if class_show_legend else 0.16, top=0.95, left=0.10, right=0.99)
 
-        for col_idx, (class_label, class_name) in enumerate([
-            (class1, name1),
-            (class2, name2),
-        ]):
-            ax = axes[col_idx]
+        for idx in class_indices[:n_samples]:
+            s = X_train_params[idx]
+            ax.plot(time_axis, 1.0 / np.maximum(s[:, 0], 1e-10),
+                    color='black', alpha=_al_sp, linewidth=_lw_sp)
 
-            # --- Background sample traces (params → 1/λ = discharge) in black ---
-            class_indices = [
-                i for i in range(len(X_train_params)) if Y_train[i] == class_label
-            ]
-            rng = np.random.RandomState(42 + class_label)
-            rng.shuffle(class_indices)
-            for idx in class_indices[:n_samples]:
-                s = X_train_params[idx]   # (T, 1)
-                ax.plot(time_axis, 1.0 / np.maximum(s[:, 0], 1e-10),
-                        color='black', alpha=_al_sp, linewidth=_lw_sp)
+        for method_key in _PAIR_METHODS:
+            if method_key not in barycenters_by_method:
+                continue
+            bary = barycenters_by_method[method_key].get(class_label)
+            if bary is None:
+                continue
 
-            # --- Barycenter curves (one per method) ---
-            for method_key in _PAIR_METHODS:
-                if method_key not in barycenters_by_method:
-                    continue
-                bary = barycenters_by_method[method_key].get(class_label)
-                if bary is None:
-                    continue
-
-                if method_key == 'euclidean_raw':
-                    # SAR amplitude ~ Exp(λ) → mean amplitude = 1/λ = discharge (no inversion)
-                    if bary.ndim > 1:
-                        b = np.mean(bary, axis=tuple(range(1, bary.ndim)))
-                    else:
-                        b = bary.ravel()
-                    b_plot = np.maximum(b, 1e-10)
+            if method_key == 'euclidean_raw':
+                if bary.ndim > 1:
+                    b = np.mean(bary, axis=tuple(range(1, bary.ndim)))
                 else:
-                    # Parameters: rate λ → 1/λ = discharge
-                    b_plot = 1.0 / np.maximum(bary[:, 0], 1e-10)
+                    b = bary.ravel()
+                b_plot = np.maximum(b, 1e-10)
+            else:
+                b_plot = 1.0 / np.maximum(bary[:, 0], 1e-10)
 
-                ax.plot(time_axis, b_plot,
-                        color=_METHOD_COLORS[method_key],
-                        linewidth=1.2,
-                        zorder=5)
+            ax.plot(time_axis, b_plot,
+                    color=_METHOD_COLORS[method_key],
+                    linewidth=1.2,
+                    zorder=5)
 
-            ax.set_yscale('log')
-            ax.set_ylim(y_lo, y_hi)
-            ax.set_title(class_name, fontsize=8, fontweight='bold')
-            ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
-            ax.tick_params(axis='x', rotation=0, labelsize=7)
-            ax.tick_params(axis='y', labelsize=7)
-            ax.grid(True, alpha=0.3)
+        ax.set_yscale('log')
+        ax.set_ylim(0.25 * y_lo, 10 * y_hi)
+        ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
+        ax.tick_params(axis='x', rotation=0, labelsize=7)
+        ax.tick_params(axis='y', labelsize=7)
+        ax.set_ylabel(r'$\lambda\,(m^3/s)$', fontsize=8)
+        ax.set_xlabel('Time', fontsize=8)
+        ax.grid(True, alpha=0.3)
 
-            if col_idx == 0:
-                ax.set_ylabel(r'$\lambda\,(m^3/s)$', fontsize=8)
+        if class_show_legend:
+            legend_handles = [
+                plt.Line2D([0], [0],
+                           color=_METHOD_COLORS[m],
+                           linewidth=1.2,
+                           label=_METHOD_LABELS[m])
+                for m in _PAIR_METHODS
+                if m in barycenters_by_method
+            ]
+            legend_handles.append(
+                plt.Line2D([0], [0], color='black', lw=0.8, alpha=0.5, label='Samples')
+            )
+            fig.legend(
+                handles=legend_handles,
+                loc='lower center',
+                ncol=len(legend_handles),
+                fontsize=6.5,
+                bbox_to_anchor=(0.5, 0.03),
+                frameon=True,
+            )
 
-        # Shared x-label — positioned below x-tick labels, above legend
-        fig.text(0.54, 0.19, 'Time', ha='center', va='center', fontsize=8)
-
-        # Horizontal legend: barycenter methods + samples entry
-        legend_handles = [
-            plt.Line2D([0], [0],
-                       color=_METHOD_COLORS[m],
-                       linewidth=1.2,
-                       label=_METHOD_LABELS[m])
-            for m in _PAIR_METHODS
-            if m in barycenters_by_method
-        ]
-        legend_handles.append(
-            plt.Line2D([0], [0], color='black', lw=0.8, alpha=0.5, label='Samples')
-        )
-        fig.legend(
-            handles=legend_handles,
-            loc='lower center',
-            ncol=len(legend_handles),
-            fontsize=6.5,
-            bbox_to_anchor=(0.5, 0.05),
-            frameon=True,
-        )
-
-        if output_dir:
-            filename = f"pair_{code1}_{code2}"
-            if save_pdf:
-                plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
-            plt.savefig(output_path / f"{filename}.png", bbox_inches='tight', dpi=150)
+        if output_dir and save_pdf:
+            filename = _sanitize_filename(class_name)
+            plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
 
         plt.close()
 

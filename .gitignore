@@ -9,3 +9,5 @@ src/results/*
 .old/
 .github/
 RESSOURCES/*
+notebooks/*
+notebooks/dev.ipynb
