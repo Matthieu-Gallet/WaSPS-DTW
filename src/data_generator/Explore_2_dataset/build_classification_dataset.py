@@ -375,10 +375,44 @@ def build_basic_dataset(nc_path: str, csv_path: str, window_size: int = 5,
     return X, Y, metadata
 
 
+def load_quantile_levels(ks_summary_path: str, ws: int, tw: int,
+                         unique_regimes: list) -> Dict[str, float]:
+    """Load per-class optimal q_level from ks_summary.csv for a given (ws, tw) config."""
+    df = pd.read_csv(ks_summary_path)
+    subset = df[(df["ws"] == ws) & (df["tw"] == tw)].dropna(subset=["q_level"])
+    regime_to_q = dict(zip(subset["regime"], subset["q_level"]))
+    return {r: float(regime_to_q.get(r, 0.0)) for r in unique_regimes}
+
+
+def apply_quantile_threshold(window: np.ndarray, q_level: float) -> np.ndarray:
+    """
+    Apply per-sample quantile threshold to a window array.
+
+    For each time step t, computes thr = quantile(finite_values, q_level),
+    sets values <= thr to NaN, then subtracts thr from remaining values.
+    Returns modified window (float64).
+    """
+    window = window.astype(np.float64)
+    T = window.shape[0]
+    for t in range(T):
+        x = window[t]
+        finite_vals = x[np.isfinite(x)]
+        if len(finite_vals) < 5:
+            window[t] = np.nan
+            continue
+        thr = np.quantile(finite_vals, q_level)
+        mask = x <= thr
+        window[t][mask] = np.nan
+        valid = ~mask & np.isfinite(x)
+        window[t][valid] -= thr
+    return window
+
+
 def build_balanced_dataset(nc_path: str, csv_path: str, window_size: int = 5,
                            time_window: int = 4, neighborhood_size: int = 20,
                            samples_per_class: Dict[str, int] = None,
-                           output_dir: str = ".", random_seed: int = 42
+                           output_dir: str = ".", random_seed: int = 42,
+                           ks_summary_path: str = None,
                            ) -> Tuple[np.ndarray, np.ndarray, Dict]:
     """
     Build balanced classification dataset with augmentation from neighborhoods.
@@ -422,6 +456,15 @@ def build_balanced_dataset(nc_path: str, csv_path: str, window_size: int = 5,
     regime_to_idx = {regime: idx for idx, regime in enumerate(unique_regimes)}
     idx_to_regime = {idx: regime for regime, idx in regime_to_idx.items()}
     print(f"\n  Label encoding: {regime_to_idx}")
+
+    # Load q_levels for quantile thresholding (if ks_summary provided)
+    q_levels = None
+    if ks_summary_path and Path(ks_summary_path).exists():
+        q_levels = load_quantile_levels(ks_summary_path, window_size, time_window, unique_regimes)
+        print(f"\n  Quantile levels loaded: {q_levels}")
+    else:
+        q_levels = {regime: 0.075 for regime in unique_regimes}  # Default q_level if not provided
+        print("\n  No ks_summary_path provided — no quantile thresholding applied.")
     
     # Set default samples_per_class if not provided
     if samples_per_class is None:
@@ -499,6 +542,8 @@ def build_balanced_dataset(nc_path: str, csv_path: str, window_size: int = 5,
             )
             
             if center_window is not None:
+                if q_levels is not None:
+                    center_window = apply_quantile_threshold(center_window, q_levels[regime])
                 X_list.append(center_window)
                 Y_list.append(regime_to_idx[regime])
                 sample_info.append({
@@ -519,6 +564,8 @@ def build_balanced_dataset(nc_path: str, csv_path: str, window_size: int = 5,
                 )
                 
                 for j, window in enumerate(neighborhood_windows):
+                    if q_levels is not None:
+                        window = apply_quantile_threshold(window, q_levels[regime])
                     X_list.append(window)
                     Y_list.append(regime_to_idx[regime])
                     sample_info.append({
@@ -631,7 +678,7 @@ Output format:
         help="Temporal grouping size (D) in time steps"
     )
     parser.add_argument(
-        "--neighborhood-size", type=int, default=20,
+        "--neighborhood-size", type=int, default=12,
         help="Size of neighborhood for augmentation (in pixels, only for balanced mode)"
     )
     parser.add_argument(
@@ -641,6 +688,11 @@ Output format:
     parser.add_argument(
         "--random-seed", type=int, default=42,
         help="Random seed for reproducibility"
+    )
+    parser.add_argument(
+        "--ks-summary-path", type=str,
+        default=str(Path(__file__).parent / "ks_summary.csv"),
+        help="Path to ks_summary.csv for per-class quantile thresholds (optional)"
     )
     
     args = parser.parse_args()
@@ -670,7 +722,8 @@ Output format:
             neighborhood_size=args.neighborhood_size,
             samples_per_class=samples_per_class,
             output_dir=args.output_dir,
-            random_seed=args.random_seed
+            random_seed=args.random_seed,
+            ks_summary_path=args.ks_summary_path,
         )
     
     print("\n" + "=" * 60)

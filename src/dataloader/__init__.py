@@ -12,7 +12,6 @@ from .classification_loader import (
     load_classification_dataset,
     preprocess_samples,
     estimate_parameters_for_samples,
-    load_class_thresholds,
 )
 from .cpazmal_loader import (
     MLDatasetLoader,
@@ -31,7 +30,6 @@ __all__ = [
     'load_classification_dataset',
     'preprocess_samples',
     'estimate_parameters_for_samples',
-    'load_class_thresholds',
     # CPAZMaL SAR dataset
     'MLDatasetLoader',
     'download_cpazmal',

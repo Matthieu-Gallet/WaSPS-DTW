@@ -8,7 +8,6 @@ This module provides functions for:
 """
 
 import numpy as np
-import pandas as pd
 from pathlib import Path
 from typing import Dict, Tuple, List, Optional
 import sys
@@ -78,91 +77,47 @@ def preprocess_samples(X: np.ndarray, max_time_steps: Optional[int] = None
     return samples
 
 
-def load_class_thresholds(
-    ks_summary_path: str,
-    ws: int,
-    tw: int,
-    idx_to_regime: Dict[int, str],
-) -> Dict[int, float]:
-    """
-    Load per-class optimal thresholds from a ks_summary CSV for a given (ws, tw) config.
-
-    Args:
-        ks_summary_path: Path to the ks_summary.csv produced by dev.py
-        ws: Spatial window size to look up
-        tw: Temporal window size to look up
-        idx_to_regime: Mapping class_idx → regime_code (from dataset metadata)
-
-    Returns:
-        Dict mapping class_idx → threshold value.
-        Classes missing from the summary are assigned threshold 0.0.
-    """
-    df = pd.read_csv(ks_summary_path)
-    subset = df[(df["ws"] == ws) & (df["tw"] == tw)].dropna(subset=["threshold"])
-    regime_to_thr = dict(zip(subset["regime"], subset["threshold"]))
-    return {
-        idx: float(regime_to_thr.get(code, 0.0))
-        for idx, code in idx_to_regime.items()
-    }
-
-
-def estimate_parameters_for_samples(X: np.ndarray, max_time_steps: Optional[int] = None,
-                                    Y: Optional[np.ndarray] = None,
-                                    class_thresholds: Optional[Dict[int, float]] = None,
+def estimate_parameters_for_samples(X: np.ndarray,
+                                    max_time_steps: Optional[int] = None,
                                     ) -> List[np.ndarray]:
     """
-    Estimate exponential distribution parameters for each sample.
+    Estimate exponential distribution lambda parameters for each sample.
 
-    For each sample, estimates lambda parameter at each time step
-    by pooling all spatial values.
-
-    When `Y` and `class_thresholds` are provided, a per-class threshold is applied:
-    values below the threshold are discarded and the remaining values are shifted
-    to zero (``values -= threshold``) before fitting.
+    Expects X to already have NaN values where data was filtered out by
+    build_classification_dataset (quantile threshold + shift applied at build time).
 
     Args:
         X: Input array of shape (N, T, D, W, W)
         max_time_steps: Optional limit on number of time steps
-        Y: Class labels, shape (N,). Required when class_thresholds is given.
-        class_thresholds: Dict mapping class_idx → threshold value.
 
     Returns:
         List of parameter arrays with shape (T, 1) for each sample
     """
     N, T, D, W1, W2 = X.shape
-    
     if max_time_steps is not None:
         T = min(T, max_time_steps)
-    
+
     estimator = LogCumulant(distribution='exponential')
     params_list = []
-    
-    for i in range(N):
-        thr = 0.0
-        if class_thresholds is not None and Y is not None:
-            thr = class_thresholds.get(int(Y[i]), 0.0)
 
+    for i in range(N):
         params = np.zeros((T, 1), dtype=np.float64)
         for t in range(T):
-            # Pool all values at time step t
             values = X[i, t, :, :, :].flatten()
-            values = values[np.isfinite(values) & (values > thr)]
-
+            values = values[np.isfinite(values) & (values > 0)]
             if len(values) >= 5:
-                values = values - thr
                 estimator.fit(values)
                 params[t, 0] = estimator.get_params()
             else:
-                # Use a default value if too few valid data points
                 params[t, 0] = np.nan
-        
-        # Replace any remaining NaN with mean of valid values
+
         valid_mask = ~np.isnan(params[:, 0])
         if valid_mask.sum() > 0 and (~valid_mask).sum() > 0:
             params[~valid_mask, 0] = params[valid_mask, 0].mean()
         elif (~valid_mask).sum() > 0:
             params[~valid_mask, 0] = 1.0
-        
+
         params_list.append(params)
-    
+
     return params_list
+

@@ -34,7 +34,6 @@ from dataloader import (
     load_classification_dataset,
     preprocess_samples,
     estimate_parameters_for_samples,
-    load_class_thresholds,
 )
 
 # Evaluation functions
@@ -94,11 +93,6 @@ Examples:
         help="Directory containing the classification dataset"
     )
     parser.add_argument(
-        "--ks-summary-path", type=str,
-        default=str(Path(__file__).parent.parent / "data_generator" / "Explore_2_dataset" / "ks_summary.csv"),
-        help="Path to ks_summary.csv for per-class thresholds (optional)"
-    )
-    parser.add_argument(
         "--output-dir", type=str,
         default=str(Path(__file__).parent.parent / "results" / "regime_classification" / "balanced"),
         help="Output directory for results"
@@ -142,7 +136,7 @@ Examples:
     
     # General parameters
     parser.add_argument(
-        "--gamma", type=float, default=10.0,
+        "--gamma", type=float, default=10,
         help="Soft-DTW regularization parameter (for one-shot and kfold modes)"
     )
     parser.add_argument(
@@ -150,11 +144,11 @@ Examples:
         help="Maximum number of time steps to use"
     )
     parser.add_argument(
-        "--sgd-epochs", type=int, default=400,
+        "--sgd-epochs", type=int, default=20,
         help="Number of epochs for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
-        "--sgd-lr", type=float, default=0.075,
+        "--sgd-lr", type=float, default=0.01,
         help="Learning rate for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
@@ -164,11 +158,11 @@ Examples:
     
     # Visualization options
     parser.add_argument(
-        "--plot-barycenters", action="store_true",
+        "--plot-barycenters", default=True, 
         help="Generate barycenter plots with training samples"
     )
     parser.add_argument(
-        "--n-samples-plot", type=int, default=20,
+        "--n-samples-plot", type=int, default=200,
         help="Number of samples per class to plot with barycenters"
     )
     
@@ -202,19 +196,8 @@ Examples:
     print("  Preprocessing raw data...")
     X_raw = preprocess_samples(X, args.max_time_steps)
 
-    # Load per-class thresholds if ks_summary available
-    class_thresholds = None
-    ks_path = Path(args.ks_summary_path)
-    if ks_path.exists():
-        ws = metadata.get("window_size", 0)
-        tw = metadata.get("time_window", 0)
-        class_thresholds = load_class_thresholds(str(ks_path), ws, tw, metadata["idx_to_regime"])
-        print(f"  Thresholds loaded from {ks_path.name} (ws={ws}, tw={tw}): {class_thresholds}")
-    else:
-        print(f"  No ks_summary found at {ks_path}, using threshold=0 for all classes.")
-
     print("  Estimating parameters...")
-    X_params = estimate_parameters_for_samples(X, args.max_time_steps, Y=Y, class_thresholds=class_thresholds)
+    X_params = estimate_parameters_for_samples(X, args.max_time_steps)
     print(f"  Raw sample shape: {X_raw[0].shape}")
     print(f"  Params sample shape: {X_params[0].shape}")
     

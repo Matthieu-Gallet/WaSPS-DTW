@@ -10,4 +10,3 @@ src/results/*
 .github/
 RESSOURCES/*
 notebooks/*
-notebooks/dev.ipynb
