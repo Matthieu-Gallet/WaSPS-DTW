@@ -26,8 +26,14 @@ from src.sdtw.classification_methods import (
     compute_barycenter_euclidean_raw,
     compute_barycenter_euclidean_params,
     compute_barycenter_wasserstein_sgd,
+    compute_barycenter_wasserstein_lbfgs,
     compute_sdtw_distance_euclidean,
     compute_sdtw_distance_wasserstein
+)
+from src.experiments.lstm_classifier import (
+    train_lstm_classifier,
+    compute_lstm_barycenters,
+    classify_by_lstm_barycenters,
 )
 
 
@@ -76,9 +82,17 @@ def evaluate_classification(X_train_raw: List[np.ndarray], X_train_params: List[
                             Y_train: np.ndarray, Y_test: np.ndarray,
                             idx_to_regime: Dict[int, str], gamma: float = 1.0,
                             sgd_epochs: int = 100, sgd_lr: float = 0.05,
-                            verbose: bool = True) -> Dict:
+                            verbose: bool = True,
+                            run_lstm: bool = False,
+                            lstm_hidden_size: int = 64,
+                            lstm_num_layers: int = 1,
+                            lstm_dropout: float = 0.0,
+                            lstm_epochs: int = 60,
+                            lstm_batch_size: int = 32,
+                            lstm_lr: float = 1e-3,
+                            lstm_seed: int = 42) -> Dict:
     """
-    Run classification evaluation with all three methods.
+    Run classification evaluation with Soft-DTW methods and optional LSTM baseline.
     
     Args:
         X_train_raw: Training samples (raw data)
@@ -92,6 +106,14 @@ def evaluate_classification(X_train_raw: List[np.ndarray], X_train_params: List[
         sgd_epochs: Number of epochs for SGD barycenter
         sgd_lr: Learning rate for SGD barycenter
         verbose: Print progress
+        run_lstm: Whether to run LSTM baseline on raw data
+        lstm_hidden_size: LSTM hidden size
+        lstm_num_layers: Number of stacked LSTM layers
+        lstm_dropout: Dropout between LSTM layers
+        lstm_epochs: Number of LSTM training epochs
+        lstm_batch_size: Batch size for LSTM training/inference
+        lstm_lr: Learning rate for LSTM training
+        lstm_seed: Random seed for LSTM reproducibility
         
     Returns:
         Dictionary with results for all methods
@@ -247,6 +269,112 @@ def evaluate_classification(X_train_raw: List[np.ndarray], X_train_params: List[
         print(f"  F1 Score (weighted): {f1_wass:.4f}")
         print(f"  F1 Score (macro): {f1_macro_wass:.4f}")
     
+    # # =========================================================================
+    # # Method 4: Soft-DTW Wasserstein on Estimated Parameters (L-BFGS-B)
+    # # =========================================================================
+    # if verbose:
+    #     print("\n" + "=" * 60)
+    #     print("Method 4: Soft-DTW Wasserstein on Estimated Parameters (L-BFGS-B)")
+    #     print("=" * 60)
+
+    # start_time = time.time()
+
+    # barycenters_wass_lbfgs = {}
+    # for class_label in unique_classes:
+    #     class_params = [X_train_params[i] for i in range(len(X_train_params)) if Y_train[i] == class_label]
+    #     if verbose:
+    #         print(f"  Computing barycenter for class {idx_to_regime[class_label]} ({len(class_params)} samples)...")
+    #     barycenters_wass_lbfgs[class_label] = compute_barycenter_wasserstein_lbfgs(
+    #         class_params, gamma=gamma, max_iter=100
+    #     )
+
+    # barycenter_time_wass_lbfgs = time.time() - start_time
+    # if verbose:
+    #     print(f"  Barycenter computation time: {barycenter_time_wass_lbfgs:.2f}s")
+
+    # start_time = time.time()
+    # Y_pred_wass_lbfgs = classify_by_nearest_barycenter(
+    #     X_test_params, barycenters_wass_lbfgs, compute_sdtw_distance_wasserstein, gamma, show_progress=verbose
+    # )
+    # classify_time_wass_lbfgs = time.time() - start_time
+
+    # f1_wass_lbfgs = f1_score(Y_test, Y_pred_wass_lbfgs, average='weighted', zero_division=0)
+    # f1_macro_wass_lbfgs = f1_score(Y_test, Y_pred_wass_lbfgs, average='macro', zero_division=0)
+
+    # results['wasserstein_lbfgs'] = {
+    #     'predictions': Y_pred_wass_lbfgs,
+    #     'f1_weighted': f1_wass_lbfgs,
+    #     'f1_macro': f1_macro_wass_lbfgs,
+    #     'barycenter_time': barycenter_time_wass_lbfgs,
+    #     'classify_time': classify_time_wass_lbfgs,
+    #     'barycenters': barycenters_wass_lbfgs
+    # }
+
+    # if verbose:
+    #     print(f"  Classification time: {classify_time_wass_lbfgs:.2f}s")
+    #     print(f"  F1 Score (weighted): {f1_wass_lbfgs:.4f}")
+    #     print(f"  F1 Score (macro): {f1_macro_wass_lbfgs:.4f}")
+
+    # =========================================================================
+    # Method 4: LSTM barycenters on Raw Data
+    # =========================================================================
+    if run_lstm:
+        if verbose:
+            print("\n" + "=" * 60)
+            print("Method 4: LSTM Barycenter on Raw Data")
+            print("=" * 60)
+
+        start_time = time.time()
+        model, state = train_lstm_classifier(
+            X_train_raw,
+            Y_train,
+            hidden_size=lstm_hidden_size,
+            num_layers=lstm_num_layers,
+            dropout=lstm_dropout,
+            epochs=lstm_epochs,
+            batch_size=lstm_batch_size,
+            learning_rate=lstm_lr,
+            seed=lstm_seed,
+            verbose=verbose,
+        )
+        barycenters_lstm = compute_lstm_barycenters(
+            model,
+            state,
+            X_train_raw,
+            Y_train,
+            batch_size=lstm_batch_size,
+        )
+        barycenter_time_lstm = time.time() - start_time
+        if verbose:
+            print(f"  Barycenter build time (train+proto): {barycenter_time_lstm:.2f}s")
+
+        start_time = time.time()
+        Y_pred_lstm = classify_by_lstm_barycenters(
+            model,
+            state,
+            barycenters_lstm,
+            X_test_raw,
+            batch_size=lstm_batch_size,
+        )
+        classify_time_lstm = time.time() - start_time
+
+        f1_lstm = f1_score(Y_test, Y_pred_lstm, average='weighted', zero_division=0)
+        f1_macro_lstm = f1_score(Y_test, Y_pred_lstm, average='macro', zero_division=0)
+
+        results['lstm_raw'] = {
+            'predictions': Y_pred_lstm,
+            'f1_weighted': f1_lstm,
+            'f1_macro': f1_macro_lstm,
+            'barycenter_time': barycenter_time_lstm,
+            'classify_time': classify_time_lstm,
+            'barycenters': barycenters_lstm,
+        }
+
+        if verbose:
+            print(f"  Classification time: {classify_time_lstm:.2f}s")
+            print(f"  F1 Score (weighted): {f1_lstm:.4f}")
+            print(f"  F1 Score (macro): {f1_macro_lstm:.4f}")
+
     return results
 
 
@@ -391,7 +519,8 @@ def print_detailed_results(results: Dict, Y_test: np.ndarray, idx_to_regime: Dic
     methods = [
         ('euclidean_raw', 'Soft-DTW Euclidean (Raw Data)'),
         ('euclidean_params', 'Soft-DTW Euclidean (Parameters)'),
-        ('wasserstein_params', 'Soft-DTW Wasserstein (Parameters)')
+        ('wasserstein_params', 'Soft-DTW Wasserstein (Parameters)'),
+        ('lstm_raw', 'LSTM Barycenter (Raw Data)')
     ]
     
     for method_key, method_name in methods:

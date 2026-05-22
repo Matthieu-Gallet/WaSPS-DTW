@@ -136,7 +136,7 @@ Examples:
     
     # General parameters
     parser.add_argument(
-        "--gamma", type=float, default=500,
+        "--gamma", type=float, default=10.0,
         help="Soft-DTW regularization parameter (for one-shot and kfold modes)"
     )
     parser.add_argument(
@@ -144,7 +144,7 @@ Examples:
         help="Maximum number of time steps to use"
     )
     parser.add_argument(
-        "--sgd-epochs", type=int, default=50,
+        "--sgd-epochs", type=int, default=75,
         help="Number of epochs for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
@@ -152,7 +152,35 @@ Examples:
         help="Learning rate for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
-        "--random-seed", type=int, default=42,
+        "--disable-lstm", action="store_true",
+        help="Disable LSTM baseline in one-shot mode"
+    )
+    parser.add_argument(
+        "--lstm-hidden-size", type=int, default=48,
+        help="LSTM hidden size (one-shot mode)"
+    )
+    parser.add_argument(
+        "--lstm-num-layers", type=int, default=1,
+        help="Number of LSTM layers (one-shot mode)"
+    )
+    parser.add_argument(
+        "--lstm-dropout", type=float, default=0.0,
+        help="LSTM dropout (used when num-layers > 1)"
+    )
+    parser.add_argument(
+        "--lstm-epochs", type=int, default=60,
+        help="Number of LSTM training epochs (one-shot mode)"
+    )
+    parser.add_argument(
+        "--lstm-batch-size", type=int, default=32,
+        help="LSTM batch size (one-shot mode)"
+    )
+    parser.add_argument(
+        "--lstm-lr", type=float, default=1e-3,
+        help="LSTM learning rate (one-shot mode)"
+    )
+    parser.add_argument(
+        "--random-seed", type=int, default=1142,
         help="Random seed for reproducibility"
     )
     
@@ -237,6 +265,14 @@ Examples:
             gamma=args.gamma,
             sgd_epochs=args.sgd_epochs,
             sgd_lr=args.sgd_lr,
+            run_lstm=(not args.disable_lstm),
+            lstm_hidden_size=args.lstm_hidden_size,
+            lstm_num_layers=args.lstm_num_layers,
+            lstm_dropout=args.lstm_dropout,
+            lstm_epochs=args.lstm_epochs,
+            lstm_batch_size=args.lstm_batch_size,
+            lstm_lr=args.lstm_lr,
+            lstm_seed=args.random_seed,
             verbose=True
         )
         
@@ -318,13 +354,16 @@ Examples:
         print("=" * 80)
         print(f"\n{'Method':<45} {'F1 (weighted)':<15} {'F1 (macro)':<15}")
         print("-" * 75)
-        for method_key in ['euclidean_raw', 'euclidean_params', 'wasserstein_params']:
-            method_name = {
-                'euclidean_raw': 'Soft-DTW Euclidean (Raw Data)',
-                'euclidean_params': 'Soft-DTW Euclidean (Parameters)',
-                'wasserstein_params': 'Soft-DTW Wasserstein (Parameters)'
-            }[method_key]
-            print(f"{method_name:<45} {results[method_key]['f1_weighted']:<15.4f} {results[method_key]['f1_macro']:<15.4f}")
+        method_name_map = {
+            'euclidean_raw': 'Soft-DTW Euclidean (Raw Data)',
+            'euclidean_params': 'Soft-DTW Euclidean (Parameters)',
+            'wasserstein_params': 'Soft-DTW Wasserstein (Parameters) SGD',
+            'lstm_raw': 'LSTM Barycenter (Raw Data)',
+        }
+        for method_key in ['euclidean_raw', 'euclidean_params', 'wasserstein_params', 'lstm_raw']:
+            if method_key not in results:
+                continue
+            print(f"{method_name_map[method_key]:<45} {results[method_key]['f1_weighted']:<15.4f} {results[method_key]['f1_macro']:<15.4f}")
         print("-" * 75)
     
     elif args.mode == "kfold":

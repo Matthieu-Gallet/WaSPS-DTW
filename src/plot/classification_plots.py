@@ -110,7 +110,7 @@ def plot_confusion_matrices(results: Dict, Y_test: np.ndarray,
                             idx_to_regime: Dict[int, str],
                             output_dir: str = None, save_pdf: bool = True):
     """
-    Plot confusion matrices for all three methods.
+    Plot confusion matrices for available classification methods.
     
     Args:
         results: Dictionary with classification results
@@ -122,19 +122,22 @@ def plot_confusion_matrices(results: Dict, Y_test: np.ndarray,
     setup_ieee_style()
     
     target_names = [idx_to_regime[i] for i in sorted(idx_to_regime.keys())]
-    methods = [
+    method_candidates = [
         ('euclidean_raw', 'Soft-DTW Euclidean\n(Raw Data)'),
         ('euclidean_params', 'Soft-DTW Euclidean\n(Parameters)'),
-        ('wasserstein_params', 'Soft-DTW Wasserstein\n(Parameters)')
+        ('wasserstein_params', 'Soft-DTW Wasserstein\n(Parameters)'),
+        ('lstm_raw', 'LSTM Barycenter\n(Raw Data)')
     ]
+    methods = [(k, n) for k, n in method_candidates if k in results]
+    if not methods:
+        return
     
-    # IEEE double-column width ≈ 7 inches
-    fig, axes = plt.subplots(1, 3, figsize=(7, 2.3))
+    n_methods = len(methods)
+    fig, axes = plt.subplots(1, n_methods, figsize=(2.15 * n_methods + 0.8, 2.3))
+    if n_methods == 1:
+        axes = [axes]
     
     for idx, (method_key, method_name) in enumerate(methods):
-        if method_key not in results:
-            continue
-            
         Y_pred = results[method_key]['predictions']
         cm = confusion_matrix(Y_test, Y_pred)
         

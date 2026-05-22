@@ -679,7 +679,7 @@ Output format:
         help="Temporal grouping size (D) in time steps"
     )
     parser.add_argument(
-        "--neighborhood-size", type=int, default=25,
+        "--neighborhood-size", type=int, default=12,
         help="Size of neighborhood for augmentation (in pixels, only for balanced mode)"
     )
     parser.add_argument(

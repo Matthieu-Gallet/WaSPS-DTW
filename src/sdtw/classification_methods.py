@@ -26,7 +26,7 @@ from sdtw.distance import SquaredEuclidean, WassersteinDistance
 # =============================================================================
 
 def compute_barycenter_euclidean_raw(samples: List[np.ndarray], gamma: float = 1.0,
-                                      max_iter: int = 50) -> np.ndarray:
+                                      max_iter: int = 1000) -> np.ndarray:
     """
     Compute Soft-DTW barycenter with Euclidean distance on raw data.
     
@@ -55,7 +55,7 @@ def compute_barycenter_euclidean_raw(samples: List[np.ndarray], gamma: float = 1
 
 
 def compute_barycenter_euclidean_params(params_list: List[np.ndarray], gamma: float = 1.0,
-                                         max_iter: int = 100) -> np.ndarray:
+                                         max_iter: int = 1000) -> np.ndarray:
     """
     Compute Soft-DTW barycenter with Euclidean distance on estimated parameters.
     
@@ -79,8 +79,32 @@ def compute_barycenter_euclidean_params(params_list: List[np.ndarray], gamma: fl
     return barycenter
 
 
+def compute_barycenter_wasserstein_lbfgs(params_list: List[np.ndarray], gamma: float = 1.0,
+                                          max_iter: int = 100) -> np.ndarray:
+    """
+    Compute Soft-DTW barycenter with Wasserstein distance using L-BFGS-B.
+
+    Args:
+        params_list: List of parameter arrays with shape (T, 1)
+        gamma: Soft-DTW regularization parameter
+        max_iter: Maximum number of L-BFGS-B iterations
+
+    Returns:
+        Barycenter parameters array with shape (T, 1)
+    """
+    bary_init = np.mean(params_list, axis=0)  # (T, 1)
+    T = bary_init.shape[0]
+    bounds = [(1e-6, None)] * T  # λ must stay positive
+    return sdtw_barycenter(
+        params_list, bary_init, gamma=gamma,
+        max_iter=max_iter, distance="wasserstein",
+        distribution="exponential", return_estimate=True,
+        precompute_params=False, bounds=bounds
+    )
+
+
 def compute_barycenter_wasserstein_sgd(params_list: List[np.ndarray], gamma: float = 1.0,
-                                        learning_rate: float = 0.075, num_epochs: int = 250,
+                                        learning_rate: float = 0.10, num_epochs: int = 20,
                                         batch_size: int = 4, verbose: bool = False) -> np.ndarray:
     """
     Compute Soft-DTW barycenter with Wasserstein distance using SGD.
