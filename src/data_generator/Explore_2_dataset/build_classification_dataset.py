@@ -293,7 +293,7 @@ def build_basic_dataset(nc_path: str, csv_path: str, window_size: int = 5,
     regime_to_idx = {regime: idx for idx, regime in enumerate(unique_regimes)}
     idx_to_regime = {idx: regime for regime, idx in regime_to_idx.items()}
     print(f"\n  Label encoding: {regime_to_idx}")
-    
+    q_levels = {regime: 0.1 for regime in unique_regimes}  # Default q_level if not provided
     # Load NetCDF data
     print("\n[2/4] Loading NetCDF data...")
     ds = xr.open_dataset(nc_path, engine='netcdf4')
@@ -324,6 +324,7 @@ def build_basic_dataset(nc_path: str, csv_path: str, window_size: int = 5,
         
         # Extract window
         window = extract_window(data, lat_idx, lon_idx, window_size, time_window)
+        window = apply_quantile_threshold(window, q_levels[regime])
         
         if window is not None:
             X_list.append(window)
@@ -463,7 +464,7 @@ def build_balanced_dataset(nc_path: str, csv_path: str, window_size: int = 5,
         q_levels = load_quantile_levels(ks_summary_path, window_size, time_window, unique_regimes)
         print(f"\n  Quantile levels loaded: {q_levels}")
     else:
-        q_levels = {regime: 0.075 for regime in unique_regimes}  # Default q_level if not provided
+        q_levels = {regime: 0.1 for regime in unique_regimes}  # Default q_level if not provided
         print("\n  No ks_summary_path provided — no quantile thresholding applied.")
     
     # Set default samples_per_class if not provided
@@ -678,7 +679,7 @@ Output format:
         help="Temporal grouping size (D) in time steps"
     )
     parser.add_argument(
-        "--neighborhood-size", type=int, default=12,
+        "--neighborhood-size", type=int, default=25,
         help="Size of neighborhood for augmentation (in pixels, only for balanced mode)"
     )
     parser.add_argument(

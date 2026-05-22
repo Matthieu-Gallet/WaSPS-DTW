@@ -379,7 +379,10 @@ def print_detailed_results(results: Dict, Y_test: np.ndarray, idx_to_regime: Dic
         Y_test: True test labels
         idx_to_regime: Mapping from label index to regime code
     """
-    target_names = [idx_to_regime[i] for i in sorted(idx_to_regime.keys())]
+    # idx_Y_test = [idx_to_regime[i] for i in Y_test]
+    target_names = [idx_to_regime[i] for i in np.unique(Y_test)]  # Only include classes present in test set
+    # target_names = [idx_to_regime[i] for i in sorted(idx_to_regime.keys())]
+    
     
     print("\n" + "=" * 80)
     print("DETAILED CLASSIFICATION RESULTS")

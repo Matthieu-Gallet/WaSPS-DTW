@@ -101,7 +101,7 @@ def compute_barycenter_wasserstein_sgd(params_list: List[np.ndarray], gamma: flo
     barycenter, _ = sgd_barycenter(
         params_list, gamma=gamma, barycenter_init_method='mean_lambda',
         learning_rate=learning_rate, num_epochs=num_epochs, batch_size=batch_size,
-        lr_decay=0.995, grad_clip=100.0, distribution="exponential",
+        lr_decay=0.5, grad_clip=10.0, distribution="exponential",
         verbose=verbose, use_softplus=True, X_is_params=True
     )
     

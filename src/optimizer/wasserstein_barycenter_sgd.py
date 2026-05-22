@@ -24,7 +24,7 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
                    num_epochs=100, batch_size=1, tol=1e-6, verbose=True,
                    lr_decay=0.95, grad_clip=10.0, distribution="exponential",
                    use_softplus=False, barycenter_init_method='mean_lambda', warmup_epochs=10, seed=123,
-                   estimator_method='log_cumulant', X_is_params=False):
+                   estimator_method='log_cumulant', X_is_params=False, return_best=True):
     """
     Simple Stochastic Gradient Descent for Soft-DTW barycenter computation.
 
@@ -63,11 +63,15 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
         Parameter estimation method: 'log_cumulant' (default) or 'mle'
     X_is_params : bool
         If True, X already contains parameters (skip estimation). Default False.
+    return_best : bool
+        If True (default), return the barycenter with the lowest loss seen during training.
+        If False, return the final barycenter. Best tracking avoids returning a degraded
+        barycenter when the SGD oscillates at late epochs.
 
     Returns
     -------
     barycenter : array
-        Optimized barycenter parameters
+        Optimized barycenter parameters (best or final depending on return_best)
     losses : list
         Loss history
     """
@@ -131,7 +135,6 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
     elif barycenter_init_method == 'mean_lambda':
         # Compute mean of all lambda series, handling different lengths
         barycenter_init = np.mean(np.array([x.flatten() for x in X_params_list]), axis=0).reshape(-1, 1)
-        print(f"  [DEBUG] Barycenter init (mean_lambda): shape={barycenter_init.shape}")
 
     # Initialize barycenter - choose parameterization
     Z_init = barycenter_init.copy().astype(np.float64)
@@ -139,6 +142,8 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
         print(f"  [DEBUG] Barycenter init shape: {Z_init.shape}, values (first 5): {Z_init.flatten()[:5]}")
     losses = []
     current_lr = learning_rate
+    best_loss = np.inf
+    best_Z = None
 
     if use_softplus:
         # Softplus parameterization: optimize in z-space where lambda = softplus(z)
@@ -250,9 +255,15 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
                     print(f"  [DEBUG] First batch - Distance: {dist_time:.3f}s, "
                           f"Gradient: {grad_time:.3f}s, Total: {batch_times[-1]:.3f}s")
 
-        epoch_loss /= (n_samples // batch_size + 1)
+        epoch_loss /= batch_count
         losses.append(epoch_loss)
         epoch_times.append(time_module.time() - epoch_start)
+
+        # Track best barycenter
+        if epoch_loss < best_loss:
+            best_loss = epoch_loss
+            best_Z = transformed_Z.copy()
+
         if verbose:
             if epoch == 0:
                 print(f"  [DEBUG] Epoch 1: {epoch_times[-1]:.3f}s, {batch_count} batches, "
@@ -284,15 +295,16 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
                     print(f"Converged after {epoch+1} epochs")
                 break
 
-    # Return final parameters in original space
     if verbose:
         print(f"  [DEBUG] Total epochs: {len(epoch_times)}, "
               f"Mean time/epoch: {np.mean(epoch_times):.3f}s, Total: {sum(epoch_times):.3f}s")
-    
+
+    # Select best or final Z
+    Z_out = best_Z if (return_best and best_Z is not None) else transformed_Z
     if use_softplus:
-        exp_z = np.exp(transformed_Z)
-        Z_final = np.where(transformed_Z > 50, transformed_Z, np.log1p(exp_z))
+        exp_z = np.exp(Z_out)
+        Z_final = np.where(Z_out > 50, Z_out, np.log1p(exp_z))
     else:
-        Z_final = transformed_Z
+        Z_final = Z_out
 
     return Z_final, losses

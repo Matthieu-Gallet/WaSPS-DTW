@@ -136,7 +136,7 @@ Examples:
     
     # General parameters
     parser.add_argument(
-        "--gamma", type=float, default=10,
+        "--gamma", type=float, default=500,
         help="Soft-DTW regularization parameter (for one-shot and kfold modes)"
     )
     parser.add_argument(
@@ -144,11 +144,11 @@ Examples:
         help="Maximum number of time steps to use"
     )
     parser.add_argument(
-        "--sgd-epochs", type=int, default=20,
+        "--sgd-epochs", type=int, default=50,
         help="Number of epochs for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
-        "--sgd-lr", type=float, default=0.01,
+        "--sgd-lr", type=float, default=0.1,
         help="Learning rate for SGD barycenter (Wasserstein method)"
     )
     parser.add_argument(
