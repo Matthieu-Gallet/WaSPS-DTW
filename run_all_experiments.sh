@@ -32,4 +32,36 @@ if [ "$classif4" = "True" ]; then
     python src/experiments/sdtw_barycenter_classification.py --mode sample-sens --sample-sizes 0.05,0.1,0.2,0.4,0.6,0.8,1.0 --n-splits 5
 fi
 
+# =============================================================================
+# CPAZMaL SAR classification (Weibull)
+# =============================================================================
+cpazmal_compare=True   # 3-method comparison: euclidean_raw / euclidean_params / wasserstein_weibull
+cpazmal_kmedoid=False  # Weibull-only kmedoid (already validated)
+cpazmal_shapelet=False # Learning shapelets (slow, ~10 min)
+
+if [ "$cpazmal_compare" = "True" ]; then
+    echo "Lancement CPAZMaL compare (3 méthodes: euc_raw / euc_params / wasserstein_weibull)..."
+    python src/experiments/cpazmal_classification.py --mode compare
+fi
+
+if [ "$cpazmal_kmedoid" = "True" ]; then
+    echo "Lancement CPAZMaL kmedoid..."
+    python src/experiments/cpazmal_classification.py --mode kmedoid
+fi
+
+if [ "$cpazmal_shapelet" = "True" ]; then
+    echo "Lancement CPAZMaL shapelet..."
+    python src/experiments/cpazmal_classification.py --mode shapelet
+fi
+
+# =============================================================================
+# Model fit robustness (river discharge)
+# =============================================================================
+robustness=False  # Trace F1 vs. model-fit quality (varies exponential KS threshold)
+
+if [ "$robustness" = "True" ]; then
+    echo "Lancement model_fit_robustness..."
+    python src/experiments/model_fit_robustness.py
+fi
+
 echo "Toutes les expériences sont terminées. Résultats dans results/regime_classification/ et autres dossiers results/"
