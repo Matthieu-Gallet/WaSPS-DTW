@@ -1,3 +1,13 @@
+"""
+Distance objects for Soft-DTW: Squared-Euclidean and Wasserstein (exponential + Weibull).
+
+Each distance object exposes:
+  - compute() → [m, n] distance matrix
+  - jacobian_product(E) → [m, d] gradient w.r.t. X (first argument)
+  - jacobian_product_Y(E) → [n, d] gradient w.r.t. Y (second argument)
+
+Both are passed directly to SoftDTW, which calls .compute() if the object has that method.
+"""
 import numpy as np
 
 from sklearn.metrics.pairwise import euclidean_distances
@@ -5,253 +15,190 @@ from sklearn.metrics.pairwise import euclidean_distances
 from .wasserstein_fast import (
     estimate_exponential_fast,
     pairwise_wasserstein_exponential,
+    estimate_weibull_fast,
+    pairwise_wasserstein_weibull,
 )
-
 from .soft_dtw_fast import (
     _jacobian_product_sq_euc,
     _jacobian_product_sq_was_exp,
+    _jacobian_product_sq_was_weibull,
 )
 
 
-class SquaredEuclidean(object):
+class SquaredEuclidean:
+    """Squared Euclidean distance for use as a Soft-DTW local cost."""
 
     def __init__(self, X, Y):
         """
         Parameters
         ----------
-        X: array, shape = [m, d]
-            First time series.
-
-        Y: array, shape = [n, d]
-            Second time series.
+        X : array, shape = [m, d]
+        Y : array, shape = [n, d]
         """
         self.X = X.astype(np.float64)
         self.Y = Y.astype(np.float64)
 
     def compute(self):
-        """
-        Compute distance matrix.
-
-        Returns
-        -------
-        D: array, shape = [m, n]
-            Distance matrix.
-        """
+        """Return [m, n] squared-Euclidean distance matrix."""
         return euclidean_distances(self.X, self.Y, squared=True)
 
     def jacobian_product(self, E):
         """
-        Compute the product between the Jacobian
-        (a linear map from m x d to m x n) and a matrix E.
-
-        Parameters
-        ----------
-        E: array, shape = [m, n]
-            Second time series.
+        Jacobian–E product: G[i, k] = Σ_j E[i,j] · 2(X[i,k] - Y[j,k]).
 
         Returns
         -------
-        G: array, shape = [m, d]
-            Product with Jacobian
-            ([m x d, m x n] * [m x n] = [m x d]).
+        G : array, shape = [m, d]
         """
         G = np.zeros_like(self.X)
-
         _jacobian_product_sq_euc(self.X, self.Y, E, G)
-
         return G
 
-class WassersteinDistance(object):
+
+class WassersteinDistance:
     """
-    Fast Wasserstein-2 distance computation using Cython-optimized functions.
-    
-    This class computes W2 distances between time series of exponential or Weibull
-    distributions using high-performance Cython implementations.
-    
+    Squared Wasserstein-2 (W₂²) distance for exponential or Weibull distributions.
+
+    The local cost matrix is W₂² (not W₂).  This is consistent with the
+    paper's forward recursion (eqn:wasps-recursion) and with the existing
+    exponential implementation.
+
     Parameters
     ----------
-    X : array, shape = [m, n_samples] or [m, 1]
-        First time series. Each row contains samples from a distribution at time t,
-        OR precomputed parameters if X_is_params=True.
-    Y : array, shape = [n, n_samples] or [n, 1]
-        Second time series. Each row contains samples from a distribution at time t,
-        OR precomputed parameters if Y_is_params=True.
-    distribution : str
-        Distribution family: 'exponential'
+    X : array, shape = [m, n_samples] or [m, d_params]
+        First time series.  Each row holds raw samples OR precomputed parameters.
+    Y : array, shape = [n, n_samples] or [n, d_params]
+    distribution : {'exponential', 'weibull'}
+        Distribution family.  Exponential uses a single rate parameter λ (d=1);
+        Weibull uses (k, λ_scale) stored as column-0=k, column-1=λ (d=2).
     precompute_params : bool
-        If True, estimate parameters once at initialization (faster for multiple calls)
+        If True, estimate parameters once at construction time (faster for
+        repeated calls such as barycenter optimisation).
     X_is_params : bool
-        If True, X already contains distribution parameters (no estimation needed).
-        Use this when X is the barycenter being optimized.
+        If True, X already holds distribution parameters — skip estimation.
     Y_is_params : bool
-        If True, Y already contains distribution parameters (no estimation needed).
-    
-    Attributes
-    ----------
-    estimate_parameters : callable
-        Cython estimation function (estimate_exponential_fast)
-    distance_matrix : array, shape = [m, n]
-        Computed Wasserstein distance matrix
-    
-    Examples
-    --------
-    >>> from scipy.stats import expon
-    >>> import numpy as np
-    >>> # Generate data: 3 time points, each with 500 samples
-    >>> X = np.array([expon.rvs(scale=1/lam, size=500) for lam in [1, 5, 10]])
-    >>> Y = np.array([expon.rvs(scale=1/lam, size=500) for lam in [2, 4, 8]])
-    >>> 
-    >>> # Compute Wasserstein distance matrix (automatically uses Cython)
-    >>> wass = WassersteinDistance(X, Y, distribution='exponential')
-    >>> D = wass.compute()
-    
+        If True, Y already holds distribution parameters — skip estimation.
+
     Notes
     -----
-    - Only W2² distance is supported (squared Wasserstein distance)
-    - Uses Cython for 20-90x speedup over pure Python
-    - Accuracy: machine precision (~1e-13 relative error)
+    - Exponential rate β ↔ Weibull(k=1, λ=1/β).  The two parameterisations
+      are *not* interchangeable objects; pick one distribution and stay with it.
+    - Weibull parameter array has shape (T, 2): [:, 0]=k, [:, 1]=λ_scale.
     """
-    
+
+    _SUPPORTED = {'exponential', 'weibull'}
+
     def __init__(self, X, Y, distribution='exponential', precompute_params=True,
                  X_is_params=False, Y_is_params=False):
-        """Initialize WassersteinDistance with data and parameters."""
         self.X = np.asarray(X, dtype=np.float64)
         self.Y = np.asarray(Y, dtype=np.float64)
         self.distribution = distribution.lower()
         self.precompute_params = precompute_params
         self.X_is_params = X_is_params
         self.Y_is_params = Y_is_params
-        
-        # Validate inputs
+
         if self.X.ndim != 2 or self.Y.ndim != 2:
-            raise ValueError("X and Y must be 2D arrays")
-        
-        # Only support exponential
-        if self.distribution not in ['exponential']:
-            raise ValueError(f"Only 'exponential' is supported. Got: '{self.distribution}'")        
+            raise ValueError("X and Y must be 2-D arrays.")
+        if self.distribution not in self._SUPPORTED:
+            raise ValueError(
+                f"distribution must be one of {self._SUPPORTED}, got '{self.distribution}'."
+            )
 
-        # Set estimation function and compute function based on distribution
         if self.distribution == 'exponential':
-            self.estimate_parameters = estimate_exponential_fast
             self._compute_matrix = pairwise_wasserstein_exponential
-            self._jacobian_func = _jacobian_product_sq_was_exp
-            if self.precompute_params:
-                # Handle X: either use as-is (if params) or estimate
-                if self.X_is_params:
-                    # X already contains parameters, use directly
-                    self.X_params_2d = self.X.copy()
-                else:
-                    # X contains samples, estimate parameters
-                    self.X_params_2d = np.array([self.estimate_parameters(self.X[i]) for i in range(self.X.shape[0])]).reshape(-1, 1)
-                
-                # Handle Y: either use as-is (if params) or estimate
-                if self.Y_is_params:
-                    # Y already contains parameters, use directly
-                    self.Y_params_2d = self.Y.copy()
-                else:
-                    # Y contains samples, estimate parameters
-                    self.Y_params_2d = np.array([self.estimate_parameters(self.Y[j]) for j in range(self.Y.shape[0])]).reshape(-1, 1)
+            self._jacobian_func   = _jacobian_product_sq_was_exp
+            self._d_params        = 1
+            if precompute_params:
+                self.X_params_2d = (
+                    self.X.copy() if X_is_params
+                    else np.array([estimate_exponential_fast(self.X[i])
+                                   for i in range(self.X.shape[0])]).reshape(-1, 1)
+                )
+                self.Y_params_2d = (
+                    self.Y.copy() if Y_is_params
+                    else np.array([estimate_exponential_fast(self.Y[j])
+                                   for j in range(self.Y.shape[0])]).reshape(-1, 1)
+                )
 
-        # Initialize distance matrix
+        elif self.distribution == 'weibull':
+            self._compute_matrix = pairwise_wasserstein_weibull
+            self._jacobian_func   = _jacobian_product_sq_was_weibull
+            self._d_params        = 2  # (k, λ_scale)
+            if precompute_params:
+                self.X_params_2d = (
+                    self.X.copy() if X_is_params
+                    else np.array([estimate_weibull_fast(self.X[i])
+                                   for i in range(self.X.shape[0])], dtype=np.float64)
+                )
+                self.Y_params_2d = (
+                    self.Y.copy() if Y_is_params
+                    else np.array([estimate_weibull_fast(self.Y[j])
+                                   for j in range(self.Y.shape[0])], dtype=np.float64)
+                )
+
         self.distance_matrix = None
-    
-    
+
+    # ------------------------------------------------------------------
     def compute(self):
-        """
-        Compute Wasserstein-2 distance matrix using fast Cython implementation.
-        
-        Returns
-        -------
-        D : array, shape = [m, n]
-            Wasserstein distance matrix where D[i,j] is the W2 distance
-            between X[i] and Y[j]
-            
-        Notes
-        -----
-        This method directly calls the optimized Cython function which:
-        1. Estimates parameters for all time points
-        2. Computes all pairwise distances
-        All in a single optimized pass for maximum performance.
-        """
-        # Call Cython matrix computation directly
-        # It handles parameter estimation and distance computation internally
+        """Compute and return the [m, n] W₂² distance matrix."""
         if self.precompute_params:
             self.distance_matrix = self._compute_matrix(
-                self.X_params_2d, self.Y_params_2d, self.precompute_params
+                self.X_params_2d, self.Y_params_2d, True
             )
         else:
-            self.distance_matrix = self._compute_matrix(
-                self.X, self.Y, self.precompute_params
-            )
-        
+            self.distance_matrix = self._compute_matrix(self.X, self.Y, False)
         return self.distance_matrix
-    
+
+    # ------------------------------------------------------------------
     def jacobian_product(self, E):
         """
-        Compute Jacobian product for Wasserstein distances w.r.t. X parameters.
-        
-        Parameters
-        ----------
-        E : array, shape = [m, n]
-            Input matrix (gradient w.r.t. distance matrix from SoftDTW backward)
-            
+        Jacobian product ∂L/∂params_X.
+
         Returns
         -------
-        G : array, shape = [m, 1]
-            Jacobian product dL/dλ_x, where d=1 for exponential.
-            
-        Notes
-        -----
-        Uses analytical derivatives of Wasserstein distances with respect to
-        distribution parameters. For exponential: d=1 (lambda).
+        G : array, shape = [m, d_params]
+            d_params = 1 for exponential (∂/∂λ_rate),
+            d_params = 2 for Weibull      (∂/∂k, ∂/∂λ_scale).
         """
         E = np.asarray(E, dtype=np.float64)
-        
-        if self.distribution == 'exponential':
-            G = np.zeros((self.X.shape[0], 1), dtype=np.float64)
-    
-        # Call the appropriate Cython jacobian function
+        G = np.zeros((self.X.shape[0], self._d_params), dtype=np.float64)
         self._jacobian_func(self.X_params_2d, self.Y_params_2d, E, G)
-        
         return G
 
+    # ------------------------------------------------------------------
     def jacobian_product_Y(self, E):
         """
-        Compute Jacobian product for Wasserstein distances w.r.t. Y parameters.
+        Jacobian product ∂L/∂params_Y.
 
-        This is the counterpart of `jacobian_product` but computes dL/dλ_y
-        (gradient with respect to the second argument, e.g. a shapelet).
-
-        For exponential W2²(λ_x, λ_y) = 2*(λ_x-λ_y)²/(λ_x²λ_y²) = 2*(1/λ_x - 1/λ_y)²:
-            ∂W2²/∂λ_y = 4*(1/λ_x - 1/λ_y) / λ_y²
-
-        So:  G_Y[j] = Σ_i E[i,j] * 4*(1/λ_x_i - 1/λ_y_j) / λ_y_j²
-
-        Parameters
-        ----------
-        E : array, shape = [m, n]
-            Gradient w.r.t. the distance matrix (from SoftDTW backward pass).
+        For exponential an explicit formula is used; for Weibull we exploit
+        the symmetry of W₂²(p,q): the gradient w.r.t. q is the same Prop-2
+        formula with p↔q, implemented by calling the Cython function with
+        swapped arguments and transposed E.
 
         Returns
         -------
-        G_Y : array, shape = [n, 1]
-            Jacobian product dL/dλ_y.
+        G_Y : array, shape = [n, d_params]
         """
         E = np.asarray(E, dtype=np.float64)
 
-        lambda_x = self.X_params_2d.flatten()   # (m,)
-        lambda_y = self.Y_params_2d.flatten()   # (n,)
+        if self.distribution == 'exponential':
+            lx = self.X_params_2d.ravel()   # (m,)
+            ly = self.Y_params_2d.ravel()   # (n,)
+            # ∂W₂²/∂λ_y = 4*(1/λ_x - 1/λ_y) / λ_y²
+            diff  = (1.0 / lx)[:, None] - (1.0 / ly)[None, :]  # (m, n)
+            G_Y   = np.sum(E * 4.0 * diff / (ly[None, :] ** 2), axis=0)
+            return G_Y.reshape(-1, 1)
 
-        # diff[i, j] = 1/λ_x[i] - 1/λ_y[j]
-        diff = (1.0 / lambda_x)[:, None] - (1.0 / lambda_y)[None, :]  # (m, n)
-
-        # G_Y[j] = Σ_i E[i,j] * 4 * diff[i,j] / λ_y[j]²
-        G_Y = np.sum(E * 4.0 * diff / (lambda_y[None, :] ** 2), axis=0)  # (n,)
-
-        return G_Y.reshape(-1, 1)
+        elif self.distribution == 'weibull':
+            # ∂W₂²(p_i, q_j)/∂params_q is the same formula as ∂/∂params_p
+            # with p ↔ q.  The Cython function computes G[i] += Σ_j E[i,j]·∂/∂p_i,
+            # so calling it with (Y_params, X_params, E.T, G_Y) gives
+            # G_Y[j] += Σ_i E[i,j]·∂/∂q_j  ✓
+            G_Y = np.zeros((self.Y.shape[0], self._d_params), dtype=np.float64)
+            self._jacobian_func(self.Y_params_2d, self.X_params_2d,
+                                np.ascontiguousarray(E.T), G_Y)
+            return G_Y
 
     def __repr__(self):
         return (f"WassersteinDistance(distribution='{self.distribution}', "
                 f"squared=True)")
-
-

@@ -127,14 +127,15 @@ def sgd_barycenter(X, gamma=1e-2, learning_rate=0.01,
         print(f"  [DEBUG] Params shape: {X_params_list[0].shape}")
 
     # Initialize barycenter if not provided
-    n_time_steps = X_params_list[0].shape[0]
+    param_shape = X_params_list[0].shape  # (T,) or (T, d)
     if barycenter_init_method == 'ones':
-        barycenter_init = np.ones((n_time_steps, 1))
+        barycenter_init = np.ones(param_shape)
     elif barycenter_init_method == 'random':
-        barycenter_init = np.random.uniform(0.1, 2.0, (n_time_steps, 1))
+        barycenter_init = np.random.uniform(0.1, 2.0, param_shape)
     elif barycenter_init_method == 'mean_lambda':
-        # Compute mean of all lambda series, handling different lengths
-        barycenter_init = np.mean(np.array([x.flatten() for x in X_params_list]), axis=0).reshape(-1, 1)
+        # Compute mean over samples, preserving (T, d_params) shape.
+        # Stack along a new axis-0 then average → (T, d_params).
+        barycenter_init = np.mean(np.stack(X_params_list, axis=0), axis=0)
 
     # Initialize barycenter - choose parameterization
     Z_init = barycenter_init.copy().astype(np.float64)

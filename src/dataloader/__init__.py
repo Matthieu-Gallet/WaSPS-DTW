@@ -17,6 +17,7 @@ from .cpazmal_loader import (
     MLDatasetLoader,
     download_cpazmal,
     windows_to_time_series,
+    estimate_weibull_params,
     extract_time_series,
 )
 
@@ -34,5 +35,6 @@ __all__ = [
     'MLDatasetLoader',
     'download_cpazmal',
     'windows_to_time_series',
+    'estimate_weibull_params',
     'extract_time_series',
 ]

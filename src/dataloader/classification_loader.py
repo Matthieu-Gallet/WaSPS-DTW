@@ -79,43 +79,63 @@ def preprocess_samples(X: np.ndarray, max_time_steps: Optional[int] = None
 
 def estimate_parameters_for_samples(X: np.ndarray,
                                     max_time_steps: Optional[int] = None,
+                                    distribution: str = 'exponential',
                                     ) -> List[np.ndarray]:
     """
-    Estimate exponential distribution lambda parameters for each sample.
+    Estimate distribution parameters for each sample.
 
     Expects X to already have NaN values where data was filtered out by
     build_classification_dataset (quantile threshold + shift applied at build time).
 
     Args:
-        X: Input array of shape (N, T, D, W, W)
-        max_time_steps: Optional limit on number of time steps
+        X:              Input array of shape (N, T, D, W, W).
+        max_time_steps: Optional limit on number of time steps.
+        distribution:   ``'exponential'`` (returns (T,1) λ-rate arrays) or
+                        ``'weibull'``    (returns (T,2) [k, λ_scale] arrays).
 
     Returns:
-        List of parameter arrays with shape (T, 1) for each sample
+        List of parameter arrays per sample.
+        Shape (T, 1) for exponential, (T, 2) for Weibull.
     """
     N, T, D, W1, W2 = X.shape
     if max_time_steps is not None:
         T = min(T, max_time_steps)
 
-    estimator = LogCumulant(distribution='exponential')
+    dist = distribution.lower()
+    if dist == 'exponential':
+        estimator = LogCumulant(distribution='exponential')
+        d_params = 1
+    elif dist == 'weibull':
+        from sdtw.wasserstein_fast import estimate_weibull_fast
+        d_params = 2
+    else:
+        raise ValueError(f"distribution must be 'exponential' or 'weibull', got '{distribution}'")
+
     params_list = []
 
     for i in range(N):
-        params = np.zeros((T, 1), dtype=np.float64)
+        params = np.zeros((T, d_params), dtype=np.float64)
         for t in range(T):
             values = X[i, t, :, :, :].flatten()
             values = values[np.isfinite(values) & (values > 0)]
             if len(values) >= 5:
-                estimator.fit(values)
-                params[t, 0] = estimator.get_params()
+                if dist == 'exponential':
+                    estimator.fit(values)
+                    params[t, 0] = estimator.get_params()
+                else:
+                    k_hat, lam_hat = estimate_weibull_fast(values.astype(np.float64))
+                    params[t, 0] = k_hat
+                    params[t, 1] = lam_hat
             else:
-                params[t, 0] = np.nan
+                params[t, :] = np.nan
 
-        valid_mask = ~np.isnan(params[:, 0])
-        if valid_mask.sum() > 0 and (~valid_mask).sum() > 0:
-            params[~valid_mask, 0] = params[valid_mask, 0].mean()
-        elif (~valid_mask).sum() > 0:
-            params[~valid_mask, 0] = 1.0
+        # Fill NaN time steps with column-wise mean, or a safe fallback.
+        for col in range(d_params):
+            valid_mask = np.isfinite(params[:, col])
+            if valid_mask.sum() > 0 and (~valid_mask).sum() > 0:
+                params[~valid_mask, col] = params[valid_mask, col].mean()
+            elif (~valid_mask).sum() > 0:
+                params[~valid_mask, col] = 1.0  # safe fallback
 
         params_list.append(params)
 

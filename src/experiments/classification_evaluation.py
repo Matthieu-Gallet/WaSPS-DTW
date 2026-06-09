@@ -26,14 +26,21 @@ from src.sdtw.classification_methods import (
     compute_barycenter_euclidean_raw,
     compute_barycenter_euclidean_params,
     compute_barycenter_wasserstein_sgd,
-    compute_barycenter_wasserstein_lbfgs,
     compute_sdtw_distance_euclidean,
-    compute_sdtw_distance_wasserstein
+    compute_sdtw_distance_wasserstein,
 )
 from src.experiments.lstm_classifier import (
     train_lstm_classifier,
     compute_lstm_barycenters,
     classify_by_lstm_barycenters,
+)
+from src.experiments.ot_sta_classifier import (
+    compute_barycenter_ot_regul_raw,
+    compute_sdtw_distance_ot_regul,
+)
+from src.experiments.shapelets_classifier import (
+    train_shapelets_classifier,
+    predict_shapelets_classifier,
 )
 
 
@@ -90,7 +97,25 @@ def evaluate_classification(X_train_raw: List[np.ndarray], X_train_params: List[
                             lstm_epochs: int = 60,
                             lstm_batch_size: int = 32,
                             lstm_lr: float = 1e-3,
-                            lstm_seed: int = 42) -> Dict:
+                            lstm_seed: int = 42,
+                            run_ot_regul: bool = False,
+                            ot_epsilon: float = 0.05,
+                            ot_max_iter: int = 30,
+                            ot_barycenter_iters: int = 60,
+                            ot_tol: float = 1e-6,
+                            ot_feature_bins: int = 32,
+                            ot_time_stride: int = 4,
+                            run_shapelets: bool = False,
+                            shapelets_epochs: int = 20,
+                            shapelets_batch_size: int = 32,
+                            shapelets_lr: float = 1e-3,
+                            shapelets_num_per_scale: int = 4,
+                            shapelets_gamma: float = 1.0,
+                            shapelets_wasserstein_epochs: int = 8,
+                            shapelets_wasserstein_lr: float = 2e-4,
+                            shapelets_wasserstein_num_per_scale: int = 2,
+                            shapelets_verbose: int = 0,
+                            shapelets_seed: int = 42) -> Dict:
     """
     Run classification evaluation with Soft-DTW methods and optional LSTM baseline.
     
@@ -114,6 +139,24 @@ def evaluate_classification(X_train_raw: List[np.ndarray], X_train_params: List[
         lstm_batch_size: Batch size for LSTM training/inference
         lstm_lr: Learning rate for LSTM training
         lstm_seed: Random seed for LSTM reproducibility
+        run_ot_regul: Whether to run STA-style regularized OT baseline on raw data
+        ot_epsilon: Entropic OT regularization
+        ot_max_iter: Max Sinkhorn iterations for distance computation
+        ot_barycenter_iters: Max iterations for OT barycenter fixed-point updates
+        ot_tol: Numerical tolerance for OT iterations
+        ot_feature_bins: Number of feature bins used for fast OT local costs
+        ot_time_stride: Temporal subsampling stride for OT local costs
+        run_shapelets: Whether to run the 3 LearningShapelets baselines
+        shapelets_epochs: Training epochs for LearningShapelets
+        shapelets_batch_size: Batch size for LearningShapelets train/predict
+        shapelets_lr: Learning rate for LearningShapelets optimizer
+        shapelets_num_per_scale: Number of shapelets for each default time scale
+        shapelets_gamma: SoftDTW gamma for shapelets_wasserstein_params
+        shapelets_wasserstein_epochs: Dedicated epochs for shapelets_wasserstein_params
+        shapelets_wasserstein_lr: Dedicated learning rate for shapelets_wasserstein_params
+        shapelets_wasserstein_num_per_scale: Number of shapelets for method 8 (single short scale)
+        shapelets_verbose: Verbosity level for LearningShapelets wrapper
+        shapelets_seed: Random seed for LearningShapelets reproducibility
         
     Returns:
         Dictionary with results for all methods
@@ -268,53 +311,6 @@ def evaluate_classification(X_train_raw: List[np.ndarray], X_train_params: List[
         print(f"  Classification time: {classify_time_wass:.2f}s")
         print(f"  F1 Score (weighted): {f1_wass:.4f}")
         print(f"  F1 Score (macro): {f1_macro_wass:.4f}")
-    
-    # # =========================================================================
-    # # Method 4: Soft-DTW Wasserstein on Estimated Parameters (L-BFGS-B)
-    # # =========================================================================
-    # if verbose:
-    #     print("\n" + "=" * 60)
-    #     print("Method 4: Soft-DTW Wasserstein on Estimated Parameters (L-BFGS-B)")
-    #     print("=" * 60)
-
-    # start_time = time.time()
-
-    # barycenters_wass_lbfgs = {}
-    # for class_label in unique_classes:
-    #     class_params = [X_train_params[i] for i in range(len(X_train_params)) if Y_train[i] == class_label]
-    #     if verbose:
-    #         print(f"  Computing barycenter for class {idx_to_regime[class_label]} ({len(class_params)} samples)...")
-    #     barycenters_wass_lbfgs[class_label] = compute_barycenter_wasserstein_lbfgs(
-    #         class_params, gamma=gamma, max_iter=100
-    #     )
-
-    # barycenter_time_wass_lbfgs = time.time() - start_time
-    # if verbose:
-    #     print(f"  Barycenter computation time: {barycenter_time_wass_lbfgs:.2f}s")
-
-    # start_time = time.time()
-    # Y_pred_wass_lbfgs = classify_by_nearest_barycenter(
-    #     X_test_params, barycenters_wass_lbfgs, compute_sdtw_distance_wasserstein, gamma, show_progress=verbose
-    # )
-    # classify_time_wass_lbfgs = time.time() - start_time
-
-    # f1_wass_lbfgs = f1_score(Y_test, Y_pred_wass_lbfgs, average='weighted', zero_division=0)
-    # f1_macro_wass_lbfgs = f1_score(Y_test, Y_pred_wass_lbfgs, average='macro', zero_division=0)
-
-    # results['wasserstein_lbfgs'] = {
-    #     'predictions': Y_pred_wass_lbfgs,
-    #     'f1_weighted': f1_wass_lbfgs,
-    #     'f1_macro': f1_macro_wass_lbfgs,
-    #     'barycenter_time': barycenter_time_wass_lbfgs,
-    #     'classify_time': classify_time_wass_lbfgs,
-    #     'barycenters': barycenters_wass_lbfgs
-    # }
-
-    # if verbose:
-    #     print(f"  Classification time: {classify_time_wass_lbfgs:.2f}s")
-    #     print(f"  F1 Score (weighted): {f1_wass_lbfgs:.4f}")
-    #     print(f"  F1 Score (macro): {f1_macro_wass_lbfgs:.4f}")
-
     # =========================================================================
     # Method 4: LSTM barycenters on Raw Data
     # =========================================================================
@@ -374,6 +370,171 @@ def evaluate_classification(X_train_raw: List[np.ndarray], X_train_params: List[
             print(f"  Classification time: {classify_time_lstm:.2f}s")
             print(f"  F1 Score (weighted): {f1_lstm:.4f}")
             print(f"  F1 Score (macro): {f1_macro_lstm:.4f}")
+
+    # =========================================================================
+    # Method 5: STA-style regularized OT barycenter on Raw Data
+    # =========================================================================
+    if run_ot_regul:
+        if verbose:
+            print("\n" + "=" * 60)
+            print("Method 5: Regularized OT (STA) Barycenter on Raw Data")
+            print("=" * 60)
+
+        start_time = time.time()
+        barycenters_ot = {}
+        for class_label in unique_classes:
+            class_samples = [X_train_raw[i] for i in range(len(X_train_raw)) if Y_train[i] == class_label]
+            if verbose:
+                print(f"  Computing OT barycenter for class {idx_to_regime[class_label]} ({len(class_samples)} samples)...")
+            barycenters_ot[class_label] = compute_barycenter_ot_regul_raw(
+                class_samples,
+                ot_epsilon=ot_epsilon,
+                ot_barycenter_iters=ot_barycenter_iters,
+                ot_tol=ot_tol,
+                ot_feature_bins=ot_feature_bins,
+                ot_time_stride=ot_time_stride,
+            )
+        barycenter_time_ot = time.time() - start_time
+        if verbose:
+            print(f"  Barycenter computation time: {barycenter_time_ot:.2f}s")
+
+        start_time = time.time()
+        Y_pred_ot = classify_by_nearest_barycenter(
+            X_test_raw,
+            barycenters_ot,
+            lambda sample, barycenter, g: compute_sdtw_distance_ot_regul(
+                sample,
+                barycenter,
+                gamma=g,
+                ot_epsilon=ot_epsilon,
+                ot_max_iter=ot_max_iter,
+                ot_tol=ot_tol,
+                ot_feature_bins=ot_feature_bins,
+                ot_time_stride=ot_time_stride,
+            ),
+            gamma,
+            show_progress=verbose,
+        )
+        classify_time_ot = time.time() - start_time
+
+        f1_ot = f1_score(Y_test, Y_pred_ot, average='weighted', zero_division=0)
+        f1_macro_ot = f1_score(Y_test, Y_pred_ot, average='macro', zero_division=0)
+
+        results['ot_regul_raw'] = {
+            'predictions': Y_pred_ot,
+            'f1_weighted': f1_ot,
+            'f1_macro': f1_macro_ot,
+            'barycenter_time': barycenter_time_ot,
+            'classify_time': classify_time_ot,
+            'barycenters': barycenters_ot,
+        }
+
+        if verbose:
+            print(f"  Classification time: {classify_time_ot:.2f}s")
+            print(f"  F1 Score (weighted): {f1_ot:.4f}")
+            print(f"  F1 Score (macro): {f1_macro_ot:.4f}")
+
+    # =========================================================================
+    # Methods 6-8: Learning Shapelets (true supervised learning)
+    # =========================================================================
+    if run_shapelets:
+        ts_len_params = int(np.asarray(X_train_params[0]).shape[0])
+        ws_shapelet_len = max(3, ts_len_params // 4)
+        ws_shapelets_size_and_len = {
+            ws_shapelet_len: shapelets_wasserstein_num_per_scale
+        }
+
+        shapelets_specs = [
+            {
+                "method_key": "shapelets_euclidean_raw",
+                "dist_measure": "euclidean",
+                "train_samples": X_train_raw,
+                "test_samples": X_test_raw,
+                "title": "Method 6: Learning Shapelets Euclidean (Raw Data)",
+                "gamma": 1.0,
+                "epochs": shapelets_epochs,
+                "lr": shapelets_lr,
+                "num_per_scale": shapelets_num_per_scale,
+                "shapelets_size_and_len": None,
+            },
+            {
+                "method_key": "shapelets_euclidean_params",
+                "dist_measure": "euclidean",
+                "train_samples": X_train_params,
+                "test_samples": X_test_params,
+                "title": "Method 7: Learning Shapelets Euclidean (Parameters)",
+                "gamma": 1.0,
+                "epochs": shapelets_epochs,
+                "lr": shapelets_lr,
+                "num_per_scale": shapelets_num_per_scale,
+                "shapelets_size_and_len": None,
+            },
+            {
+                "method_key": "shapelets_wasserstein_params",
+                "dist_measure": "soft_dtw_wasserstein",
+                "train_samples": X_train_params,
+                "test_samples": X_test_params,
+                "title": "Method 8: Learning Shapelets Soft-DTW Wasserstein (Parameters)",
+                "gamma": shapelets_gamma,
+                "epochs": shapelets_wasserstein_epochs,
+                "lr": shapelets_wasserstein_lr,
+                "num_per_scale": shapelets_wasserstein_num_per_scale,
+                "shapelets_size_and_len": ws_shapelets_size_and_len,
+            },
+        ]
+
+        for spec in shapelets_specs:
+            method_key = spec["method_key"]
+            dist_measure = spec["dist_measure"]
+            train_samples = spec["train_samples"]
+            test_samples = spec["test_samples"]
+            title = spec["title"]
+            method_gamma = spec["gamma"]
+            if verbose:
+                print("\n" + "=" * 60)
+                print(title)
+                print("=" * 60)
+
+            clf, shape_state = train_shapelets_classifier(
+                train_samples=train_samples,
+                y_train=Y_train,
+                dist_measure=dist_measure,
+                epochs=spec["epochs"],
+                batch_size=shapelets_batch_size,
+                learning_rate=spec["lr"],
+                shapelets_size_and_len=spec["shapelets_size_and_len"],
+                shapelets_gamma=method_gamma,
+                shapelets_num_per_scale=spec["num_per_scale"],
+                seed=shapelets_seed,
+                verbose=shapelets_verbose,
+            )
+            train_time = shape_state["train_time"]
+            if verbose:
+                print(f"  Training time: {train_time:.2f}s")
+
+            start_time = time.time()
+            y_pred = predict_shapelets_classifier(
+                clf=clf,
+                state=shape_state,
+                test_samples=test_samples,
+                batch_size=shapelets_batch_size,
+            )
+            classify_time = time.time() - start_time
+
+            f1_w = f1_score(Y_test, y_pred, average='weighted', zero_division=0)
+            f1_m = f1_score(Y_test, y_pred, average='macro', zero_division=0)
+
+            results[method_key] = {
+                'predictions': y_pred,
+                'f1_weighted': f1_w,
+                'f1_macro': f1_m,
+                'barycenter_time': train_time,
+                'classify_time': classify_time,
+            }
+            if verbose:
+                print(f"  Classification time: {classify_time:.2f}s")
+                print(f"  F1 Score (weighted): {f1_w:.4f}")
+                print(f"  F1 Score (macro): {f1_m:.4f}")
 
     return results
 
@@ -520,7 +681,11 @@ def print_detailed_results(results: Dict, Y_test: np.ndarray, idx_to_regime: Dic
         ('euclidean_raw', 'Soft-DTW Euclidean (Raw Data)'),
         ('euclidean_params', 'Soft-DTW Euclidean (Parameters)'),
         ('wasserstein_params', 'Soft-DTW Wasserstein (Parameters)'),
-        ('lstm_raw', 'LSTM Barycenter (Raw Data)')
+        ('lstm_raw', 'LSTM Barycenter (Raw Data)'),
+        ('ot_regul_raw', 'Regularized OT STA (Raw Data)'),
+        ('shapelets_euclidean_raw', 'Learning Shapelets Euclidean (Raw Data)'),
+        ('shapelets_euclidean_params', 'Learning Shapelets Euclidean (Parameters)'),
+        ('shapelets_wasserstein_params', 'Learning Shapelets Soft-DTW Wasserstein (Parameters)')
     ]
     
     for method_key, method_name in methods:

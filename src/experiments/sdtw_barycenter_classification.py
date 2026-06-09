@@ -156,11 +156,11 @@ Examples:
         help="Disable LSTM baseline in one-shot mode"
     )
     parser.add_argument(
-        "--lstm-hidden-size", type=int, default=48,
+        "--lstm-hidden-size", type=int, default=32,
         help="LSTM hidden size (one-shot mode)"
     )
     parser.add_argument(
-        "--lstm-num-layers", type=int, default=1,
+        "--lstm-num-layers", type=int, default=2,
         help="Number of LSTM layers (one-shot mode)"
     )
     parser.add_argument(
@@ -180,7 +180,35 @@ Examples:
         help="LSTM learning rate (one-shot mode)"
     )
     parser.add_argument(
-        "--random-seed", type=int, default=1142,
+        "--disable-ot-regul", action="store_true",
+        help="Disable regularized OT (STA-style) baseline in one-shot mode"
+    )
+    parser.add_argument(
+        "--ot-epsilon", type=float, default=0.05,
+        help="Entropic regularization for OT baseline (one-shot mode)"
+    )
+    parser.add_argument(
+        "--ot-max-iter", type=int, default=30,
+        help="Max Sinkhorn iterations for OT distance (one-shot mode)"
+    )
+    parser.add_argument(
+        "--ot-barycenter-iters", type=int, default=60,
+        help="Max iterations for OT barycenter updates (one-shot mode)"
+    )
+    parser.add_argument(
+        "--ot-tol", type=float, default=1e-6,
+        help="Tolerance for OT numerical loops (one-shot mode)"
+    )
+    parser.add_argument(
+        "--ot-feature-bins", type=int, default=16,
+        help="Number of feature bins for fast OT local costs (one-shot mode)"
+    )
+    parser.add_argument(
+        "--ot-time-stride", type=int, default=4,
+        help="Temporal stride for OT local costs (one-shot mode)"
+    )
+    parser.add_argument(
+        "--random-seed", type=int, default=42,
         help="Random seed for reproducibility"
     )
     
@@ -273,6 +301,13 @@ Examples:
             lstm_batch_size=args.lstm_batch_size,
             lstm_lr=args.lstm_lr,
             lstm_seed=args.random_seed,
+            run_ot_regul=(not args.disable_ot_regul),
+            ot_epsilon=args.ot_epsilon,
+            ot_max_iter=args.ot_max_iter,
+            ot_barycenter_iters=args.ot_barycenter_iters,
+            ot_tol=args.ot_tol,
+            ot_feature_bins=args.ot_feature_bins,
+            ot_time_stride=args.ot_time_stride,
             verbose=True
         )
         
@@ -312,7 +347,9 @@ Examples:
             methods = [
                 ('euclidean_raw', 'Soft-DTW Euclidean (Raw Data)', X_train_raw, True),
                 ('euclidean_params', 'Soft-DTW Euclidean (Parameters)', X_train_params, False),
-                ('wasserstein_params', 'Soft-DTW Wasserstein (Parameters)', X_train_params, False)
+                ('wasserstein_params', 'Soft-DTW Wasserstein (Parameters)', X_train_params, False),
+                ('lstm_raw', 'LSTM Barycenter (Raw Data)', X_train_raw, True),
+                ('ot_regul_raw', 'Regularized OT STA (Raw Data)', X_train_raw, True),
             ]
 
             # Generate class pair plots (A4 format, one figure per pair, all methods overlaid)
@@ -336,17 +373,19 @@ Examples:
             # Generate grid plots (all classes, one figure per parameter)
             print("  Generating grid barycenter plots...")
             for method_key, method_name, train_data, is_raw in methods:
-                if not is_raw:  # Only for parameter-based methods
-                    plot_all_class_barycenters_grid(
-                        barycenters=results[method_key]['barycenters'],
-                        X_train=train_data,
-                        Y_train=Y_train,
-                        idx_to_regime=metadata['idx_to_regime'],
-                        method_name=method_name,
-                        output_dir=output_dir,
-                        save_pdf=True,
-                        n_samples=args.n_samples_plot
-                    )
+                if method_key not in results or 'barycenters' not in results[method_key]:
+                    continue
+                plot_all_class_barycenters_grid(
+                    barycenters=results[method_key]['barycenters'],
+                    X_train=train_data,
+                    Y_train=Y_train,
+                    idx_to_regime=metadata['idx_to_regime'],
+                    method_name=method_name,
+                    output_dir=output_dir,
+                    save_pdf=True,
+                    n_samples=args.n_samples_plot,
+                    is_raw=is_raw,
+                )
         
         # Print summary
         print("\n" + "=" * 80)
@@ -359,8 +398,9 @@ Examples:
             'euclidean_params': 'Soft-DTW Euclidean (Parameters)',
             'wasserstein_params': 'Soft-DTW Wasserstein (Parameters) SGD',
             'lstm_raw': 'LSTM Barycenter (Raw Data)',
+            'ot_regul_raw': 'Regularized OT STA (Raw Data)',
         }
-        for method_key in ['euclidean_raw', 'euclidean_params', 'wasserstein_params', 'lstm_raw']:
+        for method_key in ['euclidean_raw', 'euclidean_params', 'wasserstein_params', 'lstm_raw', 'ot_regul_raw']:
             if method_key not in results:
                 continue
             print(f"{method_name_map[method_key]:<45} {results[method_key]['f1_weighted']:<15.4f} {results[method_key]['f1_macro']:<15.4f}")

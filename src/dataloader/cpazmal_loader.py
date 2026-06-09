@@ -443,6 +443,49 @@ def download_cpazmal(save_dir: str, token: Optional[str] = None) -> str:
 # Reshape helper
 # =============================================================================
 
+def estimate_weibull_params(series: np.ndarray, min_valid: int = 4) -> np.ndarray:
+    """
+    Estimate per-timestep Weibull(k, λ_scale) parameters from a ``(T, W²)`` series.
+
+    Each row ``series[t]`` contains W² pixel values sampled at time step t.
+    These are treated as i.i.d. draws from a Weibull distribution, whose
+    parameters are estimated by the method of log-cumulants.
+
+    Args:
+        series:     Array of shape ``(T, W²)`` — output of :func:`windows_to_time_series`
+                    or ``extract_time_series``.
+        min_valid:  Minimum number of finite positive values required per row;
+                    rows with fewer values receive the column-wise mean.
+
+    Returns:
+        Array of shape ``(T, 2)`` where column-0 = k (shape), column-1 = λ (scale).
+    """
+    from sdtw.wasserstein_fast import estimate_weibull_fast
+
+    T = series.shape[0]
+    params = np.zeros((T, 2), dtype=np.float64)
+
+    for t in range(T):
+        row = series[t].astype(np.float64)
+        valid = row[np.isfinite(row) & (row > 0)]
+        if len(valid) >= min_valid:
+            k_hat, lam_hat = estimate_weibull_fast(valid)
+            params[t, 0] = k_hat
+            params[t, 1] = lam_hat
+        else:
+            params[t, :] = np.nan
+
+    # Fill NaN rows with column-wise mean; fall back to (1.0, 1.0) if all NaN.
+    for col in range(2):
+        mask = np.isfinite(params[:, col])
+        if mask.sum() > 0 and (~mask).sum() > 0:
+            params[~mask, col] = params[mask, col].mean()
+        elif (~mask).sum() > 0:
+            params[:, col] = 1.0
+
+    return params
+
+
 def windows_to_time_series(window: np.ndarray) -> np.ndarray:
     """
     Reshape a spatial window to a time series compatible with WassersteinDistance.

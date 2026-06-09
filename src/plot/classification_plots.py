@@ -126,7 +126,8 @@ def plot_confusion_matrices(results: Dict, Y_test: np.ndarray,
         ('euclidean_raw', 'Soft-DTW Euclidean\n(Raw Data)'),
         ('euclidean_params', 'Soft-DTW Euclidean\n(Parameters)'),
         ('wasserstein_params', 'Soft-DTW Wasserstein\n(Parameters)'),
-        ('lstm_raw', 'LSTM Barycenter\n(Raw Data)')
+        ('lstm_raw', 'LSTM Barycenter\n(Raw Data)'),
+        ('ot_regul_raw', 'Regularized OT STA\n(Raw Data)')
     ]
     methods = [(k, n) for k, n in method_candidates if k in results]
     if not methods:

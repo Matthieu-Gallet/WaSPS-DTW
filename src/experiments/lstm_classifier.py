@@ -168,15 +168,21 @@ def compute_lstm_barycenters(
     batch_size: int = 64,
 ) -> Dict[int, np.ndarray]:
     """
-    Compute one latent-space barycenter (prototype) per class.
+    Compute one raw-space prototype per class from latent barycenter (medoid).
     """
     embeddings = _encode_lstm_samples(model, state, X_train_raw, batch_size=batch_size)
+    x_train = _stack_samples(X_train_raw)
     barycenters: Dict[int, np.ndarray] = {}
-    for cls in state["classes"]:
+    for cls in np.sort(np.unique(y_train)):
         class_mask = (y_train == cls)
         if not np.any(class_mask):
             continue
-        barycenters[int(cls)] = embeddings[class_mask].mean(axis=0)
+        emb_cls = embeddings[class_mask]
+        raw_cls = x_train[class_mask]
+        center = emb_cls.mean(axis=0, keepdims=True)
+        sq_dists = np.sum((emb_cls - center) ** 2, axis=1)
+        medoid_idx = int(np.argmin(sq_dists))
+        barycenters[int(cls)] = raw_cls[medoid_idx]
     return barycenters
 
 
@@ -188,11 +194,13 @@ def classify_by_lstm_barycenters(
     batch_size: int = 64,
 ) -> np.ndarray:
     """
-    Classify samples by nearest latent barycenter (Euclidean distance).
+    Classify samples by nearest encoded barycenter (Euclidean distance).
     """
     embeddings = _encode_lstm_samples(model, state, X_raw, batch_size=batch_size)
     class_labels = np.array(sorted(barycenters.keys()), dtype=np.int64)
-    centers = np.stack([barycenters[int(c)] for c in class_labels], axis=0)
+    centers_raw = [np.asarray(barycenters[int(c)], dtype=np.float32) for c in class_labels]
+    centers_emb = _encode_lstm_samples(model, state, centers_raw, batch_size=batch_size)
+    centers = np.asarray(centers_emb, dtype=np.float64)
     sq_dists = np.sum((embeddings[:, None, :] - centers[None, :, :]) ** 2, axis=2)
     nearest = np.argmin(sq_dists, axis=1)
     return class_labels[nearest]

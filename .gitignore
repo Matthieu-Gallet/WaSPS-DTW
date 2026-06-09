@@ -10,3 +10,4 @@ src/results/*
 .github/
 RESSOURCES/*
 notebooks/*
+results/regime_classification/seed_sweep/*

@@ -6,7 +6,6 @@ scikit-learn
 matplotlib
 xarray
 netcdf4
-chainer
 h5py
 tqdm
 huggingface_hub
