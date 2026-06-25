@@ -4,138 +4,173 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-WaSPS-DTW implements **Wasserstein + Soft-DTW** time series analysis: computing barycenters and classifying stochastic time series (sequences of distributions) using Soft-DTW with Euclidean or Wasserstein (exponential or Weibull) local costs. Primary applications: hydrological regime classification (NetCDF) and SAR amplitude classification (CPAZMaL/HDF5).
+WaSPS-DTW implements **Wasserstein + Soft-DTW** time series analysis: computing barycenters and
+classifying stochastic time series (sequences of distributions) using Soft-DTW with Euclidean or
+Wasserstein (exponential or Weibull) local costs. Two real datasets are supported:
+- **River discharge** (NetCDF → prebuilt `.npy`, exponential family)
+- **CPAZMaL SAR** (HDF5, Weibull family)
+
+This is the **JAX branch** (`feat/jax-refonte`). The old Cython/PyTorch pipeline lives in `.old/`.
 
 ## Environment setup
 
 ```bash
-# From repo root — creates venv/, installs dependencies, builds Cython extensions
+# From repo root — creates .venv/, installs dependencies (no Cython build step)
 bash setup_venv.sh
-source venv/bin/activate
+source .venv/bin/activate
 ```
 
-**Cython extensions must be compiled** before any `sdtw` imports will work. The `.so` files (`soft_dtw_fast`, `wasserstein_fast`) live in `src/sdtw/` and are rebuilt with:
 ```bash
-cd src && python -c "
-from setuptools import setup, Extension; from Cython.Build import cythonize; import numpy
-exts=[Extension('sdtw.soft_dtw_fast',['sdtw/soft_dtw_fast.pyx'],include_dirs=[numpy.get_include()]),
-      Extension('sdtw.wasserstein_fast',['sdtw/wasserstein_fast.pyx'],include_dirs=[numpy.get_include()])]
-setup(ext_modules=cythonize(exts,language_level=3))
-" build_ext --inplace
+# Smoke test
+python -c "import jax, ott, optax; print(jax.devices())"
 ```
 
 ## Running tests
 
-Tests must be run from `src/` (imports use `sys.path.insert` relative to file location):
-
 ```bash
-cd src
-python -m pytest sdtw/tests/ -v                        # all tests
-python -m pytest sdtw/tests/test_soft_dtw.py -v        # Soft-DTW DP correctness
-python -m pytest sdtw/tests/test_weibull.py -v         # Weibull W₂² + gradients + estimator
+source .venv/bin/activate
+python -m pytest tests/ -q       # run from repo root (not src/)
 ```
 
 ## Running experiments
 
-All experiment scripts run from the **repo root**:
+All scripts run from the **repo root**:
 
 ```bash
-source venv/bin/activate
+source .venv/bin/activate
 
-# Hydrological regime classification (exponential)
-python src/experiments/sdtw_barycenter_classification.py --mode one-shot --plot-barycenters
-python src/experiments/sdtw_barycenter_classification.py --mode kfold --n-splits 5
-python src/experiments/seed_sweep_runner.py --n-seeds 50
+# Gate-E smoke: all 4 methods × 2 modes in ~18s (T=4, n_steps=5)
+python experiments/run_classification.py configs/classification_smoke.yaml
 
-# CPAZMaL SAR classification (Weibull) — new
-python src/experiments/cpazmal_classification.py --mode kmedoid
-python src/experiments/cpazmal_classification.py --mode shapelet --epochs 20
-python src/experiments/cpazmal_classification.py --mode kmedoid --max-groups 6  # quick smoke-test
+# Synthetic exponential full run (4 methods × 2 modes × 4 seeds — slow: STA bary ~1h)
+python experiments/run_classification.py configs/classification.yaml
 
-bash run_all_experiments.sh   # toggle booleans inside to select modes
+# River-discharge regime classification (exponential, wasps+eucl_params+eucl_raw)
+python experiments/run_classification.py configs/river.yaml         # full (~20 min)
+python experiments/run_classification.py configs/river_smoke.yaml   # quick smoke (T=8, no STA)
+
+# CPAZMaL SAR classification (Weibull, wasps+eucl_params+eucl_raw)
+python experiments/run_classification.py configs/cpazmal.yaml
+# → first run extracts from HDF5 (slow), caches to data/cpazmal/
+# → set max_groups: 6 in cpazmal.yaml for a quick smoke test
+
+# Fit and save barycenters
+python experiments/run_barycenters.py configs/river.yaml
+
+# Sensitivity sweeps (synthetic exponential only, KNN mode, 4 methods)
+python experiments/run_sensitivity.py --output-dir results/jax_sensitivity
 ```
 
-CPAZMaL HDF5: `/home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5`  
-Results go to `results/` subdirectories. Figures (`.png`) are gitignored.
+Data paths:
+- CPAZMaL HDF5: `/home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5`
+- River NetCDF (raw): `/home/mgallet/Documents/Dataset/RIVER_DISCHARGES/c7491e060d94c97212f0fe7ebcff57f0/data_version-5.nc`
+- River npy (prebuilt): `data/river/` (committed; rebuild with Explore2_HydroDataset project)
+- CPAZMaL npy cache: `data/cpazmal/` (gitignored, auto-populated on first run)
 
 ## Architecture
 
 ```
-src/
-├── sdtw/                      # Core library
-│   ├── soft_dtw.py            # SoftDTW class + sdtw_divergence() helper
-│   ├── distance.py            # SquaredEuclidean, WassersteinDistance (exp + Weibull)
-│   ├── barycenter.py          # sdtw_barycenter() — L-BFGS-B via scipy
-│   ├── classification_methods.py  # Wrapper functions; distance fns with divergence=True
-│   ├── soft_dtw_fast.pyx      # Cython: DP forward/backward + Jacobian products (exp+Weibull)
-│   └── wasserstein_fast.pyx   # Cython: MLE/log-cumulants + pairwise W₂² (exp+Weibull)
-├── estimator/                 # Distribution parameter estimators
-│   ├── mle.py                 # MLE class
-│   └── log_cumulant.py        # LogCumulant (preferred — uses Cython internally)
-├── optimizer/
-│   ├── wasserstein_barycenter_sgd.py  # sgd_barycenter() — SGD with warmup/decay/clip
-│   └── learning_shapelets.py  # LearningShapelets with SoftDTW-Wasserstein distance
-├── dataloader/
-│   ├── netcdf_loader.py          # Load river discharge NetCDF files
-│   ├── classification_loader.py  # Load .npy datasets; estimate_parameters_for_samples()
-│   ├── cpazmal_loader.py         # MLDatasetLoader, extract_time_series, estimate_weibull_params
-│   ├── series_extraction.py      # Extract λ-series, sliding windows
-│   └── preprocessing.py          # Train/test split, sliding windows
-├── data_generator/            # Synthetic data (exponential/shifted series)
-├── experiments/
-│   ├── sdtw_barycenter_classification.py  # Regime experiment (4 modes)
-│   ├── cpazmal_classification.py          # CPAZMaL+Weibull (kmedoid/shapelet)  ← new
-│   ├── classification_evaluation.py       # evaluate_classification(), kfold runner
-│   ├── classification_sensitivity.py      # Gamma/sample-size sweeps
-│   ├── lstm_classifier.py                 # LSTM baseline
-│   ├── ot_sta_classifier.py               # Regularized OT/STA baseline
-│   ├── shapelets_classifier.py            # LearningShapelets wrapper
-│   └── seed_sweep_runner.py               # Multi-seed subprocess sweep
-├── plot/                      # Matplotlib helpers
-└── utils/                     # timing, binning
-```
+data/
+├── river/          # Prebuilt: X/Y/metadata_{balanced,basic}.npy
+└── cpazmal/        # Extraction cache (gitignored)
 
-**Data flow for CPAZMaL+Weibull classification:**
-1. `extract_time_series(loader)` → `X_train[i]` shape `(T, W²)` — pixels at each timestep
-2. `estimate_weibull_params(X_train[i])` → `(T, 2)` arrays `[k, λ_scale]`
-3. `compute_barycenter_wasserstein_sgd(..., distribution='weibull')` → per-class `(T, 2)` barycenters
-4. `compute_sdtw_distance_weibull(sample_params, barycenter_params, divergence=True)` → scalar
+src/
+├── distributions.py          # JAX distributions: exponential + Weibull
+├── estimation.py             # Log-cumulant / MLE fitting (outside JAX graph)
+├── costs.py                  # SqEuclidean + WaSPS W₂² (closed-form, autodiff; log_correction, use_positivity_constraint)
+├── softdtw.py                # SoftDTW forward + divergence; SoftDTW class (manual/auto × div/not-div)
+├── barycenter.py             # Fréchet barycenter via optax (adam); fit_barycenter(series, softdtw, …)
+├── data/
+│   ├── preprocess.py         # clean_series() — canonical filter for estimation
+│   ├── cpazmal_loader.py     # MLDatasetLoader + extract_time_series (HDF5)
+│   └── river_loader.py       # load_river_classification() — npy + stratified split
+├── classification/
+│   ├── nn.py                 # k-NN SoftDTW (vmap over train set)
+│   └── barycenter_clf.py     # Nearest-barycenter (joblib-parallel per class)
+└── baselines/
+    └── sta_wrapper.py        # STA 1-NN + make_cost_fn() for STA barycenter
+
+experiments/
+├── run_classification.py     # 4-method × 2-mode × multi-seed runner
+├── run_barycenters.py        # Fit + save per-class barycenters as .npy
+└── run_sensitivity.py        # γ / n_train sweeps (KNN, 4 methods)
+
+configs/
+├── classification.yaml       # Synthetic exponential (4 methods × 2 modes, 4 seeds)
+├── classification_smoke.yaml # Gate-E smoke: T=4, n_steps=5 — all 4 methods × 2 modes in ~18s
+├── river.yaml                # River discharge (wasps/eucl_params/eucl_raw)
+├── river_smoke.yaml          # River smoke (T=8, 3 methods, no STA — too slow at T=8)
+└── cpazmal.yaml              # CPAZMaL Weibull (wasps/eucl_params/eucl_raw)
+
+analysis/
+├── classification_notebook.ipynb  # Interactive: synthetic / CPAZMaL
+└── river_notebook.ipynb           # Interactive: river discharge
+
+tests/                        # pytest suite
+
+.old/                         # Archived legacy code (old Cython/PyTorch pipeline)
+```
 
 ## Key conventions
 
 **Array shapes:**
-- Raw SAR/discharge time series: `(T, N_samples)` — T timesteps, each with N_samples values
-- Exponential params: `(T, 1)` — rate β (not scale)
+- Raw time series: `(T, N_samples)` float64 — T timesteps, N values each
+- River samples: `(T, D·W·W)` after reshape from `(T, D, W, W)` raw npy
+- Exponential params: `(T, 1)` — rate β (not scale, `E[X]=1/β`)
 - Weibull params: `(T, 2)` — column 0=k (shape), column 1=λ_scale
-- Barycenter init must match parameter shape
+- NaN preserved through load → filtered by `clean_series` inside `estimation.fit`
 
-**Soft-DTW divergence (default = True everywhere):**
+**Four classification methods (defined in `experiments/run_classification.py:_METHODS`):**
+
+| Key | Representation | Cost | Barycenter | Notes |
+|-----|----------------|------|------------|-------|
+| `wasps` | params `(T,1)` or `(T,2)` | WaSPS W₂² closed-form | `use_positivity_constraint=True`, manual grad | exponential or Weibull |
+| `eucl_params` | params (MLE) | SqEuclidean | autodiff | no positivity constraint in barycenter |
+| `eucl_raw` | raw samples `(T,N)` | SqEuclidean | autodiff | raw order preserved |
+| `sta` | raw samples `(T,N)` | OT Sinkhorn (OTT) | autodiff through Sinkhorn | slow: O(T²·N·n_train) |
+
+Both KNN (k=1) and Barycenter modes are supported for all 4 methods.
+
+**`WaSPS` flags:**
+- `log_correction=True`: applies `c = δ + log(2−exp(−δ))` to the raw W₂² cost; guarantees SDTW divergence ≥ 0. Auto-set by `SoftDTW` when `is_divergence=True`.
+- `use_positivity_constraint=True`: applies `φ = softplus` to both args before W₂². The gradient `gradient_X` chains `σ(θ)`. Used in the barycenter (θ-space); KNN/predict use `False` (data already positive).
+
+**`SoftDTW` class (`softdtw.py`):**
 ```python
-D_γ(X,Y) = SDTW(X,Y) − ½(SDTW(X,X) + SDTW(Y,Y))
+SoftDTW(cost_fn, gamma, is_divergence=True, manual_grad=True)
 ```
-- `sdtw_divergence(D_xy, D_xx, D_yy, gamma)` in `soft_dtw.py`
-- All `compute_sdtw_distance_*` functions accept `divergence=True` (default)
-- Pass `divergence=False` to reproduce pre-divergence results
-- Self-terms `SDTW(b,b)` are NOT constant across barycenters — always include them
+- `value(X, Y)` → scalar: plain SDTW or `D_γ(X,Y) = SDTW(X,Y) − ½SDTW(X,X) − ½SDTW(Y,Y)`
+- `value_and_grad(X, Y)` → `(value, ∂value/∂X)`: manual path uses `cost_fn.gradient_X`; autodiff path via `jax.value_and_grad`.
+- Auto-couples `log_correction=True` on WaSPS when `is_divergence=True`.
 
-**WassersteinDistance protocol:**
+**`fit_barycenter` signature (`barycenter.py`):**
 ```python
-wd = WassersteinDistance(X, Y, distribution='weibull', X_is_params=True, Y_is_params=True)
-D  = wd.compute()              # [m, n] W₂² matrix
-G  = wd.jacobian_product(E)    # [m, 2] for Weibull, [m, 1] for exponential
-GY = wd.jacobian_product_Y(E)  # [n, 2] — uses symmetry trick (swapped args + E.T)
+fit_barycenter(series, softdtw: SoftDTW, n_steps=200, lr=1e-2, init=None, verbose=False)
 ```
+Positivity enforced via `cost_fn.use_positivity_constraint` — no `softplus` or `manual_grad` kwargs.
 
-**Two barycenter optimization backends:**
-- `sdtw_barycenter()` — L-BFGS-B; good for small T, exponential only
-- `sgd_barycenter(distribution='weibull')` — SGD with warmup/decay; handles `(T, 2)` params
+**Divergence self-term identity:**
+`∂SDTW(X,X)/∂X = 2·gradient_X(E_xx,X,X)`, so `−½·∂f(x,x)/∂x = −gradient_X(E_xx,x,x)`.
+Full divergence backward: `gX = gradient_X(E_xy,x,y) − gradient_X(E_xx,x,x)`.
+`gradient_Y` is never needed and is not implemented.
 
-**`X_is_params` / `Y_is_params` flags:** Pass `True` when a series already holds distribution parameters to skip redundant re-estimation.
+**`max_train_samples` / `max_test_samples`:**  
+Applied ONCE after loading (stratified subsample) so all methods compare on the same samples.
+`-1` = no cap. Set `20/20` when `sta` is in the method list (Sinkhorn is the bottleneck).
 
-**Import pattern:** All modules use `sys.path.insert(0, str(parent_dir))` — there is no `pip install -e .`. Scripts must run from the correct working directory (repo root for experiments, `src/` for tests).
+**STA complexity warning:**  
+STA KNN cost is O(T²·n_train·n_test) Sinkhorn calls — quadratic in timesteps.  
+STA barycenter is even slower (O(T²) Sinkhorn calls per gradient step × n_steps × n_classes).  
+`configs/river.yaml` excludes STA (T=52 → days).  
+`configs/river_smoke.yaml` (T=8) also excludes STA (T=8 → ~17 min for KNN alone).  
+Gate-E smoke: `classification_smoke.yaml` (T=4, n_steps=5) runs STA in ~5s per seed.  
+**`_sinkhorn_jit` must stay `@jax.jit`** in `sta_wrapper.py` — without it, each Sinkhorn call re-traces (64× slower; verified empirically: 4579s → 72s).
+
+**cpazmal cache:**  
+`data/cpazmal/X_train_{all|mgN}.npy` etc. Delete to force re-extraction from HDF5.
+
+**Import pattern:** All modules use `sys.path.insert(0, str(_SRC))` — no `pip install -e .`.
+Experiments run from repo root, tests from repo root (not `src/`).
 
 **Exponential parameterization:** Rate β (not scale), so `E[X] = 1/β`.  
-**Weibull parameterization:** Scale λ (not rate), so `E[X^k] = λ^k`.  
-Exponential ↔ Weibull(k=1, λ=1/β) — the two are *not* interchangeable distance objects.
-
-**UCR data:** Located at `../dev/UCR_TS_Archive_2015/` (relative to repo root), files named `<Dataset>_TRAIN` / `<Dataset>_TEST` (no extension, space-separated, first column is label).
+**Weibull parameterization:** Scale λ (not rate), so `E[X^k] = λ^k`.

@@ -184,15 +184,15 @@ Examples:
         help="Disable regularized OT (STA-style) baseline in one-shot mode"
     )
     parser.add_argument(
-        "--ot-epsilon", type=float, default=0.05,
+        "--ot-epsilon", type=float, default=0.005,
         help="Entropic regularization for OT baseline (one-shot mode)"
     )
     parser.add_argument(
-        "--ot-max-iter", type=int, default=30,
+        "--ot-max-iter", type=int, default=50,
         help="Max Sinkhorn iterations for OT distance (one-shot mode)"
     )
     parser.add_argument(
-        "--ot-barycenter-iters", type=int, default=60,
+        "--ot-barycenter-iters", type=int, default=120,
         help="Max iterations for OT barycenter updates (one-shot mode)"
     )
     parser.add_argument(
@@ -200,12 +200,48 @@ Examples:
         help="Tolerance for OT numerical loops (one-shot mode)"
     )
     parser.add_argument(
-        "--ot-feature-bins", type=int, default=16,
+        "--ot-feature-bins", type=int, default=32,
         help="Number of feature bins for fast OT local costs (one-shot mode)"
     )
     parser.add_argument(
         "--ot-time-stride", type=int, default=4,
         help="Temporal stride for OT local costs (one-shot mode)"
+    )
+    parser.add_argument(
+        "--disable-shapelets", action="store_true",
+        help="Disable Learning Shapelets baselines in one-shot mode"
+    )
+    parser.add_argument(
+        "--shapelets-epochs", type=int, default=20,
+        help="Training epochs for Learning Shapelets baselines (one-shot mode)"
+    )
+    parser.add_argument(
+        "--shapelets-batch-size", type=int, default=32,
+        help="Batch size for Learning Shapelets train/predict (one-shot mode)"
+    )
+    parser.add_argument(
+        "--shapelets-lr", type=float, default=1e-3,
+        help="Learning rate for Learning Shapelets optimizer (one-shot mode)"
+    )
+    parser.add_argument(
+        "--shapelets-num-per-scale", type=int, default=4,
+        help="Number of shapelets per default scale (one-shot mode)"
+    )
+    parser.add_argument(
+        "--shapelets-gamma", type=float, default=1.0,
+        help="SoftDTW gamma for shapelets_wasserstein_params (one-shot mode)"
+    )
+    parser.add_argument(
+        "--shapelets-wasserstein-epochs", type=int, default=8,
+        help="Training epochs dedicated to shapelets_wasserstein_params (one-shot mode)"
+    )
+    parser.add_argument(
+        "--shapelets-wasserstein-lr", type=float, default=2e-4,
+        help="Learning rate dedicated to shapelets_wasserstein_params (one-shot mode)"
+    )
+    parser.add_argument(
+        "--shapelets-wasserstein-num-per-scale", type=int, default=2,
+        help="Number of shapelets for method 8 single short scale (one-shot mode)"
     )
     parser.add_argument(
         "--random-seed", type=int, default=42,
@@ -308,6 +344,17 @@ Examples:
             ot_tol=args.ot_tol,
             ot_feature_bins=args.ot_feature_bins,
             ot_time_stride=args.ot_time_stride,
+            run_shapelets=(not args.disable_shapelets),
+            shapelets_epochs=args.shapelets_epochs,
+            shapelets_batch_size=args.shapelets_batch_size,
+            shapelets_lr=args.shapelets_lr,
+            shapelets_num_per_scale=args.shapelets_num_per_scale,
+            shapelets_gamma=args.shapelets_gamma,
+            shapelets_wasserstein_epochs=args.shapelets_wasserstein_epochs,
+            shapelets_wasserstein_lr=args.shapelets_wasserstein_lr,
+            shapelets_wasserstein_num_per_scale=args.shapelets_wasserstein_num_per_scale,
+            shapelets_verbose=1,
+            shapelets_seed=args.random_seed,
             verbose=True
         )
         
@@ -399,8 +446,20 @@ Examples:
             'wasserstein_params': 'Soft-DTW Wasserstein (Parameters) SGD',
             'lstm_raw': 'LSTM Barycenter (Raw Data)',
             'ot_regul_raw': 'Regularized OT STA (Raw Data)',
+            'shapelets_euclidean_raw': 'Learning Shapelets Euclidean (Raw Data)',
+            'shapelets_euclidean_params': 'Learning Shapelets Euclidean (Parameters)',
+            'shapelets_wasserstein_params': 'Learning Shapelets Soft-DTW Wasserstein (Parameters)',
         }
-        for method_key in ['euclidean_raw', 'euclidean_params', 'wasserstein_params', 'lstm_raw', 'ot_regul_raw']:
+        for method_key in [
+            'euclidean_raw',
+            'euclidean_params',
+            'wasserstein_params',
+            'lstm_raw',
+            'ot_regul_raw',
+            'shapelets_euclidean_raw',
+            'shapelets_euclidean_params',
+            'shapelets_wasserstein_params',
+        ]:
             if method_key not in results:
                 continue
             print(f"{method_name_map[method_key]:<45} {results[method_key]['f1_weighted']:<15.4f} {results[method_key]['f1_macro']:<15.4f}")

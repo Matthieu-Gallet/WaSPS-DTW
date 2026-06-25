@@ -461,8 +461,10 @@ def estimate_weibull_params(series: np.ndarray, min_valid: int = 4) -> np.ndarra
         Array of shape ``(T, 2)`` where column-0 = k (shape), column-1 = λ (scale).
     """
     from sdtw.wasserstein_fast import estimate_weibull_fast
-
-    T = series.shape[0]
+    try:
+        T = series.shape[0]
+    except AttributeError:
+        T = len(series)
     params = np.zeros((T, 2), dtype=np.float64)
 
     for t in range(T):

@@ -121,13 +121,18 @@ def plot_confusion_matrices(results: Dict, Y_test: np.ndarray,
     """
     setup_ieee_style()
     
-    target_names = [idx_to_regime[i] for i in sorted(idx_to_regime.keys())]
+    labels = sorted(idx_to_regime.keys())
+    target_names = [idx_to_regime[i] for i in labels]
     method_candidates = [
         ('euclidean_raw', 'Soft-DTW Euclidean\n(Raw Data)'),
         ('euclidean_params', 'Soft-DTW Euclidean\n(Parameters)'),
         ('wasserstein_params', 'Soft-DTW Wasserstein\n(Parameters)'),
+        ('wasserstein_weibull', 'WaSPS-DTW Weibull\n(Wasserstein)'),
         ('lstm_raw', 'LSTM Barycenter\n(Raw Data)'),
-        ('ot_regul_raw', 'Regularized OT STA\n(Raw Data)')
+        ('ot_regul_raw', 'Regularized OT STA\n(Raw Data)'),
+        ('shapelets_euclidean_raw', 'Learning Shapelets\nEuclidean Raw'),
+        ('shapelets_euclidean_params', 'Learning Shapelets\nEuclidean Params'),
+        ('shapelets_wasserstein_params', 'Learning Shapelets\nWasserstein Params')
     ]
     methods = [(k, n) for k, n in method_candidates if k in results]
     if not methods:
@@ -140,10 +145,11 @@ def plot_confusion_matrices(results: Dict, Y_test: np.ndarray,
     
     for idx, (method_key, method_name) in enumerate(methods):
         Y_pred = results[method_key]['predictions']
-        cm = confusion_matrix(Y_test, Y_pred)
-        
-        # Normalize confusion matrix
-        cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        cm = confusion_matrix(Y_test, Y_pred, labels=labels)
+        row_sums = cm.sum(axis=1, keepdims=True)
+        cm_normalized = np.where(row_sums > 0,
+                                  cm.astype('float') / np.maximum(row_sums, 1),
+                                  0.0)
         
         ax = axes[idx]
         
@@ -196,7 +202,9 @@ def plot_barycenter_with_samples(results: Dict, X_train_raw: List[np.ndarray],
                                   X_train_params: List[np.ndarray],
                                   Y_train: np.ndarray, idx_to_regime: Dict[int, str],
                                   output_dir: str = None, save_pdf: bool = True,
-                                  param_names: List[str] = None):
+                                  param_names: List[str] = None,
+                                  log_scale: bool = True,
+                                  time_axis=None):
     """
     Plot barycenters with training samples for each class.
     
@@ -224,9 +232,10 @@ def plot_barycenter_with_samples(results: Dict, X_train_raw: List[np.ndarray],
     if n_classes == 1:
         axes = axes.reshape(1, -1)
     
-    # Create time axis for 2019
     T = X_train_params[0].shape[0]
-    time_axis = pd.date_range(start='2019-01-01', periods=T, freq='D')
+    if time_axis is None:
+        time_axis = np.arange(T)
+    use_date_fmt = isinstance(time_axis, pd.DatetimeIndex)
     
     colors = plt.cm.Set2(np.linspace(0, 1, n_classes))
     
@@ -240,35 +249,37 @@ def plot_barycenter_with_samples(results: Dict, X_train_raw: List[np.ndarray],
         class_indices = [i for i in range(len(X_train_params)) if Y_train[i] == class_label]
         class_params = [X_train_params[i] for i in class_indices]
         
-        # Get barycenter (use Wasserstein barycenter if available)
-        if 'wasserstein_params' in results and 'barycenters' in results['wasserstein_params']:
-            barycenter = results['wasserstein_params']['barycenters'][class_label]
-        elif 'euclidean_params' in results and 'barycenters' in results['euclidean_params']:
-            barycenter = results['euclidean_params']['barycenters'][class_label]
-        else:
+        # Get barycenter — prefer Wasserstein (Weibull or exponential), fall back to Euclidean
+        bary_key = None
+        for key in ('wasserstein_weibull', 'wasserstein_params', 'euclidean_params'):
+            if (key in results and 'barycenters' in results.get(key, {})
+                    and class_label in results[key]['barycenters']):
+                bary_key = key
+                break
+        if bary_key is None:
             continue
+        barycenter = results[bary_key]['barycenters'][class_label]
         
         for param_idx in range(n_params):
             ax = axes[class_idx, param_idx]
             
-            # Plot individual samples (light)
-            for sample_params in class_params[:20]:  # Limit to 20 samples for clarity
-                ax.semilogy(time_axis, sample_params[:, param_idx], 
-                       color=colors[class_idx], alpha=0.2, linewidth=0.5)
-            
-            # Plot barycenter (bold)
-            ax.semilogy(time_axis, barycenter[:, param_idx], 
-                   color='black', linewidth=1.5, label='Barycenter')
-            
+            plot_fn = ax.semilogy if log_scale else ax.plot
+            for sample_params in class_params[:20]:
+                plot_fn(time_axis, sample_params[:, param_idx],
+                        color=colors[class_idx], alpha=0.2, linewidth=0.5)
+
+            plot_fn(time_axis, barycenter[:, param_idx],
+                    color='black', linewidth=1.5, label='Barycenter')
+
             if class_idx == 0:
                 ax.set_title(param_names[param_idx], fontsize=10)
-            
+
             if param_idx == 0:
                 ax.set_ylabel(class_name, fontsize=10)
-            
+
             if class_idx == n_classes - 1:
-                # Format x-axis with months
-                ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
+                if use_date_fmt:
+                    ax.xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b'))
                 ax.tick_params(axis='x', rotation=0)
             else:
                 ax.set_xticklabels([])
@@ -809,6 +820,192 @@ def plot_class_pair_barycenters(barycenters_by_method: Dict[str, Dict[int, np.nd
             plt.savefig(output_path / f"{filename}.pdf", bbox_inches='tight', dpi=300)
 
         plt.close()
+
+
+# =============================================================================
+# CPAZMaL sensitivity line plots
+# =============================================================================
+
+def plot_cpazmal_sensitivity(df: pd.DataFrame, x_col: str, xlabel: str,
+                              output_dir: str, filename: str,
+                              x_log: bool = False):
+    """
+    Generic line plot for CPAZMaL sensitivity sub-experiments.
+
+    One line per method (euclidean_raw, euclidean_params, wasserstein_weibull),
+    with shaded ±1-std band when 'f1_weighted_std' / 'f1_macro_std' columns exist.
+
+    Parameters
+    ----------
+    df : DataFrame with columns [x_col, method, f1_weighted_mean, f1_macro_mean,
+         optionally f1_weighted_std, f1_macro_std].
+    x_col : column to use as the x-axis.
+    xlabel : human-readable x-axis label.
+    output_dir : directory where .png and .pdf are saved.
+    filename : base file name without extension.
+    x_log : if True, use log-scale x-axis.
+    """
+    setup_ieee_style()
+
+    method_styles = {
+        'euclidean_raw':       {'color': '#1f77b4', 'ls': '--',  'label': 'SDTW Euclidean (Raw)'},
+        'euclidean_params':    {'color': '#ff7f0e', 'ls': '-.',  'label': 'SDTW Euclidean (Weibull params)'},
+        'wasserstein_weibull': {'color': '#2ca02c', 'ls': '-',   'label': 'WaSPS-DTW Weibull'},
+    }
+
+    has_std_w = 'f1_weighted_std' in df.columns
+    has_std_m = 'f1_macro_std' in df.columns
+
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))
+
+    for method, style in method_styles.items():
+        sub = df[df['method'] == method].sort_values(x_col)
+        if sub.empty:
+            continue
+        for ax, (metric, std_col, has_std) in zip(
+            axes,
+            [('f1_weighted_mean', 'f1_weighted_std', has_std_w),
+             ('f1_macro_mean',    'f1_macro_std',    has_std_m)],
+        ):
+            ax.plot(sub[x_col], sub[metric],
+                    color=style['color'], ls=style['ls'],
+                    marker='o', ms=5, label=style['label'])
+            if has_std and std_col in sub.columns:
+                ax.fill_between(sub[x_col],
+                                sub[metric] - sub[std_col],
+                                sub[metric] + sub[std_col],
+                                color=style['color'], alpha=0.15)
+
+    for ax, title in zip(axes, ['F1 (weighted)', 'F1 (macro)']):
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(title)
+        ax.set_title(title)
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+        if x_log:
+            ax.set_xscale('log')
+
+    plt.tight_layout()
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out / f"{filename}.png", dpi=150, bbox_inches='tight')
+    fig.savefig(out / f"{filename}.pdf", bbox_inches='tight')
+    plt.close(fig)
+    print(f"Plot saved: {out / filename}.png")
+
+
+# =============================================================================
+# Multi-gamma barycenter comparison plots
+# =============================================================================
+
+def plot_barycenters_gamma_comparison(barycenters_by_gamma: dict,
+                                       idx_to_class: dict,
+                                       output_dir: str,
+                                       param_names: list = None):
+    """
+    For each class: one figure comparing barycenters from 3 methods at multiple γ values.
+
+    Layout (3 rows per class figure):
+      Row 0 — Euclidean (Raw): mean pixel amplitude vs time, one line per γ.
+      Row 1 — k (shape):  euclidean_params + wasserstein_weibull, one line per method×γ.
+      Row 2 — λ (scale):  same.
+
+    Line style encodes γ: first gamma → dashed, second gamma → solid.
+    Color encodes method: orange = euclidean_params, green = wasserstein_weibull,
+                          blue = euclidean_raw.
+
+    Parameters
+    ----------
+    barycenters_by_gamma : {gamma: {class_label: {method_key: array}}}
+    idx_to_class : {int label → str class name}
+    output_dir : directory where per-class PDF files are saved.
+    param_names : list of 2 strings for the 2 Weibull params (default: ['k', 'λ']).
+    """
+    setup_ieee_style()
+
+    if param_names is None:
+        param_names = ['k (shape)', 'λ (scale)']
+
+    gammas   = sorted(barycenters_by_gamma.keys())
+    ls_map   = {gammas[i]: ls for i, ls in enumerate(['--', '-', ':', '-.'][:len(gammas)])}
+
+    method_colors = {
+        'euclidean_raw':       '#1f77b4',  # blue
+        'euclidean_params':    '#ff7f0e',  # orange
+        'wasserstein_weibull': '#2ca02c',  # green
+    }
+    method_labels = {
+        'euclidean_raw':       'Euclidean (Raw)',
+        'euclidean_params':    'Euclidean (params)',
+        'wasserstein_weibull': 'WaSPS-DTW Weibull',
+    }
+
+    # Determine class set from the first gamma entry
+    first_gamma_data = barycenters_by_gamma[gammas[0]]
+    classes = sorted(first_gamma_data.keys())
+
+    out = Path(output_dir) / 'barycenter_gamma_cmp'
+    out.mkdir(parents=True, exist_ok=True)
+
+    for cls in classes:
+        cls_name = idx_to_class.get(cls, str(cls))
+
+        # Infer T from the first available barycenter
+        T = None
+        for g in gammas:
+            for method in ('wasserstein_weibull', 'euclidean_params', 'euclidean_raw'):
+                bary = barycenters_by_gamma[g].get(cls, {}).get(method)
+                if bary is not None:
+                    T = bary.shape[0]
+                    break
+            if T is not None:
+                break
+        if T is None:
+            continue
+        t_axis = np.arange(T)
+
+        fig, axes = plt.subplots(3, 1, figsize=(7, 6), sharex=True)
+        fig.suptitle(f'Barycenters — {cls_name}', fontsize=10, fontweight='bold')
+
+        # ── Row 0: euclidean_raw mean amplitude ──────────────────────────────
+        ax0 = axes[0]
+        for g in gammas:
+            bary = barycenters_by_gamma[g].get(cls, {}).get('euclidean_raw')
+            if bary is None:
+                continue
+            mean_amp = np.nanmean(bary, axis=1)  # (T,) mean over W² pixels
+            ax0.plot(t_axis, mean_amp,
+                     color=method_colors['euclidean_raw'],
+                     ls=ls_map[g], lw=1.2,
+                     label=f'γ={g:.0e}')
+        ax0.set_ylabel('Mean amplitude\n(Euclidean raw)', fontsize=8)
+        ax0.legend(fontsize=7, loc='upper right')
+        ax0.grid(True, alpha=0.3)
+
+        # ── Rows 1-2: Weibull params from param-based methods ────────────────
+        for param_idx, (ax, pname) in enumerate(zip(axes[1:], param_names)):
+            for method in ('euclidean_params', 'wasserstein_weibull'):
+                for g in gammas:
+                    bary = barycenters_by_gamma[g].get(cls, {}).get(method)
+                    if bary is None:
+                        continue
+                    ax.plot(t_axis, bary[:, param_idx],
+                            color=method_colors[method],
+                            ls=ls_map[g], lw=1.2,
+                            label=f'{method_labels[method]}  γ={g:.0e}')
+            ax.set_ylabel(pname, fontsize=8)
+            ax.legend(fontsize=6, loc='upper right', ncol=2)
+            ax.grid(True, alpha=0.3)
+
+        axes[-1].set_xlabel('Time index (date)', fontsize=8)
+        plt.tight_layout()
+
+        fname = ''.join(c if c.isalnum() or c in '_-' else '_' for c in cls_name)
+        plt.savefig(out / f'barycenter_gamma_{fname}.pdf', bbox_inches='tight', dpi=300)
+        plt.savefig(out / f'barycenter_gamma_{fname}.png', dpi=150, bbox_inches='tight')
+        plt.close(fig)
+
+    print(f"  Multi-gamma barycenter plots saved to {out}/")
 
 
 def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],

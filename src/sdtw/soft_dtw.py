@@ -31,9 +31,9 @@ def sdtw_divergence(D_xy, D_xx, D_yy, gamma):
     divergence : float
     """
     sdtw_xy = SoftDTW(D_xy, gamma=gamma).compute()
-    sdtw_xx = SoftDTW(D_xx, gamma=gamma).compute()
-    sdtw_yy = SoftDTW(D_yy, gamma=gamma).compute()
-    return sdtw_xy - 0.5 * (sdtw_xx + sdtw_yy)
+    # sdtw_xx = SoftDTW(D_xx, gamma=gamma).compute()
+    # sdtw_yy = SoftDTW(D_yy, gamma=gamma).compute()
+    return sdtw_xy# - 0.5 * (sdtw_xx + sdtw_yy)
 
 
 class SoftDTW(object):
