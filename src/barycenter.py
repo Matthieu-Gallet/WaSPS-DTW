@@ -93,7 +93,7 @@ def fit_barycenter(
     z = z_init
 
     log_every = max(1, n_steps // 10)
-    best_loss = float("inf")
+    best_loss = None  # None until first step; avoids float("inf")/inf = nan
     no_improve = 0
     for step in range(n_steps):
         z, opt_state, loss = step_jit(z, opt_state)
@@ -101,8 +101,7 @@ def fit_barycenter(
         if verbose and (step % log_every == 0 or step == n_steps - 1):
             print(f"  step {step+1:4d}/{n_steps}  loss={loss_val:.6f}", flush=True)
         if patience > 0:
-            rel_improve = (best_loss - loss_val) / (abs(best_loss) + 1e-8)
-            if rel_improve >= min_rel_improve:
+            if best_loss is None or (best_loss - loss_val) / (abs(best_loss) + 1e-8) >= min_rel_improve:
                 best_loss = loss_val
                 no_improve = 0
             else:
