@@ -1,0 +1,36 @@
+# Experiment config — River-discharge 4-method comparison including STA (T reduced)
+# Run: python experiments/run_classification.py configs/river_sta.yaml
+#
+# STA is O(T²): at T=365 (balanced, daily) it is intractable even at 20×20 samples.
+# This config uses max_time_steps=52 to reduce T to a tractable range (~minutes for KNN).
+# Note: truncation to 52 daily steps covers only ~7 weeks — not a full seasonal cycle.
+# Use configs/river.yaml (T=365, 3 methods) for the main result.
+
+dataset:
+  type: river
+  family: exponential
+  data_dir: data/river
+  mode: balanced          # balanced: 400 samples, T=365 (daily), 4 classes
+  test_size: 0.2
+  max_time_steps: 52      # truncate to 52 daily steps for STA tractability
+
+classification:
+  gamma: 1.0
+  k: 1
+  n_steps: 200
+  lr: 0.01
+  sta_epsilon: 0.05
+  max_train_samples: 20   # same cap as river.yaml — equal comparison
+  max_test_samples: 20
+  samples_per_step: 50    # rectangularise raw arrays to (T, 50) — required for eucl_raw + STA
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+
+methods: [wasps, eucl_params, eucl_raw, sta]
+modes:   [knn, barycenter]
+
+n_seeds: 4
+seed: 42
+
+output:
+  dir: results/jax_river_sta

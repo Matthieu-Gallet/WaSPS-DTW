@@ -1,0 +1,34 @@
+# Experiment config — CPAZMaL SAR classification (Weibull, 3 methods × 2 modes)
+# Run: python experiments/run_classification.py configs/cpazmal.yaml
+#
+# First run extracts from HDF5 (slow); subsequent runs load from data/cpazmal/ cache.
+# After extraction, check T and per-timestep valid counts to tune samples_per_step.
+# To include STA: verify T is tractable, then add 'sta' to methods.
+
+dataset:
+  type: cpazmal
+  family: weibull
+  hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
+  max_groups: null   # null = all groups; integer = limit for quick smoke-test
+
+classification:
+  gamma: 1.0
+  k: 1
+  n_steps: 200
+  lr: 0.005
+  sta_epsilon: 0.05
+  max_train_samples: 20   # same series-cap as river for fair comparison
+  max_test_samples: 20    # adjust after extraction once class counts are known
+  samples_per_step: 50    # rectangularise raw SAR arrays to (T, 50) — set after extraction
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+
+# STA excluded pending T inspection; raw N varies across windows.
+methods: [wasps, eucl_params, eucl_raw]
+modes:   [knn, barycenter]
+
+n_seeds: 1    # CPAZMaL uses a fixed spatial split; only one seed makes sense
+seed: 42
+
+output:
+  dir: results/jax_cpazmal
