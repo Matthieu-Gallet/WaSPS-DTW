@@ -1,0 +1,28 @@
+# Gate-E smoke config — all 4 methods × 2 modes, completes in ~1 min
+# T=4 (T²=16 Sinkhorn calls) + n_steps=5 makes STA barycenter tractable
+# Run: python experiments/run_classification.py configs/classification_smoke.yaml
+
+dataset:
+  type: synthetic
+  family: exponential
+  n_train_per_class: 3   # 3×2 = 6 train total
+  n_test_per_class: 2
+  T: 4                   # T²=16 Sinkhorn calls per pair
+  N_samples: 10
+  rate_params: [1.0, 5.0]   # 2 clearly-separated classes
+
+classification:
+  gamma: 1.0
+  k: 1
+  n_steps: 5
+  lr: 0.05
+  sta_epsilon: 0.1
+
+methods: [wasps, eucl_params, eucl_raw, sta]
+modes:   [knn, barycenter]
+
+n_seeds: 2
+seed: 42
+
+output:
+  dir: results/jax_classification_smoke

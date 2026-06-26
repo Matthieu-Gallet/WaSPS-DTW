@@ -27,7 +27,7 @@ classification:
   early_stop_tol: 1.0e-4
 
 methods: [wasps, eucl_params, eucl_raw, sta]
-modes:   [knn, barycenter]
+modes:   [knn]          # STA barycenter at T=52 is intractable (T²=2704 Sinkhorn/step ≈ 12h)
 
 n_seeds: 4
 seed: 42

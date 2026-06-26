@@ -18,13 +18,13 @@ classification:
   lr: 0.005
   sta_epsilon: 0.05
   max_train_samples: 20   # same series-cap as river for fair comparison
-  max_test_samples: 20    # adjust after extraction once class counts are known
-  samples_per_step: 50    # rectangularise raw SAR arrays to (T, 50) — set after extraction
+  max_test_samples: 20
+  samples_per_step: 100   # rectangularise raw SAR arrays to (T, 100); min valid~105
   early_stop_patience: 20
   early_stop_tol: 1.0e-4
 
-# STA excluded pending T inspection; raw N varies across windows.
-methods: [wasps, eucl_params, eucl_raw]
+# STA included: T_train=24 (biweekly SAR), O(T²)=576 — tractable at 20×20 samples.
+methods: [wasps, eucl_params, eucl_raw, sta]
 modes:   [knn, barycenter]
 
 n_seeds: 1    # CPAZMaL uses a fixed spatial split; only one seed makes sense

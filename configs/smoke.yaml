@@ -1,0 +1,26 @@
+# Fast smoke test: M1 + M3 only, minimal sizes (~30s)
+dataset:
+  type: synthetic
+  family: exponential
+  n_classes: 2
+  n_train_per_class: 3
+  n_test_per_class: 2
+  T: 4
+  N_samples: 20
+  rate_params: [1.0, 5.0]
+
+classification:
+  gamma: 1.0
+  k: 1
+  n_steps: 30
+  lr: 0.01
+  log_space: true
+  n_quantiles_m2: 10
+  sta_epsilon: 0.05
+
+methods: [M1, M3]
+
+output:
+  dir: results/jax_smoke
+
+seed: 42

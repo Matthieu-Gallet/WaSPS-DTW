@@ -46,13 +46,14 @@ python experiments/run_classification.py configs/classification_smoke.yaml
 python experiments/run_classification.py configs/classification.yaml
 
 # River-discharge regime classification (exponential, wasps+eucl_params+eucl_raw)
-python experiments/run_classification.py configs/river.yaml         # full (~20 min)
+python experiments/run_classification.py configs/river.yaml         # full (~25 min, T=365, no STA)
+python experiments/run_classification.py configs/river_sta.yaml     # 4 methods w/ STA, T=52 truncated
 python experiments/run_classification.py configs/river_smoke.yaml   # quick smoke (T=8, no STA)
 
-# CPAZMaL SAR classification (Weibull, wasps+eucl_params+eucl_raw)
+# CPAZMaL SAR classification (Weibull, 4 methods × 2 modes — STA bary ~2h)
 python experiments/run_classification.py configs/cpazmal.yaml
 # → first run extracts from HDF5 (slow), caches to data/cpazmal/
-# → set max_groups: 6 in cpazmal.yaml for a quick smoke test
+# → set max_groups: 6 in cpazmal.yaml for a quick smoke test (3 methods, no STA)
 
 # Fit and save barycenters
 python experiments/run_barycenters.py configs/river.yaml
@@ -145,9 +146,11 @@ SoftDTW(cost_fn, gamma, is_divergence=True, manual_grad=True)
 
 **`fit_barycenter` signature (`barycenter.py`):**
 ```python
-fit_barycenter(series, softdtw: SoftDTW, n_steps=200, lr=1e-2, init=None, verbose=False)
+fit_barycenter(series, softdtw: SoftDTW, n_steps=200, lr=1e-2, init=None, verbose=False,
+               dtype=jnp.float64, patience=15, min_rel_improve=1e-4)
 ```
 Positivity enforced via `cost_fn.use_positivity_constraint` — no `softplus` or `manual_grad` kwargs.
+Default dtype is `float64` (required for numerically stable gradient on wide-range exponential data).
 
 **Divergence self-term identity:**
 `∂SDTW(X,X)/∂X = 2·gradient_X(E_xx,X,X)`, so `−½·∂f(x,x)/∂x = −gradient_X(E_xx,x,x)`.
@@ -161,10 +164,30 @@ Applied ONCE after loading (stratified subsample) so all methods compare on the 
 **STA complexity warning:**  
 STA KNN cost is O(T²·n_train·n_test) Sinkhorn calls — quadratic in timesteps.  
 STA barycenter is even slower (O(T²) Sinkhorn calls per gradient step × n_steps × n_classes).  
-`configs/river.yaml` excludes STA (T=52 → days).  
-`configs/river_smoke.yaml` (T=8) also excludes STA (T=8 → ~17 min for KNN alone).  
+Measured: CPAZMaL STA/bary (T=24, n_classes=10, 2 train/class) ≈ 2–3h.  
+`configs/river.yaml` excludes STA (T=365 daily — intractable).  
+`configs/river_sta.yaml` uses `max_time_steps: 52` (truncated) to make STA **KNN** tractable (~12 min/seed).  
+  STA barycenter at T=52 is also intractable (T²=2704 Sinkhorn/step ≈ 12h → only modes: [knn] in river_sta.yaml).  
+`configs/river_smoke.yaml` (T=8) also excludes STA.  
 Gate-E smoke: `classification_smoke.yaml` (T=4, n_steps=5) runs STA in ~5s per seed.  
 **`_sinkhorn_jit` must stay `@jax.jit`** in `sta_wrapper.py` — without it, each Sinkhorn call re-traces (64× slower; verified empirically: 4579s → 72s).
+
+**Barycenter prediction uses plain SDTW (not divergence):**  
+`predict()` in `barycenter_clf.py` uses `is_divergence=False`. The SoftDTW divergence requires
+`T_test ≈ T_bary` to avoid bias — the self-term `½SDTW(b,b)` scales with T_bary, so when
+T_test ≠ T_bary, it dominates the discriminative SDTW(z,b) term and all predictions collapse to
+one class. For CPAZMaL (T_test=5, T_bary=24), using is_divergence=True caused f1=0.027 → fixed
+to is_divergence=False → f1=0.150. Plain SDTW is also the semantically correct choice (nearest
+centroid by distance, not divergence).
+
+**WaSPS barycenter structural limitation (real data with wide β range):**  
+For exponential distributions, W₂²(β₁,β₂) = 2(μ₁-μ₂)² where μ=1/β. The WaSPS Fréchet barycenter
+per-timestep = arithmetic mean of μ_i = **harmonic mean** of β. For river β ∈ [0.025, 44], one
+outlier sample with β=0.025 (μ=40) dominates, pulling the barycenter far from typical values.
+Combined with the softplus bijector (Δβ ≈ β·lr → tiny step for small β), only 5 train/class (20 cap),
+and T=365 (long sequences): wasps/bary f1≈0.10 vs wasps/KNN f1≈0.47. Float64 does NOT fix this
+(structural, not numerical). **wasps/KNN is the primary river result.** Increasing max_train_samples
+beyond 20 (e.g., 80) would give more stable barycenters but was not tested.
 
 **cpazmal cache:**  
 `data/cpazmal/X_train_{all|mgN}.npy` etc. Delete to force re-extraction from HDF5.

@@ -87,8 +87,9 @@ def predict(
     classes = sorted(barycenters.keys())
     bary_jax = {cls: jnp.array(barycenters[cls], dtype=jnp.float64) for cls in classes}
 
-    # Build once; captures cost_fn and gamma as closure constants.
-    sdtw_fn = SoftDTW(cost_fn, gamma, is_divergence=True, manual_grad=False)
+    # Plain SDTW (not divergence): avoids self-term ½SDTW(b,b) dominating when
+    # T_test ≠ T_bary, and matches KNN semantics (nearest centroid by DTW distance).
+    sdtw_fn = SoftDTW(cost_fn, gamma, is_divergence=False, manual_grad=False)
 
     @jax.jit
     def divergence_to_bary(z: jax.Array, b: jax.Array) -> jax.Array:

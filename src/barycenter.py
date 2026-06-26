@@ -35,7 +35,7 @@ def fit_barycenter(
     lr: float = 1e-2,
     init: np.ndarray | None = None,
     verbose: bool = False,
-    dtype = jnp.float32,
+    dtype = jnp.float64,
     patience: int = 15,
     min_rel_improve: float = 1e-4,
 ) -> np.ndarray:
@@ -51,8 +51,7 @@ def fit_barycenter(
         lr:               Adam learning rate.
         init:             (T, n_params) initialisation; default = mean of series.
         verbose:          Print loss every 10% of n_steps.
-        dtype:            JAX computation dtype.  Default float32.  Pass jnp.float64 for
-                          higher precision (Weibull / fine-tolerance tests).
+        dtype:            JAX computation dtype.  Default float64.
         patience:         Stop early after this many steps without a relative improvement
                           of at least min_rel_improve.  0 = disabled.
         min_rel_improve:  Minimum relative loss improvement to count as progress.
