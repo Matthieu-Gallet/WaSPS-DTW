@@ -174,8 +174,11 @@ Measured: CPAZMaL STA/bary (T=24, n_classes=10, 2 train/class) ≈ 6.6h total:
   Fix: pass data as stacked JAX args (not closed-over); wrap predict value() in @jax.jit.
   Not yet implemented — acceptable for single-seed CPAZMaL validation run.  
 `configs/river.yaml` excludes STA (T=365 daily — intractable).  
-`configs/river_sta.yaml` uses `max_time_steps: 52` (truncated) to make STA **KNN** tractable (~12 min/seed).  
-  STA barycenter at T=52 is also intractable (T²=2704 Sinkhorn/step ≈ 12h → only modes: [knn] in river_sta.yaml).  
+`configs/river_sta.yaml` uses `max_time_steps: 25` (truncated) for STA **KNN** (~13 min/seed, 4 seeds ≈ 52 min).  
+  Why T=25 not T=52: river Sinkhorn convergence is ~10× slower than CPAZMaL (river β ∈ [0.025, 44] →  
+  large transport distances → many iterations at ε=0.05). Empirical: T=52 measured ~56 min/seed.  
+  T=25 cuts T² from 2704 to 625, restoring the 13 min/seed estimate.  
+  STA barycenter omitted (T²=625 Sinkhorn/step at T=25 is still slow; modes: [knn] only).  
 `configs/river_smoke.yaml` (T=8) also excludes STA.  
 Gate-E smoke: `classification_smoke.yaml` (T=4, n_steps=5) runs STA in ~5s per seed.  
 **`_sinkhorn_jit` must stay `@jax.jit`** in `sta_wrapper.py` — without it, each Sinkhorn call re-traces (64× slower; verified empirically: 4579s → 72s).

@@ -10,6 +10,12 @@ from .classification_plots import (
     plot_summary_figure,
     plot_class_pair_barycenters,
     plot_all_class_barycenters_grid,
+    # Previously defined but not exported
+    plot_cpazmal_sensitivity,
+    plot_barycenters_gamma_comparison,
+    # Debug helpers (new in JAX branch)
+    plot_samples_with_fitted_pdf,
+    plot_barycenter_debug,
 )
 
 __all__ = [
@@ -22,4 +28,8 @@ __all__ = [
     'plot_summary_figure',
     'plot_class_pair_barycenters',
     'plot_all_class_barycenters_grid',
+    'plot_cpazmal_sensitivity',
+    'plot_barycenters_gamma_comparison',
+    'plot_samples_with_fitted_pdf',
+    'plot_barycenter_debug',
 ]

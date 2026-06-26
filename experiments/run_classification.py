@@ -132,6 +132,15 @@ def _load_river(cfg: dict, seed: int):
 
 
 def _load_cpazmal(cfg: dict, seed: int = 42):
+    """Load CPAZMaL data.  Caches arrays to disk; returns (X_train, X_test, labels, labels).
+
+    Also caches and returns a `groups` array (geographic group index per sample)
+    when available from the HDF5.  The `groups` array is used by the debug report
+    to detect whether a class barycenter is built from a single geographic group.
+    The return value is extended to (X_train, X_test, labels, labels, groups_or_None)
+    when the caller passes `return_groups=True` — but for backward compatibility the
+    normal call still returns 4 values.
+    """
     from data.cpazmal_loader import MLDatasetLoader, extract_time_series
     ds        = cfg["dataset"]
     hdf5_path = ds["hdf5_path"]
@@ -141,11 +150,16 @@ def _load_cpazmal(cfg: dict, seed: int = 42):
     cx_train  = cache_dir / f"X_train_{suffix}.npy"
     cx_pred   = cache_dir / f"X_predict_{suffix}.npy"
     cy        = cache_dir / f"y_{suffix}.npy"
+    cg        = cache_dir / f"groups_{suffix}.npy"  # geographic group identity
+
+    groups = None
     if cx_train.exists():
         print(f"[cpazmal] loading from cache (max_groups={max_groups})")
         X_train = list(np.load(cx_train,  allow_pickle=True))
         X_test  = list(np.load(cx_pred,   allow_pickle=True))
         labels  = np.load(cy)
+        if cg.exists():
+            groups = np.load(cg)
     else:
         print(f"[cpazmal] extracting from HDF5 (max_groups={max_groups}) …")
         loader = MLDatasetLoader(hdf5_path)
@@ -153,10 +167,13 @@ def _load_cpazmal(cfg: dict, seed: int = 42):
         X_train = list(data["X_train"])
         X_test  = list(data["X_predict"])
         labels  = np.asarray(data["y"])
+        groups  = np.asarray(data["groups"]) if "groups" in data else None
         cache_dir.mkdir(parents=True, exist_ok=True)
         np.save(cx_train, np.array(X_train, dtype=object), allow_pickle=True)
         np.save(cx_pred,  np.array(X_test,  dtype=object), allow_pickle=True)
         np.save(cy, labels)
+        if groups is not None:
+            np.save(cg, groups)
         print(f"[cpazmal] cache saved to {cache_dir}")
     # Rectangularise raw arrays if samples_per_step is set
     n = cfg["classification"].get("samples_per_step")
@@ -164,21 +181,35 @@ def _load_cpazmal(cfg: dict, seed: int = 42):
         rng = np.random.default_rng(seed)
         X_train = [to_fixed_n(s, n, rng) for s in X_train]
         X_test  = [to_fixed_n(s, n, rng) for s in X_test]
-    return X_train, X_test, labels, labels
+    return X_train, X_test, labels, labels, groups
 
 
 # ---------------------------------------------------------------------------
 # Subsample helper
 # ---------------------------------------------------------------------------
 
-def _subsample(X, y, max_n, rng):
+def _subsample(X, y, max_n, rng, extra=None):
+    """Stratified subsample of X, y (and optionally an extra array such as group indices).
+
+    Args:
+        extra: optional 1-D numpy array of the same length as y (e.g. geographic
+               group indices).  Subsampled alongside X and y; returned as a third
+               value when not None.
+
+    Returns:
+        (X_sub, y_sub) when extra is None; (X_sub, y_sub, extra_sub) otherwise.
+    """
     if max_n < 0 or max_n >= len(y):
-        return X, y
+        return (X, y, extra) if extra is not None else (X, y)
     idx, _ = train_test_split(
         np.arange(len(y)), train_size=max_n,
         random_state=int(rng.integers(2**31)), stratify=y,
     )
-    return [X[i] for i in np.sort(idx)], y[np.sort(idx)]
+    sorted_idx = np.sort(idx)
+    sub_extra  = extra[sorted_idx] if extra is not None else None
+    if extra is not None:
+        return [X[i] for i in sorted_idx], y[sorted_idx], sub_extra
+    return [X[i] for i in sorted_idx], y[sorted_idx]
 
 
 # ---------------------------------------------------------------------------
@@ -208,6 +239,194 @@ def _metrics(preds, truth):
 
 
 # ---------------------------------------------------------------------------
+# Debug dump helpers (gated by cfg["debug"]=True, first seed only)
+# ---------------------------------------------------------------------------
+
+def _debug_dump_dataset(
+    train_raw: list,
+    train_labels: np.ndarray,
+    family: str,
+    debug_dir: Path,
+    groups: np.ndarray = None,
+) -> None:
+    """Write shared dataset diagnostics to ``debug_dir``.
+
+    Produces, for each class:
+    - samples_pdf_<class>.pdf  — histogram + MLE & log-cumulant PDF overlay at 3 timesteps
+    And writes ``debug_dir/dataset_report.log`` with:
+    - Per-class: sample count, T, N/timestep, min/max/mean/std/skew, %NaN, nb resampled,
+      goodness-of-fit KS and Anderson-Darling (MLE), averaged over timesteps.
+    - If ``groups`` array is provided: nb distinct geographic groups per class in the subsampled
+      training set.
+    """
+    import scipy.stats as scipy_stats
+    try:
+        import distributions as _dists
+        from data.preprocess import clean_series as _clean
+        from data.preprocess import to_fixed_n as _to_fixed_n
+    except ImportError:
+        print("[debug] WARNING: cannot import 'distributions'/'data.preprocess' — skipping dataset report")
+        return
+    try:
+        from plot.classification_plots import plot_samples_with_fitted_pdf
+    except ImportError:
+        print("[debug] WARNING: cannot import 'plot.classification_plots' — skipping PDF plots")
+        plot_samples_with_fitted_pdf = None
+
+    debug_dir.mkdir(parents=True, exist_ok=True)
+    dist  = _dists.get(family)
+    classes = sorted(set(train_labels.tolist()))
+
+    # Build {label: index-into-train_raw} per class (post-subsample view)
+    class_indices = {c: [i for i, lbl in enumerate(train_labels) if lbl == c]
+                     for c in classes}
+
+    log_lines = []
+    log_lines.append(f"=== Dataset debug report — family={family} ===\n")
+    log_lines.append(f"Total training samples: {len(train_labels)}  "
+                     f"classes: {sorted(classes)}\n\n")
+
+    for cls in classes:
+        idx_list = class_indices[cls]
+        series   = [train_raw[i] for i in idx_list]
+        n_samp   = len(series)
+        if n_samp == 0:
+            log_lines.append(f"--- class {cls}: NO SAMPLES ---\n")
+            continue
+
+        T  = series[0].shape[0]
+        N_raw = series[0].shape[1] if series[0].ndim > 1 else 1
+
+        # ── Per-class raw stats (over all timesteps × all samples) ──
+        all_vals = np.concatenate([s.ravel() for s in series])
+        nan_frac = float(np.mean(~np.isfinite(all_vals)))
+        valid    = all_vals[np.isfinite(all_vals) & (all_vals > 0)]
+
+        from scipy.stats import skew as _skew
+        v_min  = float(np.min(valid)) if len(valid) else float('nan')
+        v_max  = float(np.max(valid)) if len(valid) else float('nan')
+        v_mean = float(np.mean(valid)) if len(valid) else float('nan')
+        v_std  = float(np.std(valid))  if len(valid) else float('nan')
+        v_skew = float(_skew(valid))   if len(valid) >= 3 else float('nan')
+
+        # ── Per-timestep: n_valid, resample needed, KS & AD goodness-of-fit ──
+        ks_stats  = []
+        ad_stats  = []
+        n_resamp_ts = 0   # timesteps where resampling with replacement was used
+        for t in range(T):
+            pooled = np.concatenate([_clean(s[t]) for s in series])
+            if len(pooled) < 5:
+                continue
+            n_valid_t = len(pooled)
+            # Count series-timestep pairs where the raw window had fewer valid
+            # pixels than N_raw (before to_fixed_n); proxied by clean < N_raw.
+            # Note: after to_fixed_n(n=N_raw), clean_series removes the shifted
+            # minimum, so the count will be ~N (one per series) — this is
+            # expected and not a data-quality concern.
+            n_resamp_ts += sum(
+                1 for s in series
+                if len(_clean(s[t])) < N_raw
+            )
+            # MLE fit + goodness-of-fit — append each stat immediately so a
+            # failure in one test does not suppress the other.
+            try:
+                params = dist.estimate(pooled, method='mle')
+                if family == 'exponential':
+                    beta = float(params)
+                    ks_s, _ = scipy_stats.kstest(pooled, 'expon',
+                                                 args=(0, 1.0 / beta))
+                    ks_stats.append(float(ks_s))
+                    ad_r = scipy_stats.anderson(pooled, dist='expon')
+                    ad_stats.append(float(ad_r.statistic))
+                else:
+                    k_v, lam_v = float(params[0]), float(params[1])
+                    ks_s, _ = scipy_stats.kstest(
+                        pooled, 'weibull_min',
+                        args=(k_v, 0, lam_v),
+                    )
+                    ks_stats.append(float(ks_s))
+                    # 'weibull_min' (not 'weibull_max') is the scipy AD valid key
+                    ad_r = scipy_stats.anderson(pooled, dist='weibull_min')
+                    ad_stats.append(float(ad_r.statistic))
+            except Exception:
+                pass
+
+        ks_mean  = float(np.mean(ks_stats))  if ks_stats  else float('nan')
+        ad_mean  = float(np.mean(ad_stats))  if ad_stats  else float('nan')
+
+        # ── Geographic groups (CPAZMaL only) ──
+        group_info = ""
+        if groups is not None:
+            cls_groups = groups[np.array(idx_list)]
+            n_distinct = len(set(cls_groups.tolist()))
+            group_info = (f"\n  Geographic groups in subsample: {n_distinct} "
+                          f"(group IDs: {sorted(set(cls_groups.tolist()))})")
+
+        log_lines.append(
+            f"--- class {cls} ---\n"
+            f"  n_samples:      {n_samp}\n"
+            f"  shape:          T={T}, N_raw={N_raw}\n"
+            f"  values:         min={v_min:.4g}  max={v_max:.4g}  "
+            f"mean={v_mean:.4g}  std={v_std:.4g}  skew={v_skew:.4g}\n"
+            f"  NaN fraction:   {nan_frac:.2%}\n"
+            f"  timesteps with resampling (per-series): {n_resamp_ts}\n"
+            f"  goodness-of-fit (MLE, mean over T):\n"
+            f"    KS statistic:  {ks_mean:.4f}   (closer to 0 = better fit)\n"
+            f"    AD statistic:  {ad_mean:.4f}   (lower = better fit)"
+            f"{group_info}\n\n"
+        )
+
+        # ── Per-class samples + PDF plot ──
+        if plot_samples_with_fitted_pdf is not None:
+            plot_samples_with_fitted_pdf(
+                series, family, cls, f'class_{cls}',
+                output_dir=str(debug_dir),
+                n_timesteps=3,
+            )
+
+    # Write log
+    log_path = debug_dir / "dataset_report.log"
+    with open(log_path, "w") as f:
+        f.writelines(log_lines)
+    print(f"[debug] dataset report → {log_path}", flush=True)
+
+
+def _debug_dump_barycenters(
+    method: str,
+    barycenters: dict,
+    train_repr: list,
+    train_labels: np.ndarray,
+    family: str,
+    debug_dir: Path,
+) -> None:
+    """Write per-method barycenter plots to ``debug_dir/<method>/``."""
+    try:
+        from plot.classification_plots import plot_barycenter_debug
+    except ImportError:
+        print(f"[debug] WARNING: cannot import 'plot.classification_plots' — skipping bary plots")
+        return
+
+    method_dir = debug_dir / method
+    method_dir.mkdir(parents=True, exist_ok=True)
+
+    classes = sorted(barycenters.keys())
+    class_indices = {c: [i for i, lbl in enumerate(train_labels) if lbl == c]
+                     for c in classes}
+
+    for cls in classes:
+        bary = np.asarray(barycenters[cls])
+        cls_series = [train_repr[i] for i in class_indices[cls]]
+        plot_barycenter_debug(
+            bary, cls_series, family,
+            class_label=cls, class_name=f'class_{cls}',
+            method=method,
+            output_dir=str(method_dir),
+        )
+
+    print(f"[debug]   barycenters/{method}/ → {len(classes)} class plots", flush=True)
+
+
+# ---------------------------------------------------------------------------
 # Single-seed runner
 # ---------------------------------------------------------------------------
 
@@ -217,19 +436,37 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
     ds_type   = cfg["dataset"]["type"]
     rng       = np.random.default_rng(seed)
 
+    cpazmal_groups = None   # geographic group identity (CPAZMaL only)
     if ds_type == "synthetic":
         train_raw, test_raw, train_labels, test_labels = _make_synthetic(cfg, rng)
     elif ds_type == "river":
         train_raw, test_raw, train_labels, test_labels = _load_river(cfg, seed)
     elif ds_type == "cpazmal":
-        train_raw, test_raw, train_labels, test_labels = _load_cpazmal(cfg, seed=seed)
+        train_raw, test_raw, train_labels, test_labels, cpazmal_groups = \
+            _load_cpazmal(cfg, seed=seed)
     else:
         raise ValueError(f"dataset.type '{ds_type}' not supported")
 
-    train_raw, train_labels = _subsample(train_raw, train_labels,
-                                          clf_cfg.get("max_train_samples", -1), rng)
-    test_raw, test_labels   = _subsample(test_raw,  test_labels,
-                                          clf_cfg.get("max_test_samples",  -1), rng)
+    # Subsample train set; also subsample cpazmal_groups (geographic IDs) if present
+    _subsample_result = _subsample(train_raw, train_labels,
+                                   clf_cfg.get("max_train_samples", -1), rng,
+                                   extra=cpazmal_groups)
+    if cpazmal_groups is not None:
+        train_raw, train_labels, cpazmal_groups = _subsample_result
+    else:
+        train_raw, train_labels = _subsample_result
+
+    test_raw, test_labels = _subsample(test_raw, test_labels,
+                                       clf_cfg.get("max_test_samples", -1), rng)
+
+    # Debug: dataset-level diagnostics (once, for the first seed only)
+    _debug = cfg.get("debug", False)
+    _debug_dir = Path(cfg["output"]["dir"]) / "debug" if _debug else None
+    _is_first_seed = (seed == cfg.get("seed", 42))
+    if _debug and _is_first_seed:
+        print(f"[debug] writing dataset diagnostics → {_debug_dir}", flush=True)
+        _debug_dump_dataset(train_raw, train_labels, family, _debug_dir,
+                            groups=cpazmal_groups)
 
     gamma       = clf_cfg["gamma"]
     k           = clf_cfg.get("k", 1)
@@ -280,6 +517,12 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
                 min_rel_improve=clf_cfg.get("early_stop_tol", 1e-4),
             )
             train_time = time.time() - t0
+
+            # Debug: barycenter plots for the first seed
+            if _debug and _is_first_seed:
+                _debug_dump_barycenters(method, barycenters, train_repr,
+                                        train_labels, family, _debug_dir)
+
             t1 = time.time()
             preds = predict(test_repr, barycenters, cost_fn, gamma)
             infer_time = time.time() - t1

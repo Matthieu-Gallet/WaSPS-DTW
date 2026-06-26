@@ -1,0 +1,726 @@
+{
+  "config": {
+    "dataset": {
+      "type": "river",
+      "family": "exponential",
+      "data_dir": "data/river",
+      "mode": "balanced",
+      "test_size": 0.2,
+      "max_time_steps": 25
+    },
+    "classification": {
+      "gamma": 1.0,
+      "k": 1,
+      "n_steps": 200,
+      "lr": 0.01,
+      "sta_epsilon": 0.05,
+      "max_train_samples": 20,
+      "max_test_samples": 20,
+      "samples_per_step": 50,
+      "early_stop_patience": 20,
+      "early_stop_tol": 0.0001
+    },
+    "methods": [
+      "wasps",
+      "eucl_params",
+      "eucl_raw",
+      "sta"
+    ],
+    "modes": [
+      "knn"
+    ],
+    "n_seeds": 4,
+    "seed": 42,
+    "output": {
+      "dir": "results/jax_river_sta"
+    }
+  },
+  "summary": [
+    {
+      "method": "eucl_params",
+      "mode": "knn",
+      "n_seeds": 4,
+      "acc_mean": 0.3375,
+      "acc_std": 0.0739509972887452,
+      "f1_mean": 0.3098970473970474,
+      "f1_std": 0.09268868768754919,
+      "time_mean": 0.23736774921417236,
+      "time_std": 0.011604136015779188
+    },
+    {
+      "method": "eucl_raw",
+      "mode": "knn",
+      "n_seeds": 4,
+      "acc_mean": 0.275,
+      "acc_std": 0.05590169943749473,
+      "f1_mean": 0.23245663650075415,
+      "f1_std": 0.07593293504231906,
+      "time_mean": 0.2764127254486084,
+      "time_std": 0.04750058019800256
+    },
+    {
+      "method": "sta",
+      "mode": "knn",
+      "n_seeds": 4,
+      "acc_mean": 0.375,
+      "acc_std": 0.16770509831248426,
+      "f1_mean": 0.3628517316017316,
+      "f1_std": 0.16717198258653912,
+      "time_mean": 1645.7925556898117,
+      "time_std": 110.66016715324793
+    },
+    {
+      "method": "wasps",
+      "mode": "knn",
+      "n_seeds": 4,
+      "acc_mean": 0.2375,
+      "acc_std": 0.17809758560968758,
+      "f1_mean": 0.2262085137085137,
+      "f1_std": 0.17414074307659272,
+      "time_mean": 0.5179437398910522,
+      "time_std": 0.1380374320940147
+    }
+  ],
+  "per_seed": [
+    {
+      "accuracy": 0.5,
+      "f1_weighted": 0.48538961038961037,
+      "confusion_matrix": [
+        [
+          3,
+          1,
+          1,
+          0
+        ],
+        [
+          2,
+          2,
+          0,
+          1
+        ],
+        [
+          3,
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          0,
+          0,
+          4
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "wasps",
+      "mode": "knn",
+      "seed": 42,
+      "time_s": 0.6512312889099121
+    },
+    {
+      "accuracy": 0.45,
+      "f1_weighted": 0.45629370629370636,
+      "confusion_matrix": [
+        [
+          2,
+          2,
+          0,
+          1
+        ],
+        [
+          1,
+          3,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          3,
+          0
+        ],
+        [
+          1,
+          3,
+          0,
+          1
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_params",
+      "mode": "knn",
+      "seed": 42,
+      "time_s": 0.23877573013305664
+    },
+    {
+      "accuracy": 0.2,
+      "f1_weighted": 0.11764705882352941,
+      "confusion_matrix": [
+        [
+          0,
+          3,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          1,
+          3
+        ],
+        [
+          1,
+          1,
+          0,
+          3
+        ],
+        [
+          0,
+          1,
+          0,
+          4
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_raw",
+      "mode": "knn",
+      "seed": 42,
+      "time_s": 0.35805368423461914
+    },
+    {
+      "accuracy": 0.55,
+      "f1_weighted": 0.5173160173160174,
+      "confusion_matrix": [
+        [
+          2,
+          1,
+          1,
+          1
+        ],
+        [
+          0,
+          3,
+          0,
+          2
+        ],
+        [
+          0,
+          2,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          5
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "sta",
+      "mode": "knn",
+      "seed": 42,
+      "time_s": 1557.2051439285278
+    },
+    {
+      "accuracy": 0.0,
+      "f1_weighted": 0.0,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          2,
+          3
+        ],
+        [
+          1,
+          0,
+          1,
+          3
+        ],
+        [
+          1,
+          0,
+          0,
+          4
+        ],
+        [
+          1,
+          2,
+          2,
+          0
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "wasps",
+      "mode": "knn",
+      "seed": 43,
+      "time_s": 0.36202430725097656
+    },
+    {
+      "accuracy": 0.3,
+      "f1_weighted": 0.26884226884226886,
+      "confusion_matrix": [
+        [
+          3,
+          1,
+          1,
+          0
+        ],
+        [
+          1,
+          0,
+          2,
+          2
+        ],
+        [
+          2,
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          1,
+          3,
+          1
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_params",
+      "mode": "knn",
+      "seed": 43,
+      "time_s": 0.21814846992492676
+    },
+    {
+      "accuracy": 0.3,
+      "f1_weighted": 0.29166666666666663,
+      "confusion_matrix": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          3,
+          1,
+          0,
+          1
+        ],
+        [
+          1,
+          0,
+          1,
+          3
+        ],
+        [
+          2,
+          0,
+          0,
+          3
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_raw",
+      "mode": "knn",
+      "seed": 43,
+      "time_s": 0.2470417022705078
+    },
+    {
+      "accuracy": 0.1,
+      "f1_weighted": 0.08333333333333333,
+      "confusion_matrix": [
+        [
+          2,
+          0,
+          1,
+          2
+        ],
+        [
+          1,
+          0,
+          0,
+          4
+        ],
+        [
+          2,
+          1,
+          0,
+          2
+        ],
+        [
+          2,
+          3,
+          0,
+          0
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "sta",
+      "mode": "knn",
+      "seed": 43,
+      "time_s": 1834.912614107132
+    },
+    {
+      "accuracy": 0.25,
+      "f1_weighted": 0.24444444444444446,
+      "confusion_matrix": [
+        [
+          1,
+          1,
+          2,
+          1
+        ],
+        [
+          2,
+          0,
+          2,
+          1
+        ],
+        [
+          1,
+          2,
+          2,
+          0
+        ],
+        [
+          1,
+          1,
+          1,
+          2
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "wasps",
+      "mode": "knn",
+      "seed": 44,
+      "time_s": 0.6594226360321045
+    },
+    {
+      "accuracy": 0.35,
+      "f1_weighted": 0.3106060606060606,
+      "confusion_matrix": [
+        [
+          2,
+          1,
+          1,
+          1
+        ],
+        [
+          2,
+          0,
+          2,
+          1
+        ],
+        [
+          2,
+          0,
+          2,
+          1
+        ],
+        [
+          1,
+          0,
+          1,
+          3
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_params",
+      "mode": "knn",
+      "seed": 44,
+      "time_s": 0.2483518123626709
+    },
+    {
+      "accuracy": 0.35,
+      "f1_weighted": 0.3094017094017094,
+      "confusion_matrix": [
+        [
+          0,
+          0,
+          3,
+          2
+        ],
+        [
+          2,
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          2,
+          2,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          4
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_raw",
+      "mode": "knn",
+      "seed": 44,
+      "time_s": 0.24217700958251953
+    },
+    {
+      "accuracy": 0.4,
+      "f1_weighted": 0.3939393939393939,
+      "confusion_matrix": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          1,
+          2,
+          1,
+          1
+        ],
+        [
+          1,
+          2,
+          2,
+          0
+        ],
+        [
+          1,
+          1,
+          0,
+          3
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "sta",
+      "mode": "knn",
+      "seed": 44,
+      "time_s": 1582.97318816185
+    },
+    {
+      "accuracy": 0.2,
+      "f1_weighted": 0.175,
+      "confusion_matrix": [
+        [
+          1,
+          1,
+          2,
+          1
+        ],
+        [
+          3,
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          4
+        ],
+        [
+          3,
+          0,
+          0,
+          2
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "wasps",
+      "mode": "knn",
+      "seed": 45,
+      "time_s": 0.3990967273712158
+    },
+    {
+      "accuracy": 0.25,
+      "f1_weighted": 0.20384615384615384,
+      "confusion_matrix": [
+        [
+          1,
+          1,
+          1,
+          2
+        ],
+        [
+          3,
+          0,
+          2,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          0,
+          4
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_params",
+      "mode": "knn",
+      "seed": 45,
+      "time_s": 0.24419498443603516
+    },
+    {
+      "accuracy": 0.25,
+      "f1_weighted": 0.2111111111111111,
+      "confusion_matrix": [
+        [
+          2,
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0,
+          3
+        ],
+        [
+          0,
+          3,
+          2,
+          0
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_raw",
+      "mode": "knn",
+      "seed": 45,
+      "time_s": 0.2583785057067871
+    },
+    {
+      "accuracy": 0.45,
+      "f1_weighted": 0.45681818181818185,
+      "confusion_matrix": [
+        [
+          2,
+          1,
+          1,
+          1
+        ],
+        [
+          2,
+          3,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          2,
+          3
+        ],
+        [
+          2,
+          1,
+          0,
+          2
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "sta",
+      "mode": "knn",
+      "seed": 45,
+      "time_s": 1608.079276561737
+    }
+  ]
+}

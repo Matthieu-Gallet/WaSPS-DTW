@@ -1008,6 +1008,264 @@ def plot_barycenters_gamma_comparison(barycenters_by_gamma: dict,
     print(f"  Multi-gamma barycenter plots saved to {out}/")
 
 
+# =============================================================================
+# Debug: samples histogram + fitted-PDF overlay (new in JAX branch)
+# =============================================================================
+
+def plot_samples_with_fitted_pdf(
+    raw_series: List[np.ndarray],
+    family: str,
+    class_label: int,
+    class_name: str,
+    output_dir: str = None,
+    n_timesteps: int = 3,
+    methods: tuple = ('mle', 'log_cumulant'),
+    save_pdf: bool = True,
+) -> None:
+    """Histogram + fitted-PDF overlay for one class at selected timesteps.
+
+    Pools raw pixel/sample values from all training series of the class at
+    ``n_timesteps`` evenly-spaced timesteps, draws a normalised histogram, and
+    overlays fitted PDFs for each requested estimation method (MLE and/or
+    log-cumulant).  Useful for diagnosing:
+    - Whether the parametric family (exponential / Weibull) fits the data.
+    - Whether MLE and log-cumulant agree (divergence → data poorly modelled).
+    - Timesteps with very few valid samples (degenerate fit).
+
+    Args:
+        raw_series:  List of (T, N) raw sample arrays for one class.
+        family:      'exponential' or 'weibull'.
+        class_label: Integer class label (used for seed only).
+        class_name:  Human-readable name (title and filename).
+        output_dir:  Directory to save PDF; None = display only.
+        n_timesteps: Number of timesteps to inspect (evenly spaced over T).
+        methods:     Estimation methods to overlay ('mle', 'log_cumulant').
+        save_pdf:    Save as PDF when ``output_dir`` is set.
+    """
+    from scipy.stats import expon, weibull_min
+    try:
+        import distributions as _dists
+        from data.preprocess import clean_series as _clean
+    except ImportError:
+        warnings.warn(
+            "plot_samples_with_fitted_pdf: cannot import 'distributions' / "
+            "'data.preprocess' — ensure src/ is on sys.path."
+        )
+        return
+
+    setup_ieee_style()
+
+    if not raw_series:
+        return
+
+    T = raw_series[0].shape[0]
+    dist = _dists.get(family)
+
+    # Evenly spaced timesteps (0-based), deduplicated
+    if n_timesteps >= T:
+        t_indices = list(range(T))
+    else:
+        t_indices = [int(round((T - 1) * i / max(n_timesteps - 1, 1)))
+                     for i in range(n_timesteps)]
+        t_indices = sorted(set(t_indices))[:n_timesteps]
+
+    _meth_colors = {'mle': '#e74c3c', 'log_cumulant': '#2980b9'}
+    _meth_labels = {'mle': 'MLE', 'log_cumulant': 'Log-cumulant'}
+    _meth_ls     = {'mle': '-',   'log_cumulant': '--'}
+
+    n = len(t_indices)
+    fig, axes = plt.subplots(n, 1, figsize=(5.0, 2.5 * n), squeeze=False)
+    fig.suptitle(f'{class_name}  —  samples + fitted PDF', fontsize=9, fontweight='bold')
+
+    for row_idx, t in enumerate(t_indices):
+        ax = axes[row_idx, 0]
+
+        # Pool and clean samples from all training series at timestep t
+        pooled = np.concatenate([_clean(s[t]) for s in raw_series])
+        if len(pooled) < 5:
+            ax.set_title(f't={t}  (too few valid samples: {len(pooled)})', fontsize=8)
+            ax.axis('off')
+            continue
+
+        ax.hist(pooled, bins=min(30, max(10, len(pooled) // 10)),
+                density=True, color='#95a5a6', alpha=0.65,
+                label=f'samples (n={len(pooled)})', edgecolor='none')
+
+        x_lo = max(np.percentile(pooled, 1) * 0.5, 1e-6)
+        x_hi = np.percentile(pooled, 99) * 1.5
+        x_grid = np.linspace(x_lo, x_hi, 300)
+
+        for meth in methods:
+            try:
+                params = dist.estimate(pooled, method=meth)
+                if family == 'exponential':
+                    beta = float(params)
+                    pdf_vals = expon(scale=1.0 / beta).pdf(x_grid)
+                else:  # weibull
+                    k_val, lam_val = float(params[0]), float(params[1])
+                    pdf_vals = weibull_min(c=k_val, scale=lam_val, loc=0).pdf(x_grid)
+                ax.plot(x_grid, pdf_vals,
+                        color=_meth_colors.get(meth, 'k'),
+                        ls=_meth_ls.get(meth, '-'),
+                        lw=1.3,
+                        label=_meth_labels.get(meth, meth))
+            except Exception as exc:
+                warnings.warn(
+                    f"plot_samples_with_fitted_pdf: {meth} failed at t={t}: {exc}"
+                )
+
+        ax.set_xlabel('Value', fontsize=7)
+        ax.set_ylabel('Density', fontsize=7)
+        ax.set_title(f't={t}  (n={len(pooled)})', fontsize=8)
+        ax.legend(fontsize=6)
+        ax.grid(True, alpha=0.3)
+        ax.tick_params(labelsize=7)
+
+    plt.tight_layout()
+
+    if output_dir:
+        out = Path(output_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        safe = ''.join(c if (c.isalnum() or c in '_-') else '_'
+                       for c in class_name.strip())
+        while '__' in safe:
+            safe = safe.replace('__', '_')
+        safe = safe.strip('_') or f'class{class_label}'
+        if save_pdf:
+            plt.savefig(out / f'samples_pdf_{safe}.pdf', bbox_inches='tight', dpi=300)
+
+    plt.close()
+
+
+# =============================================================================
+# Debug: barycenter + sample traces per method (new in JAX branch)
+# =============================================================================
+
+def plot_barycenter_debug(
+    barycenter: np.ndarray,
+    class_series: List[np.ndarray],
+    family: str,
+    class_label: int,
+    class_name: str,
+    method: str,
+    output_dir: str = None,
+    param_names: List[str] = None,
+    n_samples: int = 10,
+    save_pdf: bool = True,
+) -> None:
+    """Barycenter + sample traces for one (class, method) pair.
+
+    Produces one subplot per parameter (or one subplot for the spatial mean
+    when the representation is raw).  Sample traces are drawn in thin
+    semi-transparent black; the fitted barycenter is drawn in a bold colour.
+
+    Args:
+        barycenter:   Fitted barycenter, shape (T, n_params) for params-repr
+                      or (T, N) for raw-repr.
+        class_series: List of (T, n_params or N) training series for the class.
+        family:       'exponential' or 'weibull'.
+        class_label:  Integer class label (seed and filename suffix).
+        class_name:   Human-readable class name (title and filename).
+        method:       Method key ('wasps', 'eucl_params', 'eucl_raw', 'sta').
+        output_dir:   Directory to save PDF; None = display only.
+        param_names:  Parameter names for subplot titles.  Default: family-based.
+        n_samples:    Max number of sample traces to overlay.
+        save_pdf:     Save as PDF when ``output_dir`` is set.
+    """
+    setup_ieee_style()
+
+    is_raw = method in ('eucl_raw', 'sta')
+    T = barycenter.shape[0]
+    t_axis = np.arange(T)
+
+    # Default param names
+    if param_names is None:
+        if is_raw:
+            param_names = ['spatial mean (raw samples)']
+        elif family == 'exponential':
+            param_names = ['rate β  (1/β = mean)']
+        else:  # weibull
+            param_names = ['k (shape)', 'λ (scale)']
+
+    if is_raw:
+        n_plots = 1
+        # Collapse spatial dimension → mean amplitude for each series / barycenter
+        def _to_plot(arr):
+            if arr.ndim == 1:
+                return arr
+            return np.nanmean(arr, axis=1)
+        series_vals = [_to_plot(s) for s in class_series]
+        bary_vals   = [_to_plot(barycenter)]
+        y_labels    = param_names[:1]
+    else:
+        n_params = barycenter.shape[1]
+        n_plots  = n_params
+        series_vals = [s[:, p] for p in range(n_plots) for s in class_series]
+        bary_vals   = [barycenter[:, p] for p in range(n_plots)]
+        y_labels    = (param_names + ['param'])[:n_plots]
+
+    # Barcenter colour — method-specific
+    _bary_colors = {
+        'wasps':       '#2ca02c',   # green
+        'eucl_params': '#ff7f0e',   # orange
+        'eucl_raw':    '#1f77b4',   # blue
+        'sta':         '#9467bd',   # purple
+    }
+    bary_color = _bary_colors.get(method, '#d62728')
+
+    rng = np.random.RandomState(42 + class_label)
+    class_idx = list(range(len(class_series)))
+    rng.shuffle(class_idx)
+    sel_idx = class_idx[:n_samples]
+
+    _lw_s = max(0.2, 0.7 * (5.0 / max(n_samples, 5)) ** 0.3)
+    _al_s = max(0.10, 0.5 * (5.0 / max(n_samples, 5)) ** 0.5)
+
+    fig, axes = plt.subplots(n_plots, 1,
+                              figsize=(5.5, 2.2 * n_plots),
+                              squeeze=False, sharex=True)
+    fig.suptitle(f'{class_name}  [{method}]  —  barycenter + samples',
+                 fontsize=9, fontweight='bold')
+
+    for p_idx in range(n_plots):
+        ax = axes[p_idx, 0]
+
+        # Sample traces
+        for i in sel_idx:
+            vals = series_vals[p_idx * len(class_series) + i] if not is_raw else series_vals[i]
+            if not is_raw:
+                vals = class_series[i][:, p_idx]
+            ax.plot(t_axis, vals,
+                    color='black', alpha=_al_s, linewidth=_lw_s)
+
+        # Barycenter trace
+        bv = bary_vals[p_idx]
+        ax.plot(t_axis, bv,
+                color=bary_color, linewidth=2.0, zorder=5,
+                label='Barycenter')
+
+        ax.set_ylabel(y_labels[p_idx], fontsize=8)
+        ax.grid(True, alpha=0.3)
+        ax.tick_params(labelsize=7)
+        if p_idx == 0:
+            ax.legend(fontsize=7, loc='upper right')
+
+    axes[-1, 0].set_xlabel('Time index', fontsize=8)
+    plt.tight_layout()
+
+    if output_dir:
+        out = Path(output_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        safe_cls = ''.join(c if (c.isalnum() or c in '_-') else '_'
+                           for c in class_name.strip()).strip('_') or f'class{class_label}'
+        safe_mth = method.replace(' ', '_')
+        if save_pdf:
+            plt.savefig(out / f'bary_{safe_cls}_{safe_mth}.pdf',
+                        bbox_inches='tight', dpi=300)
+
+    plt.close()
+
+
 def plot_all_class_barycenters_grid(barycenters: Dict[int, np.ndarray],
                                      X_train: List[np.ndarray],
                                      Y_train: np.ndarray,
