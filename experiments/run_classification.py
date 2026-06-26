@@ -422,8 +422,11 @@ def _debug_dump_barycenters(
             method=method,
             output_dir=str(method_dir),
         )
+        # Also persist the barycenter array so it can be reloaded without recomputing
+        npy_path = method_dir / f"{method}_class{cls}.npy"
+        np.save(npy_path, bary)
 
-    print(f"[debug]   barycenters/{method}/ → {len(classes)} class plots", flush=True)
+    print(f"[debug]   barycenters/{method}/ → {len(classes)} class plots + .npy", flush=True)
 
 
 # ---------------------------------------------------------------------------
@@ -469,7 +472,8 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
                             groups=cpazmal_groups)
 
     gamma       = clf_cfg["gamma"]
-    k           = clf_cfg.get("k", 1)
+    # Support both "k_values: [1, 10]" (list) and legacy "k: 1" (scalar).
+    k_values    = clf_cfg.get("k_values") or [clf_cfg.get("k", 1)]
     n_steps     = clf_cfg["n_steps"]
     lr          = clf_cfg["lr"]
     sta_epsilon = clf_cfg.get("sta_epsilon", 0.05)
@@ -492,20 +496,21 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
         test_repr  = _get_repr(repr_type, 'test')
 
         if 'knn' in modes:
-            t0 = time.time()
-            if method == 'sta':
-                preds = sta_knn(train_raw, train_labels, test_raw,
-                                gamma=gamma, epsilon=sta_epsilon, k=k)
-            else:
-                preds = sdtw_knn(train_repr, train_labels, test_repr,
-                                 cost_fn=cost_fn, gamma=gamma, k=k)
-            elapsed = time.time() - t0
-            res = _metrics(preds, test_labels)
-            res.update({"method": method, "mode": "knn",
-                        "seed": seed, "time_s": elapsed})
-            results.append(res)
-            print(f"  [{method}/knn] acc={res['accuracy']:.3f}  "
-                  f"f1={res['f1_weighted']:.3f}  t={elapsed:.1f}s", flush=True)
+            for k in k_values:
+                t0 = time.time()
+                if method == 'sta':
+                    preds = sta_knn(train_raw, train_labels, test_raw,
+                                    gamma=gamma, epsilon=sta_epsilon, k=k)
+                else:
+                    preds = sdtw_knn(train_repr, train_labels, test_repr,
+                                     cost_fn=cost_fn, gamma=gamma, k=k)
+                elapsed = time.time() - t0
+                res = _metrics(preds, test_labels)
+                res.update({"method": method, "mode": "knn", "k": k,
+                            "seed": seed, "time_s": elapsed})
+                results.append(res)
+                print(f"  [{method}/knn k={k}] acc={res['accuracy']:.3f}  "
+                      f"f1={res['f1_weighted']:.3f}  t={elapsed:.1f}s", flush=True)
 
         if 'barycenter' in modes:
             t0 = time.time()
@@ -527,7 +532,7 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
             preds = predict(test_repr, barycenters, cost_fn, gamma)
             infer_time = time.time() - t1
             res = _metrics(preds, test_labels)
-            res.update({"method": method, "mode": "barycenter",
+            res.update({"method": method, "mode": "barycenter", "k": None,
                         "seed": seed, "time_s": train_time + infer_time,
                         "train_time_s": train_time, "infer_time_s": infer_time})
             results.append(res)
@@ -542,17 +547,27 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
 # ---------------------------------------------------------------------------
 
 def _save_confusion_matrices(all_results: list, out_dir: Path) -> None:
-    """Save one confusion-matrix PDF per mode, using the last seed's results."""
+    """Save one confusion-matrix PDF per (mode, k) group, using the last seed's results.
+
+    Filename convention:
+    - Single K for a mode → ``confusion_matrix_<mode>.pdf``   (backward compat)
+    - Multiple K values    → ``confusion_matrix_<mode>_k<k>.pdf``
+    """
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     from collections import defaultdict
 
-    by_mode: dict = defaultdict(list)
+    by_mode_k: dict = defaultdict(list)
     for r in all_results:
-        by_mode[r['mode']].append(r)
+        by_mode_k[(r['mode'], r.get('k'))].append(r)
 
-    for mode, rows in by_mode.items():
+    # Determine whether any mode has multiple K values (to decide filename format)
+    mode_ks: dict = defaultdict(set)
+    for (mode, k) in by_mode_k:
+        mode_ks[mode].add(k)
+
+    for (mode, k), rows in by_mode_k.items():
         last_seed = max(r['seed'] for r in rows)
         last_rows = sorted(
             [r for r in rows if r['seed'] == last_seed],
@@ -575,7 +590,8 @@ def _save_confusion_matrices(all_results: list, out_dir: Path) -> None:
             ax.set_yticks(range(n_cls))
             ax.set_xticklabels(classes, rotation=45, ha='right', fontsize=7)
             ax.set_yticklabels(classes, fontsize=7)
-            ax.set_title(f"{row['method']}\nf1={row['f1_weighted']:.3f}", fontsize=8)
+            k_label = f"k={k} " if k is not None else ""
+            ax.set_title(f"{row['method']} ({k_label}f1={row['f1_weighted']:.3f})", fontsize=8)
             ax.set_xlabel('Predicted', fontsize=7)
             for i in range(n_cls):
                 for j in range(n_cls):
@@ -585,7 +601,10 @@ def _save_confusion_matrices(all_results: list, out_dir: Path) -> None:
         axes_flat[0].set_ylabel('True', fontsize=7)
 
         plt.tight_layout()
-        fname = out_dir / f"confusion_matrix_{mode}.pdf"
+        if len(mode_ks[mode]) > 1 and k is not None:
+            fname = out_dir / f"confusion_matrix_{mode}_k{k}.pdf"
+        else:
+            fname = out_dir / f"confusion_matrix_{mode}.pdf"
         fig.savefig(fname, bbox_inches='tight')
         plt.close(fig)
         print(f"  figure: {fname}")
@@ -599,18 +618,21 @@ def _aggregate(all_results: list) -> list:
     from collections import defaultdict
     buckets: dict = defaultdict(list)
     for r in all_results:
-        buckets[(r["method"], r["mode"])].append(r)
+        # Use k=None for barycenter rows (K-independent); use actual k for KNN rows.
+        buckets[(r["method"], r["mode"], r.get("k"))].append(r)
     summary = []
-    for (method, mode), rows in sorted(buckets.items()):
+    for (method, mode, k), rows in sorted(buckets.items(),
+                                          key=lambda x: (x[0][0], x[0][1], x[0][2] or -1)):
         acc  = [r["accuracy"]    for r in rows]
         f1   = [r["f1_weighted"] for r in rows]
         time = [r["time_s"]      for r in rows]
-        summary.append({
-            "method": method, "mode": mode, "n_seeds": len(rows),
+        entry = {
+            "method": method, "mode": mode, "k": k, "n_seeds": len(rows),
             "acc_mean":  float(np.mean(acc)),   "acc_std":  float(np.std(acc)),
             "f1_mean":   float(np.mean(f1)),    "f1_std":   float(np.std(f1)),
             "time_mean": float(np.mean(time)),  "time_std": float(np.std(time)),
-        })
+        }
+        summary.append(entry)
     return summary
 
 
@@ -648,7 +670,7 @@ def main(config_path: str):
 
     csv_path = out_dir / "classification_scores.csv"
     with open(csv_path, "w", newline="") as f:
-        fields = ["method", "mode", "n_seeds",
+        fields = ["method", "mode", "k", "n_seeds",
                   "acc_mean", "acc_std", "f1_mean", "f1_std",
                   "time_mean", "time_std"]
         w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
@@ -663,7 +685,8 @@ def main(config_path: str):
 
     print(f"\n[done] results saved to {out_dir}")
     for row in summary:
-        print(f"  {row['method']:12s}/{row['mode']:10s}  "
+        k_tag = f" k={row['k']}" if row.get("k") is not None else ""
+        print(f"  {row['method']:12s}/{row['mode']:10s}{k_tag:6s}  "
               f"f1={row['f1_mean']:.3f}±{row['f1_std']:.3f}  "
               f"acc={row['acc_mean']:.3f}±{row['acc_std']:.3f}")
 
