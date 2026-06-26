@@ -167,9 +167,12 @@ Applied ONCE after loading (stratified subsample) so all methods compare on the 
 **STA complexity warning:**  
 STA KNN cost is O(T²·n_train·n_test) Sinkhorn calls — quadratic in timesteps.  
 STA barycenter is even slower (O(T²) Sinkhorn calls per gradient step × n_steps × n_classes).  
-Measured: CPAZMaL STA/bary (T=24, n_classes=10, 2 train/class) ≈ 6h. JAX recompiles per class
-  (closure captures training data as embedded constants → no cache reuse). Fix: pass data as
-  stacked JAX argument, not closed-over list. Not yet implemented.  
+Measured: CPAZMaL STA/bary (T=24, n_classes=10, 2 train/class) ≈ 6.6h total:
+  t_train=7343s (122 min) + predict≈16126s (269 min). Two JAX anti-patterns:
+  (1) Training: per-class closure captures data → 10 JIT recompiles (~815s each).
+  (2) Predict: Python double loop calls cost_fn(z,b) per pair → ~200 JIT recompiles (~80s each).
+  Fix: pass data as stacked JAX args (not closed-over); wrap predict value() in @jax.jit.
+  Not yet implemented — acceptable for single-seed CPAZMaL validation run.  
 `configs/river.yaml` excludes STA (T=365 daily — intractable).  
 `configs/river_sta.yaml` uses `max_time_steps: 52` (truncated) to make STA **KNN** tractable (~12 min/seed).  
   STA barycenter at T=52 is also intractable (T²=2704 Sinkhorn/step ≈ 12h → only modes: [knn] in river_sta.yaml).  
