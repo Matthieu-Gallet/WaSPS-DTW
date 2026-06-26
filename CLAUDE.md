@@ -58,7 +58,7 @@ python experiments/run_classification.py configs/cpazmal.yaml
 # Fit and save barycenters
 python experiments/run_barycenters.py configs/river.yaml
 
-# Sensitivity sweeps (synthetic exponential only, KNN mode, 4 methods)
+# Sensitivity sweeps (synthetic exponential only, KNN mode, 3 methods — no STA)
 python experiments/run_sensitivity.py --output-dir results/jax_sensitivity
 ```
 
@@ -94,7 +94,7 @@ src/
 experiments/
 ├── run_classification.py     # 4-method × 2-mode × multi-seed runner
 ├── run_barycenters.py        # Fit + save per-class barycenters as .npy
-└── run_sensitivity.py        # γ / n_train sweeps (KNN, 4 methods)
+└── run_sensitivity.py        # γ / n_train sweeps (KNN, 3 methods — no STA)
 
 configs/
 ├── classification.yaml       # Synthetic exponential (4 methods × 2 modes, 4 seeds)
@@ -150,7 +150,10 @@ fit_barycenter(series, softdtw: SoftDTW, n_steps=200, lr=1e-2, init=None, verbos
                dtype=jnp.float64, patience=15, min_rel_improve=1e-4)
 ```
 Positivity enforced via `cost_fn.use_positivity_constraint` — no `softplus` or `manual_grad` kwargs.
-Default dtype is `float64` (required for numerically stable gradient on wide-range exponential data).
+Default dtype is `float64`. **Required for WaSPS on wide-range data**: float32 ULP (~12 at loss=1e5)
+exceeds the early stopping threshold (1e-4 × 1e5 = 10), causing false patience triggers. Observed
+on river: seed=45 float32 f1=0.065 (35 steps), float64 f1=0.383 (100 steps). See also CLAUDE.md
+WaSPS structural limitation section.
 
 **Divergence self-term identity:**
 `∂SDTW(X,X)/∂X = 2·gradient_X(E_xx,X,X)`, so `−½·∂f(x,x)/∂x = −gradient_X(E_xx,x,x)`.
@@ -164,7 +167,9 @@ Applied ONCE after loading (stratified subsample) so all methods compare on the 
 **STA complexity warning:**  
 STA KNN cost is O(T²·n_train·n_test) Sinkhorn calls — quadratic in timesteps.  
 STA barycenter is even slower (O(T²) Sinkhorn calls per gradient step × n_steps × n_classes).  
-Measured: CPAZMaL STA/bary (T=24, n_classes=10, 2 train/class) ≈ 2–3h.  
+Measured: CPAZMaL STA/bary (T=24, n_classes=10, 2 train/class) ≈ 6h. JAX recompiles per class
+  (closure captures training data as embedded constants → no cache reuse). Fix: pass data as
+  stacked JAX argument, not closed-over list. Not yet implemented.  
 `configs/river.yaml` excludes STA (T=365 daily — intractable).  
 `configs/river_sta.yaml` uses `max_time_steps: 52` (truncated) to make STA **KNN** tractable (~12 min/seed).  
   STA barycenter at T=52 is also intractable (T²=2704 Sinkhorn/step ≈ 12h → only modes: [knn] in river_sta.yaml).  
@@ -184,10 +189,19 @@ centroid by distance, not divergence).
 For exponential distributions, W₂²(β₁,β₂) = 2(μ₁-μ₂)² where μ=1/β. The WaSPS Fréchet barycenter
 per-timestep = arithmetic mean of μ_i = **harmonic mean** of β. For river β ∈ [0.025, 44], one
 outlier sample with β=0.025 (μ=40) dominates, pulling the barycenter far from typical values.
-Combined with the softplus bijector (Δβ ≈ β·lr → tiny step for small β), only 5 train/class (20 cap),
-and T=365 (long sequences): wasps/bary f1≈0.10 vs wasps/KNN f1≈0.47. Float64 does NOT fix this
-(structural, not numerical). **wasps/KNN is the primary river result.** Increasing max_train_samples
-beyond 20 (e.g., 80) would give more stable barycenters but was not tested.
+Combined with the softplus bijector (Δβ ≈ β·lr → tiny step for small β) and only 5 train/class (20 cap).
+
+**Float64 precision matters for WaSPS early stopping:** When the WaSPS loss is large (~1e5, driven
+by the β=0.025 outlier), float32 ULP ≈ 12 at that magnitude — larger than the early stopping
+threshold (1e-4 × 1e5 = 10). Float32 literally cannot represent sub-threshold loss improvements →
+patience triggers falsely. Float64 ULP ≈ 2.2×10⁻¹¹ → correctly detects any improvement.
+Observed on river seed=45: float32 stopped at step ~35 (f1=0.065), float64 ran to step ~100
+(f1=0.383). Float64 is **essential** for WaSPS barycenters with wide-range data.
+
+Despite float64, wasps/bary f1≈0.17 (float64, 4 seeds) is below eucl_params/bary f1≈0.25 — the
+harmonic-mean structural limitation remains. **wasps/KNN is the primary river result** (f1≈0.47,
+competitive with eucl_params/KNN ≈0.46). Increasing max_train_samples beyond 20 would give more
+stable barycenters but was not tested.
 
 **cpazmal cache:**  
 `data/cpazmal/X_train_{all|mgN}.npy` etc. Delete to force re-extraction from HDF5.
