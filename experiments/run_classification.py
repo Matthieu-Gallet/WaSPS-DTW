@@ -123,6 +123,7 @@ def _load_river(cfg: dict, seed: int):
         test_size=ds.get("test_size", 0.2),
         max_time_steps=ds.get("max_time_steps"),
         samples_per_step=cfg["classification"].get("samples_per_step"),
+        aggregate_days=ds.get("aggregate_days"),
         seed=seed,
     )
     return (

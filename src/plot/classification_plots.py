@@ -1087,7 +1087,7 @@ def plot_samples_with_fitted_pdf(
             ax.axis('off')
             continue
 
-        ax.hist(pooled, bins=min(30, max(10, len(pooled) // 10)),
+        ax.hist(pooled, bins=20,
                 density=True, color='#95a5a6', alpha=0.65,
                 label=f'samples (n={len(pooled)})', edgecolor='none')
 
@@ -1114,6 +1114,7 @@ def plot_samples_with_fitted_pdf(
                     f"plot_samples_with_fitted_pdf: {meth} failed at t={t}: {exc}"
                 )
 
+        ax.set_yscale('log')
         ax.set_xlabel('Value', fontsize=7)
         ax.set_ylabel('Density', fontsize=7)
         ax.set_title(f't={t}  (n={len(pooled)})', fontsize=8)
@@ -1244,6 +1245,7 @@ def plot_barycenter_debug(
                 color=bary_color, linewidth=2.0, zorder=5,
                 label='Barycenter')
 
+        ax.set_yscale('log')
         ax.set_ylabel(y_labels[p_idx], fontsize=8)
         ax.grid(True, alpha=0.3)
         ax.tick_params(labelsize=7)
