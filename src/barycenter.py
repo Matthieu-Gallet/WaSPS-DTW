@@ -63,7 +63,17 @@ def fit_barycenter(
     if N == 0:
         raise ValueError("series must be non-empty")
 
-    series_jax = [jnp.asarray(s, dtype=dtype) for s in series]
+    # NaN-fill before converting to JAX: some timesteps may have no valid samples for MLE
+    # (clean_time_series filters all raw values at that step). Replace NaN with per-series
+    # column mean so those timesteps contribute a neutral value rather than crashing Adam.
+    series_clean = []
+    for s in series:
+        s_np = np.asarray(s, dtype=np.float64)
+        if np.isnan(s_np).any():
+            col_means = np.nanmean(s_np, axis=0, keepdims=True)
+            s_np = np.where(np.isnan(s_np), col_means, s_np)
+        series_clean.append(s_np)
+    series_jax = [jnp.asarray(s, dtype=dtype) for s in series_clean]
 
     if init is None:
         init_arr = jnp.mean(jnp.stack(series_jax), axis=0)
