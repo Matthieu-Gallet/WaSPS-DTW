@@ -111,4 +111,8 @@ def fit_barycenter(
                     break
 
     # θ-space → p-space (identity for plain callables or unconstrained costs)
-    return np.asarray(to_con(z))
+    # Clip to strictly positive: distribution parameters (β, λ, k) must be > 0.
+    # For wasps, to_con = softplus which is always > 0, so this is a no-op.
+    # For eucl_params/eucl_raw (identity bijector), the unconstrained optimizer can
+    # drift slightly negative; 1e-8 floor restores physical validity without bias.
+    return np.clip(np.asarray(to_con(z)), 1e-8, None)

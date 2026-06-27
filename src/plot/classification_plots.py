@@ -1114,7 +1114,6 @@ def plot_samples_with_fitted_pdf(
                     f"plot_samples_with_fitted_pdf: {meth} failed at t={t}: {exc}"
                 )
 
-        ax.set_yscale('log')
         ax.set_xlabel('Value', fontsize=7)
         ax.set_ylabel('Density', fontsize=7)
         ax.set_title(f't={t}  (n={len(pooled)})', fontsize=8)
