@@ -4,6 +4,7 @@ __pycache__/
 *.so
 src/dev.ipynb
 src/results/classification_dataset/*
+data/cpazmal/
 *.png
 src/results/*
 .old/
@@ -11,3 +12,8 @@ src/results/*
 RESSOURCES/*
 notebooks/*
 results/regime_classification/seed_sweep/*
+*.md
+data/**/*.npy
+results/**/*.npy
+results/**/*.pdf
+

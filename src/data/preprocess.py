@@ -4,7 +4,7 @@ and to_fixed_n(series, n, rng) for rectangularising raw arrays."""
 import numpy as np
 
 
-def clean_series(x: np.ndarray) -> np.ndarray:
+def clean_series(x: np.ndarray,threshold: float = -1.0) -> np.ndarray:
     """Return strictly positive values after removing non-finite/non-positive entries
     and subtracting (min + 1e-8).
 
@@ -15,14 +15,17 @@ def clean_series(x: np.ndarray) -> np.ndarray:
     """
     x = np.asarray(x, dtype=np.float64).ravel()
     x = x[np.isfinite(x)]
-    x = x[x > 0.0]
+    if threshold < 0.0:
+        x = x[x > 0.0]
+    else:
+        x = x[x > np.quantile(x, threshold)]
     if len(x) == 0:
         return x
     x = x - (x.min() + 1e-8)
     return x[x > 0.0]
 
 
-def clean_time_series(series) -> list:
+def clean_time_series(series, threshold: float = -1.0) -> list:
     """Clean each timestep of a time series (apply clean_series per row).
 
     Args:
@@ -42,7 +45,7 @@ def clean_time_series(series) -> list:
         rows = [series[t] for t in range(series.shape[0])]
     else:
         rows = list(series)
-    return [clean_series(row) for row in rows]
+    return [clean_series(row, threshold=threshold) for row in rows]
 
 
 def to_fixed_n(series, n: int, rng: np.random.Generator) -> np.ndarray:

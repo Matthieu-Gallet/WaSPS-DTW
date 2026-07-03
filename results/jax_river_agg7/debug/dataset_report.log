@@ -1,0 +1,43 @@
+=== Dataset debug report — family=exponential ===
+Total training samples: 320  classes: [0, 1, 3, 5]
+
+--- class 0 ---
+  n_samples:      80
+  shape:          T=52, N_raw=350
+  values:         min=2.441e-05  max=137.5  mean=2.115  std=8.086  skew=6.563
+  NaN fraction:   0.00%
+  timesteps with resampling (per-series): 4160
+  goodness-of-fit (MLE, mean over T):
+    KS statistic:  0.6023   (closer to 0 = better fit)
+    AD statistic:  38651.4206   (lower = better fit)
+
+--- class 1 ---
+  n_samples:      80
+  shape:          T=52, N_raw=350
+  values:         min=2.441e-05  max=3738  mean=6.002  std=39.26  skew=24.74
+  NaN fraction:   0.00%
+  timesteps with resampling (per-series): 4160
+  goodness-of-fit (MLE, mean over T):
+    KS statistic:  0.6409   (closer to 0 = better fit)
+    AD statistic:  52771.5193   (lower = better fit)
+
+--- class 3 ---
+  n_samples:      80
+  shape:          T=52, N_raw=350
+  values:         min=2.441e-05  max=411.5  mean=3.671  std=15.7  skew=9.429
+  NaN fraction:   0.00%
+  timesteps with resampling (per-series): 4160
+  goodness-of-fit (MLE, mean over T):
+    KS statistic:  0.5291   (closer to 0 = better fit)
+    AD statistic:  34474.8264   (lower = better fit)
+
+--- class 5 ---
+  n_samples:      80
+  shape:          T=52, N_raw=350
+  values:         min=2.441e-05  max=945.7  mean=4.221  std=19.43  skew=12.97
+  NaN fraction:   0.00%
+  timesteps with resampling (per-series): 4160
+  goodness-of-fit (MLE, mean over T):
+    KS statistic:  0.5234   (closer to 0 = better fit)
+    AD statistic:  33358.1361   (lower = better fit)
+

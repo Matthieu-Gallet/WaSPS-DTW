@@ -37,8 +37,6 @@ from pathlib import Path
 import jax
 import numpy as np
 import yaml
-from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
-from sklearn.model_selection import train_test_split
 
 _HERE = Path(__file__).parent
 _SRC  = _HERE.parent / "src"
@@ -47,196 +45,12 @@ sys.path.insert(0, str(_SRC))
 jax.config.update("jax_enable_x64", True)  # must precede jax.numpy usage
 import distributions
 from data.preprocess import clean_time_series, to_fixed_n
-from baselines.sta_wrapper import knn_predict as sta_knn, make_cost_fn as sta_cost_fn
+from baselines.sta_wrapper import knn_predict as sta_knn
 from classification.barycenter_clf import fit_barycenters, predict
 from classification.nn import knn_predict as sdtw_knn
-from costs import SqEuclidean, WaSPS
-from softdtw import SoftDTW
 
-
-# ---------------------------------------------------------------------------
-# Method table — one entry per method, referenced everywhere
-# ---------------------------------------------------------------------------
-
-# repr:        'params' → estimate distribution parameters first
-#              'raw'    → use raw sample arrays directly
-_METHODS = {
-    'wasps':       {'repr': 'params'},
-    'eucl_params': {'repr': 'params'},
-    'eucl_raw':    {'repr': 'raw'},
-    'sta':         {'repr': 'raw'},
-}
-
-
-def _make_cost_fn(method: str, family: str, sta_epsilon: float):
-    """Cost function for KNN and predict (data in positive-param space, no θ conversion)."""
-    if method == 'wasps':
-        return WaSPS(family, log_correction=True)
-    if method in ('eucl_params', 'eucl_raw'):
-        return SqEuclidean()
-    if method == 'sta':
-        return sta_cost_fn(sta_epsilon)
-    raise ValueError(f"unknown method '{method}'")
-
-
-def _make_softdtw_bary(method: str, family: str, sta_epsilon: float, gamma: float) -> SoftDTW:
-    """SoftDTW instance for barycenter fitting."""
-    if method == 'wasps':
-        cost_fn = WaSPS(family, use_positivity_constraint=True)
-        return SoftDTW(cost_fn, gamma, is_divergence=True, manual_grad=True)
-    if method in ('eucl_params', 'eucl_raw'):
-        return SoftDTW(SqEuclidean(), gamma, is_divergence=True, manual_grad=False)
-    if method == 'sta':
-        return SoftDTW(sta_cost_fn(sta_epsilon), gamma, is_divergence=True, manual_grad=False)
-    raise ValueError(f"unknown method '{method}'")
-
-
-# ---------------------------------------------------------------------------
-# Data loaders
-# ---------------------------------------------------------------------------
-
-def _make_synthetic(cfg: dict, rng: np.random.Generator):
-    family = cfg["dataset"]["family"]
-    if family != "exponential":
-        raise ValueError("synthetic dataset only supports family=exponential")
-    rates   = cfg["dataset"]["rate_params"]
-    n_train = cfg["dataset"]["n_train_per_class"]
-    n_test  = cfg["dataset"]["n_test_per_class"]
-    T, N    = cfg["dataset"]["T"], cfg["dataset"]["N_samples"]
-    train_raw, test_raw, train_labels, test_labels = [], [], [], []
-    for cls_idx, rate in enumerate(rates):
-        for _ in range(n_train):
-            train_raw.append(rng.exponential(1.0 / rate, (T, N)))
-            train_labels.append(cls_idx)
-        for _ in range(n_test):
-            test_raw.append(rng.exponential(1.0 / rate, (T, N)))
-            test_labels.append(cls_idx)
-    return train_raw, test_raw, np.array(train_labels), np.array(test_labels)
-
-
-def _load_river(cfg: dict, seed: int):
-    from data.river_loader import load_river_classification
-    ds   = cfg["dataset"]
-    data = load_river_classification(
-        data_dir=ds["data_dir"],
-        mode=ds.get("mode", "balanced"),
-        test_size=ds.get("test_size", 0.2),
-        max_time_steps=ds.get("max_time_steps"),
-        samples_per_step=cfg["classification"].get("samples_per_step"),
-        aggregate_days=ds.get("aggregate_days"),
-        seed=seed,
-    )
-    return (
-        data["X_train"], data["X_test"],
-        np.asarray(data["y_train"]), np.asarray(data["y_test"]),
-    )
-
-
-def _load_cpazmal(cfg: dict, seed: int = 42):
-    """Load CPAZMaL data.  Caches arrays to disk; returns (X_train, X_test, labels, labels).
-
-    Also caches and returns a `groups` array (geographic group index per sample)
-    when available from the HDF5.  The `groups` array is used by the debug report
-    to detect whether a class barycenter is built from a single geographic group.
-    The return value is extended to (X_train, X_test, labels, labels, groups_or_None)
-    when the caller passes `return_groups=True` — but for backward compatibility the
-    normal call still returns 4 values.
-    """
-    from data.cpazmal_loader import MLDatasetLoader, extract_time_series
-    ds        = cfg["dataset"]
-    hdf5_path = ds["hdf5_path"]
-    max_groups= ds.get("max_groups")
-    cache_dir = Path(ds.get("cache_dir", "data/cpazmal"))
-    suffix    = "all" if max_groups is None else f"mg{max_groups}"
-    cx_train  = cache_dir / f"X_train_{suffix}.npy"
-    cx_pred   = cache_dir / f"X_predict_{suffix}.npy"
-    cy        = cache_dir / f"y_{suffix}.npy"
-    cg        = cache_dir / f"groups_{suffix}.npy"  # geographic group identity
-
-    groups = None
-    if cx_train.exists():
-        print(f"[cpazmal] loading from cache (max_groups={max_groups})")
-        X_train = list(np.load(cx_train,  allow_pickle=True))
-        X_test  = list(np.load(cx_pred,   allow_pickle=True))
-        labels  = np.load(cy)
-        if cg.exists():
-            groups = np.load(cg)
-    else:
-        print(f"[cpazmal] extracting from HDF5 (max_groups={max_groups}) …")
-        loader = MLDatasetLoader(hdf5_path)
-        data   = extract_time_series(loader, max_groups=max_groups)
-        X_train = list(data["X_train"])
-        X_test  = list(data["X_predict"])
-        labels  = np.asarray(data["y"])
-        groups  = np.asarray(data["groups"]) if "groups" in data else None
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        np.save(cx_train, np.array(X_train, dtype=object), allow_pickle=True)
-        np.save(cx_pred,  np.array(X_test,  dtype=object), allow_pickle=True)
-        np.save(cy, labels)
-        if groups is not None:
-            np.save(cg, groups)
-        print(f"[cpazmal] cache saved to {cache_dir}")
-    # Rectangularise raw arrays if samples_per_step is set
-    n = cfg["classification"].get("samples_per_step")
-    if n is not None:
-        rng = np.random.default_rng(seed)
-        X_train = [to_fixed_n(s, n, rng) for s in X_train]
-        X_test  = [to_fixed_n(s, n, rng) for s in X_test]
-    return X_train, X_test, labels, labels, groups
-
-
-# ---------------------------------------------------------------------------
-# Subsample helper
-# ---------------------------------------------------------------------------
-
-def _subsample(X, y, max_n, rng, extra=None):
-    """Stratified subsample of X, y (and optionally an extra array such as group indices).
-
-    Args:
-        extra: optional 1-D numpy array of the same length as y (e.g. geographic
-               group indices).  Subsampled alongside X and y; returned as a third
-               value when not None.
-
-    Returns:
-        (X_sub, y_sub) when extra is None; (X_sub, y_sub, extra_sub) otherwise.
-    """
-    if max_n < 0 or max_n >= len(y):
-        return (X, y, extra) if extra is not None else (X, y)
-    idx, _ = train_test_split(
-        np.arange(len(y)), train_size=max_n,
-        random_state=int(rng.integers(2**31)), stratify=y,
-    )
-    sorted_idx = np.sort(idx)
-    sub_extra  = extra[sorted_idx] if extra is not None else None
-    if extra is not None:
-        return [X[i] for i in sorted_idx], y[sorted_idx], sub_extra
-    return [X[i] for i in sorted_idx], y[sorted_idx]
-
-
-# ---------------------------------------------------------------------------
-# Representation builder
-# ---------------------------------------------------------------------------
-
-def _build_repr(raw_series: list, repr_type: str, family: str) -> list:
-    """params → estimate distribution parameters; raw → return as-is."""
-    if repr_type == 'params':
-        return [distributions.get(family).fit_time_series(clean_time_series(s), dtype=np.float64)
-                for s in raw_series]
-    return raw_series
-
-
-# ---------------------------------------------------------------------------
-# Metric helper
-# ---------------------------------------------------------------------------
-
-def _metrics(preds, truth):
-    classes = sorted(set(truth.tolist()))
-    return {
-        "accuracy":         float(accuracy_score(truth, preds)),
-        "f1_weighted":      float(f1_score(truth, preds, average="weighted", zero_division=0)),
-        "confusion_matrix": confusion_matrix(truth, preds, labels=classes).tolist(),
-        "classes":          classes,
-    }
+from data_utils import build_repr, load_dataset, metrics as _metrics, subsample as _subsample
+from method_defs import _METHODS, make_cost_fn as _make_cost_fn, make_softdtw_bary as _make_softdtw_bary
 
 
 # ---------------------------------------------------------------------------
@@ -431,70 +245,80 @@ def _debug_dump_barycenters(
 
 
 # ---------------------------------------------------------------------------
-# Single-seed runner
+# Single-seed/fold runner
 # ---------------------------------------------------------------------------
 
-def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
-    family    = cfg["dataset"]["family"]
-    clf_cfg   = cfg["classification"]
-    ds_type   = cfg["dataset"]["type"]
-    rng       = np.random.default_rng(seed)
+def _run_one_seed(cfg: dict, seed: int, methods: list, fold: int | None = None) -> list:
+    family  = cfg["dataset"]["family"]
+    clf_cfg = cfg["classification"]
+    rng     = np.random.default_rng(seed)
 
-    cpazmal_groups = None   # geographic group identity (CPAZMaL only)
-    if ds_type == "synthetic":
-        train_raw, test_raw, train_labels, test_labels = _make_synthetic(cfg, rng)
-    elif ds_type == "river":
-        train_raw, test_raw, train_labels, test_labels = _load_river(cfg, seed)
-    elif ds_type == "cpazmal":
-        train_raw, test_raw, train_labels, test_labels, cpazmal_groups = \
-            _load_cpazmal(cfg, seed=seed)
-    else:
-        raise ValueError(f"dataset.type '{ds_type}' not supported")
+    data = load_dataset(cfg, seed, fold=fold)
+    train_raw    = data["X_train"]
+    test_raw     = data["X_test"]
+    train_labels = data["y_train"]
+    test_labels  = data["y_test"]
+    groups_train = data.get("groups_train")
 
-    # Subsample train set; also subsample cpazmal_groups (geographic IDs) if present
-    _subsample_result = _subsample(train_raw, train_labels,
-                                   clf_cfg.get("max_train_samples", -1), rng,
-                                   extra=cpazmal_groups)
-    if cpazmal_groups is not None:
-        train_raw, train_labels, cpazmal_groups = _subsample_result
+    # Subsample
+    _sub = _subsample(train_raw, train_labels,
+                      clf_cfg.get("max_train_samples", -1), rng, extra=groups_train)
+    if groups_train is not None:
+        train_raw, train_labels, groups_train = _sub
     else:
-        train_raw, train_labels = _subsample_result
+        train_raw, train_labels = _sub
 
     test_raw, test_labels = _subsample(test_raw, test_labels,
                                        clf_cfg.get("max_test_samples", -1), rng)
 
+    # Raw downsampling: auto-compute N_min when samples_per_step is not set in config
+    # but the method list includes raw-type methods (eucl_raw, sta).
+    # Computed independently for train and test — no information leakage.
+    raw_methods = [m for m in methods if _METHODS[m]['repr'] == 'raw']
+    if raw_methods and clf_cfg.get("samples_per_step") is None:
+        from data_utils import compute_raw_n_min
+        n_min_train = compute_raw_n_min(train_raw)
+        n_min_test  = compute_raw_n_min(test_raw)
+        if n_min_train > 0 and n_min_test > 0:
+            rng_raw = np.random.default_rng(seed)
+            train_raw = [to_fixed_n(s, n_min_train, rng_raw) for s in train_raw]
+            test_raw  = [to_fixed_n(s, n_min_test,  rng_raw) for s in test_raw]
+            print(f"[raw] auto N_min: train={n_min_train}  test={n_min_test}", flush=True)
+
     # Debug: dataset-level diagnostics (once, for the first seed only)
     _debug = cfg.get("debug", False)
     _debug_dir = Path(cfg["output"]["dir"]) / "debug" if _debug else None
-    _is_first_seed = (seed == cfg.get("seed", 42))
-    if _debug and _is_first_seed:
+    _is_first = (seed == cfg.get("seed", 42)) and (fold is None or fold == 0)
+    if _debug and _is_first:
         print(f"[debug] writing dataset diagnostics → {_debug_dir}", flush=True)
         _debug_dump_dataset(train_raw, train_labels, family, _debug_dir,
-                            groups=cpazmal_groups)
+                            groups=groups_train)
 
     gamma       = clf_cfg["gamma"]
-    # Support both "k_values: [1, 10]" (list) and legacy "k: 1" (scalar).
     k_values    = clf_cfg.get("k_values") or [clf_cfg.get("k", 1)]
     n_steps     = clf_cfg["n_steps"]
     lr          = clf_cfg["lr"]
     sta_epsilon = clf_cfg.get("sta_epsilon", 0.05)
     modes       = [m.lower() for m in cfg.get("modes", ["knn", "barycenter"])]
 
-    results      = []
+    results     = []
+    # Cache: (repr_type, split) → (repr_list, filtered_labels)
     _repr_cache: dict = {}
 
     def _get_repr(repr_type, split):
         if (repr_type, split) not in _repr_cache:
             raw = train_raw if split == 'train' else test_raw
-            _repr_cache[(repr_type, split)] = _build_repr(raw, repr_type, family)
+            lbl = train_labels if split == 'train' else test_labels
+            _repr_cache[(repr_type, split)] = build_repr(raw, lbl, repr_type, family)
         return _repr_cache[(repr_type, split)]
 
+    run_id = fold if fold is not None else seed
+
     for method in methods:
-        cfg_m     = _METHODS[method]
-        repr_type = cfg_m['repr']
+        repr_type = _METHODS[method]['repr']
         cost_fn   = _make_cost_fn(method, family, sta_epsilon)
-        train_repr = _get_repr(repr_type, 'train')
-        test_repr  = _get_repr(repr_type, 'test')
+        train_repr, train_repr_labels = _get_repr(repr_type, 'train')
+        test_repr,  test_repr_labels  = _get_repr(repr_type, 'test')
 
         if 'knn' in modes:
             for k in k_values:
@@ -502,13 +326,15 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
                 if method == 'sta':
                     preds = sta_knn(train_raw, train_labels, test_raw,
                                     gamma=gamma, epsilon=sta_epsilon, k=k)
+                    truth = test_labels
                 else:
-                    preds = sdtw_knn(train_repr, train_labels, test_repr,
+                    preds = sdtw_knn(train_repr, train_repr_labels, test_repr,
                                      cost_fn=cost_fn, gamma=gamma, k=k)
+                    truth = test_repr_labels
                 elapsed = time.time() - t0
-                res = _metrics(preds, test_labels)
+                res = _metrics(preds, truth)
                 res.update({"method": method, "mode": "knn", "k": k,
-                            "seed": seed, "time_s": elapsed})
+                            "seed": seed, "fold": fold, "time_s": elapsed})
                 results.append(res)
                 print(f"  [{method}/knn k={k}] acc={res['accuracy']:.3f}  "
                       f"f1={res['f1_weighted']:.3f}  t={elapsed:.1f}s", flush=True)
@@ -517,24 +343,24 @@ def _run_one_seed(cfg: dict, seed: int, methods: list) -> list:
             t0 = time.time()
             softdtw_bary = _make_softdtw_bary(method, family, sta_epsilon, gamma)
             barycenters = fit_barycenters(
-                train_repr, train_labels, softdtw_bary,
+                train_repr, train_repr_labels, softdtw_bary,
                 n_steps=n_steps, lr=lr,
                 patience=clf_cfg.get("early_stop_patience", 15),
                 min_rel_improve=clf_cfg.get("early_stop_tol", 1e-4),
             )
             train_time = time.time() - t0
 
-            # Debug: barycenter plots for the first seed
-            if _debug and _is_first_seed:
+            if _debug and _is_first:
                 _debug_dump_barycenters(method, barycenters, train_repr,
-                                        train_labels, family, _debug_dir)
+                                        train_repr_labels, family, _debug_dir)
 
             t1 = time.time()
             preds = predict(test_repr, barycenters, cost_fn, gamma)
             infer_time = time.time() - t1
-            res = _metrics(preds, test_labels)
+            res = _metrics(preds, test_repr_labels)
             res.update({"method": method, "mode": "barycenter", "k": None,
-                        "seed": seed, "time_s": train_time + infer_time,
+                        "seed": seed, "fold": fold,
+                        "time_s": train_time + infer_time,
                         "train_time_s": train_time, "infer_time_s": infer_time})
             results.append(res)
             print(f"  [{method}/bary] acc={res['accuracy']:.3f}  "
@@ -656,13 +482,26 @@ def main(config_path: str):
     if unknown:
         print(f"[warn] unknown methods: {unknown} — skipping")
 
+    cv       = cfg.get("cross_validation", {})
+    n_splits = int(cv.get("n_splits", 1))
+    fold_cfg = int(cv.get("fold", 0))
+
+    # K-fold mode: fold=-1 → iterate over all folds (one seed); else use fixed fold
+    if n_splits > 1 and fold_cfg < 0:
+        iterations = [(base_seed, f) for f in range(n_splits)]
+        print(f"[run] K-fold mode: n_splits={n_splits}  group_aware={cv.get('group_aware', False)}")
+    else:
+        fold_arg = fold_cfg if n_splits > 1 else None
+        iterations = [(seed, fold_arg) for seed in seeds]
+
     print(f"[run] dataset={cfg['dataset']['type']}  family={family}  "
-          f"methods={methods}  seeds={seeds}", flush=True)
+          f"methods={methods}  n_iter={len(iterations)}", flush=True)
 
     all_results = []
-    for seed in seeds:
-        print(f"\n[seed={seed}]", flush=True)
-        all_results.extend(_run_one_seed(cfg, seed, methods))
+    for seed, fold in iterations:
+        tag = f"fold={fold}" if fold is not None else f"seed={seed}"
+        print(f"\n[{tag}]", flush=True)
+        all_results.extend(_run_one_seed(cfg, seed, methods, fold=fold))
 
     summary = _aggregate(all_results)
 

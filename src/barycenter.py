@@ -14,6 +14,7 @@ Positivity constraint (use_positivity_constraint in SoftDTW.cost_fn):
 
 from __future__ import annotations
 
+import functools
 import numpy as np
 import optax
 import jax
@@ -22,6 +23,36 @@ jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 
 from softdtw import SoftDTW
+
+
+# ---------------------------------------------------------------------------
+# Module-level JIT step — cached across fit_barycenter calls
+# ---------------------------------------------------------------------------
+
+def _step_body(z, opt_state, data_arr, sdtw, tx):
+    """One Adam step: map value_and_grad over N training series, update z.
+
+    sdtw and tx are static (Python objects, not JAX arrays).  Keeping this
+    function at module level means the same Python object is reused every call →
+    jax.jit can find its compiled kernel in the XLA cache without retracing.
+    """
+    vals, grads = jax.lax.map(lambda xi: sdtw.value_and_grad(z, xi), data_arr)
+    loss = jnp.mean(vals)
+    grad_z = jnp.mean(grads, axis=0)
+    updates, new_state = tx.update(grad_z, opt_state)
+    new_z = optax.apply_updates(z, updates)
+    return new_z, new_state, loss
+
+
+# static_argnums=(3, 4): sdtw and tx are Python objects (non-JAX); JAX caches
+# by their id().  Classes sharing the same sdtw and tx instances get cache hits.
+_step_jit = jax.jit(_step_body, static_argnums=(3, 4))
+
+
+@functools.lru_cache(maxsize=32)
+def _get_optimizer(lr: float) -> optax.GradientTransformation:
+    """Return a cached optax.adam for lr.  Same lr → same Python object → same JIT cache entry."""
+    return optax.sgd(lr)
 
 
 # ---------------------------------------------------------------------------
@@ -62,13 +93,14 @@ def fit_barycenter(
     N = len(series)
     if N == 0:
         raise ValueError("series must be non-empty")
-
+    if verbose:
+        print(f"Fitting barycenter of {N} series with {n_steps} steps, lr={lr}, patience={patience}, min_rel_improve={min_rel_improve}")
     # NaN-fill before converting to JAX: some timesteps may have no valid samples for MLE
     # (clean_time_series filters all raw values at that step). Replace NaN with per-series
     # column mean so those timesteps contribute a neutral value rather than crashing Adam.
     series_clean = []
     for s in series:
-        s_np = np.asarray(s, dtype=np.float64)
+        s_np = np.asarray(s, dtype=dtype)
         if np.isnan(s_np).any():
             col_means = np.nanmean(s_np, axis=0, keepdims=True)
             s_np = np.where(np.isnan(s_np), col_means, s_np)
@@ -84,20 +116,17 @@ def fit_barycenter(
     to_unc = getattr(softdtw.cost_fn, 'to_unconstrained', lambda x: x)
     to_con = getattr(softdtw.cost_fn, 'to_constrained',   lambda x: x)
     z_init = to_unc(init_arr)
-    data_z = [to_unc(xi) for xi in series_jax]
+    # Stack all training series into (N, T, n_params) and apply to_unc in one batch.
+    # to_unc is elementwise (inverse_softplus or identity) so applying to the stacked
+    # array is equivalent to N separate calls — but avoids N eager JAX dispatches.
+    data_z_stacked = to_unc(jnp.stack(series_jax))   # (N, T, n_params)
 
-    def step_fn(z, opt_state):
-        vg_pairs = [softdtw.value_and_grad(z, xi) for xi in data_z]
-        vals  = jnp.stack([v for v, _ in vg_pairs])
-        grads = jnp.stack([g for _, g in vg_pairs])
-        loss = jnp.mean(vals)
-        grad_z = jnp.mean(grads, axis=0)
-        updates, new_state = tx.update(grad_z, opt_state)
-        new_z = optax.apply_updates(z, updates)
-        return new_z, new_state, loss
-
-    step_jit = jax.jit(step_fn)
-    tx = optax.adam(lr)
+    # Use the module-level _step_jit (static on sdtw and tx) so that multiple calls
+    # to fit_barycenter with the same (softdtw, lr) share the XLA compiled kernel.
+    # In fit_barycenters, all classes use the same softdtw and lr → 1 compilation,
+    # N-1 cache hits.  _get_optimizer caches optax.adam(lr) so the same Python object
+    # is returned for the same lr → same id() → same static arg → same JIT cache key.
+    tx = _get_optimizer(lr)
     opt_state = tx.init(z_init)
     z = z_init
 
@@ -105,7 +134,7 @@ def fit_barycenter(
     best_loss = None  # None until first step; avoids float("inf")/inf = nan
     no_improve = 0
     for step in range(n_steps):
-        z, opt_state, loss = step_jit(z, opt_state)
+        z, opt_state, loss = _step_jit(z, opt_state, data_z_stacked, softdtw, tx)
         loss_val = float(loss)
         if verbose and (step % log_every == 0 or step == n_steps - 1):
             print(f"  step {step+1:4d}/{n_steps}  loss={loss_val:.6f}", flush=True)

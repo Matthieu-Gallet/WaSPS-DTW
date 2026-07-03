@@ -12,10 +12,10 @@ from barycenter import fit_barycenter
 from softdtw import SoftDTW
 
 
-def _fit_one_class(cls, cls_series, softdtw, n_steps, lr, patience, min_rel_improve):
+def _fit_one_class(cls, cls_series, softdtw, n_steps, lr, patience, min_rel_improve, verbose):
     """Fit a barycenter for one class (worker function for joblib)."""
     return cls, fit_barycenter(cls_series, softdtw, n_steps=n_steps, lr=lr,
-                               patience=patience, min_rel_improve=min_rel_improve)
+                               patience=patience, min_rel_improve=min_rel_improve, verbose=verbose)
 
 
 def fit_barycenters(
@@ -27,6 +27,7 @@ def fit_barycenters(
     n_jobs: int = 1,
     patience: int = 15,
     min_rel_improve: float = 1e-4,
+    verbose: bool = True,
 ) -> dict:
     """Fit one SoftDTW barycenter per class.
 
@@ -37,13 +38,14 @@ def fit_barycenters(
                           Note: joblib loky spawns separate processes, each with own JAX state.
         patience:         Early-stop patience (steps without relative improvement).  0 = off.
         min_rel_improve:  Minimum relative improvement to count as progress.
-
+        verbose:          Whether to print progress messages.
     Returns:
         barycenters: dict mapping class label → (T, n_params) numpy array.
     """
     labels = np.asarray(train_labels)
     classes = sorted(set(labels.tolist()))
-
+    if verbose:
+        print(f"Fitting barycenters for {len(classes)} classes: {classes} with {n_steps} steps, lr={lr}, patience={patience}, min_rel_improve={min_rel_improve}")
     class_series = {
         cls: [s for s, l in zip(train_series, labels) if l == cls]
         for cls in classes
@@ -53,7 +55,7 @@ def fit_barycenters(
         # Sequential path — avoids joblib overhead for small n_classes
         return {
             cls: fit_barycenter(class_series[cls], softdtw, n_steps=n_steps, lr=lr,
-                                patience=patience, min_rel_improve=min_rel_improve)
+                                patience=patience, min_rel_improve=min_rel_improve, verbose=verbose)
             for cls in classes
         }
 
@@ -61,7 +63,7 @@ def fit_barycenters(
     effective_jobs = min(len(classes), os.cpu_count() or 1) if n_jobs == -1 else n_jobs
     results = Parallel(n_jobs=effective_jobs, backend='loky')(
         delayed(_fit_one_class)(cls, class_series[cls], softdtw, n_steps, lr,
-                                patience, min_rel_improve)
+                                patience, min_rel_improve, verbose=verbose)
         for cls in classes
     )
     return dict(results)
@@ -72,32 +74,47 @@ def predict(
     barycenters: dict,
     cost_fn,
     gamma: float,
+    is_divergence: bool = False,
+    manual_grad: bool = False,
+    dtype = jnp.float64,
 ) -> np.ndarray:
-    """Classify each test series by minimum SoftDTW divergence to class barycenters.
+    """Classify each test series by minimum SoftDTW distance to class barycenters.
 
     Args:
-        test_series:  List of (T, p) arrays.
-        barycenters:  dict label → (T, p) array (from fit_barycenters).
-        cost_fn:      Ground cost callable(a, b) → scalar (positive-param space).
-        gamma:        SoftDTW regularisation.
+        test_series:   List of (T, p) arrays.
+        barycenters:   dict label → (T_bary, p) array (from fit_barycenters).
+        cost_fn:       Ground cost callable(a, b) → scalar (positive-param space).
+        gamma:         SoftDTW regularisation.
+        is_divergence: Use SoftDTW divergence D_γ instead of plain SDTW.
+                       Default False — plain SDTW is the correct semantics for nearest
+                       centroid (see CLAUDE.md: divergence self-term dominates when
+                       T_test ≠ T_bary).
+        manual_grad:   Use manual gradient path (WaSPS only).
+        dtype:         Computation dtype (float64 recommended for WaSPS).
 
     Returns:
         predictions: (N_test,) array of class labels.
     """
     classes = sorted(barycenters.keys())
-    bary_jax = {cls: jnp.array(barycenters[cls], dtype=jnp.float64) for cls in classes}
 
-    # Plain SDTW (not divergence): avoids self-term ½SDTW(b,b) dominating when
-    # T_test ≠ T_bary, and matches KNN semantics (nearest centroid by DTW distance).
-    sdtw_fn = SoftDTW(cost_fn, gamma, is_divergence=False, manual_grad=False)
+    # Plain SDTW (not divergence by default): avoids self-term ½SDTW(b,b) dominating
+    # when T_test ≠ T_bary, and matches KNN semantics (nearest centroid by DTW distance).
+    sdtw_fn = SoftDTW(cost_fn, gamma, is_divergence=is_divergence, manual_grad=manual_grad)
+
+    # Stack barycenters for vmap over C classes — same shape (T_bary, p) for all classes.
+    # vmap generates one vectorised XLA kernel instead of C sequential calls.
+    bary_stacked = jnp.stack(
+        [jnp.array(barycenters[cls], dtype=dtype) for cls in classes]
+    )  # (C, T_bary, p)
 
     @jax.jit
-    def divergence_to_bary(z: jax.Array, b: jax.Array) -> jax.Array:
-        return sdtw_fn.value(z, b)
+    def all_dists(z: jax.Array) -> jax.Array:
+        """vmap over C barycentres → (C,) distances in a single kernel."""
+        return jax.vmap(lambda b: sdtw_fn.value(z, b))(bary_stacked)
 
     preds = []
     for s in test_series:
-        z = jnp.array(s, dtype=jnp.float64)
-        dists = [float(divergence_to_bary(z, bary_jax[cls])) for cls in classes]
+        z = jnp.array(s, dtype=dtype)
+        dists = np.array(all_dists(z))
         preds.append(classes[int(np.argmin(dists))])
     return np.array(preds)

@@ -45,6 +45,18 @@ class TestBarycentEuclidean:
         assert b.shape == (8, 3)
         assert np.all(np.isfinite(b))
 
+    def test_variable_length_series_are_padded_before_stacking(self):
+        rng = np.random.default_rng(10)
+        series = [
+            rng.uniform(0, 1, (5, 1)).astype(np.float64),
+            rng.uniform(0, 1, (7, 1)).astype(np.float64),
+            rng.uniform(0, 1, (6, 1)).astype(np.float64),
+        ]
+        b = fit_barycenter(series, self._make_sdtw(gamma=1.0), n_steps=20,
+                           dtype=jnp.float64)
+        assert b.shape == (7, 1)
+        assert np.all(np.isfinite(b))
+
     def test_loss_decreases(self):
         rng = np.random.default_rng(4)
         series = [rng.uniform(0, 2, (5, 2)).astype(np.float64) for _ in range(4)]

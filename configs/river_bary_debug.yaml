@@ -1,0 +1,36 @@
+# River barycentre-seulement — run ciblé debug, pleine échelle, 1 seed
+# Run: python experiments/run_classification.py configs/river_bary_debug.yaml
+#
+# Objectif : produire les plots barycentres + rapport stats sans relancer le KNN complet.
+# Même paramètres d'entraînement que river_full.yaml (80 train/classe, T=365, 200 steps).
+# 1 seed → ~50-90 min (1 seed × 3 méthodes × ~1500s/method).
+
+dataset:
+  type: river
+  family: exponential
+  data_dir: data/river
+  mode: balanced          # 400 samples, T=365 daily, 4 classes
+  test_size: 0.2
+  max_time_steps: null    # T=365 complet
+
+classification:
+  gamma: 1.0
+  k_values: [1]           # k requis même si KNN pas dans modes (lecture config)
+  n_steps: 200
+  lr: 0.01
+  max_train_samples: -1   # tous les samples (80 train/classe)
+  max_test_samples: -1    # tous les samples (20 test/classe)
+  samples_per_step: 50
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+
+methods: [wasps, eucl_params, eucl_raw]
+modes:   [barycenter]     # barycentre uniquement
+
+n_seeds: 1
+seed: 42
+
+debug: true               # dataset_report.log + samples_pdf + bary plots + .npy
+
+output:
+  dir: results/jax_river_bary_debug

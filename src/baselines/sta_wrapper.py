@@ -13,6 +13,8 @@ Space and Time", AISTATS 2020.
 
 from __future__ import annotations
 
+import functools
+
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -29,7 +31,7 @@ def _valid_samples(x: np.ndarray) -> np.ndarray:
     which shifts by min — that would erase the inter-class scale difference needed
     for OT to discriminate distributions at different locations).
     """
-    x = np.asarray(x, dtype=np.float64).ravel()
+    x = np.asarray(x, dtype=np.float32).ravel()
     x = x[np.isfinite(x) & (x > 0.0)]
     return x if len(x) > 0 else np.array([1e-8])
 
@@ -49,8 +51,8 @@ def _sinkhorn_jit(x_pts, y_pts, epsilon):
 
 def _ot_cost(x_samples: np.ndarray, y_samples: np.ndarray, epsilon: float) -> float:
     """Regularized OT cost between two 1-D empirical distributions."""
-    x_pts = jnp.array(x_samples.reshape(-1, 1), dtype=jnp.float64)
-    y_pts = jnp.array(y_samples.reshape(-1, 1), dtype=jnp.float64)
+    x_pts = jnp.array(x_samples.reshape(-1, 1), dtype=jnp.float32)
+    y_pts = jnp.array(y_samples.reshape(-1, 1), dtype=jnp.float32)
     return float(_sinkhorn_jit(x_pts, y_pts, float(epsilon)))
 
 
@@ -65,11 +67,11 @@ def make_cost_fn(epsilon: float):
         epsilon: Sinkhorn regularisation.
 
     Returns:
-        cost_fn: (a, b) → scalar, where a, b are (N,) JAX float64 arrays.
+        cost_fn: (a, b) → scalar, where a, b are (N,) JAX float32 arrays.
     """
     def cost_fn(a: jax.Array, b: jax.Array) -> jax.Array:
         geom = pointcloud.PointCloud(a.reshape(-1, 1), b.reshape(-1, 1), epsilon=epsilon)
-        return sinkhorn.Sinkhorn(max_iterations=500)(
+        return sinkhorn.Sinkhorn(max_iterations=10)(
             linear_problem.LinearProblem(geom)
         ).reg_ot_cost
     return cost_fn
@@ -94,16 +96,57 @@ def sta_cost_matrix(
     Returns:
         D: (T_x, T_y) cost matrix, D[i, j] = OT(x[i], y[j]).
     """
-    x = np.asarray(x, dtype=np.float64)
-    y = np.asarray(y, dtype=np.float64)
+    x = np.asarray(x, dtype=np.float32)
+    y = np.asarray(y, dtype=np.float32)
     T_x, T_y = x.shape[0], y.shape[0]
-    D = np.empty((T_x, T_y), dtype=np.float64)
+    D = np.empty((T_x, T_y), dtype=np.float32)
     for i in range(T_x):
         xi = _valid_samples(x[i])
         for j in range(T_y):
             yj = _valid_samples(y[j])
             D[i, j] = _ot_cost(xi, yj, epsilon)
     return D
+
+
+@functools.partial(jax.jit, static_argnames=('epsilon',))
+def _sta_cost_matrix_jit(x_arr: jax.Array, y_arr: jax.Array, epsilon: float) -> jax.Array:
+    """(T_x, T_y) cost matrix via double vmap — 1 XLA kernel instead of T_x×T_y dispatches.
+
+    x_arr: (T_x, N)  y_arr: (T_y, N)  — all values finite, positive (after to_fixed_n).
+    """
+    def row_costs(xi):
+        return jax.vmap(
+            lambda yj: sinkhorn.Sinkhorn(max_iterations=500)(
+                linear_problem.LinearProblem(
+                    pointcloud.PointCloud(xi.reshape(-1, 1), yj.reshape(-1, 1), epsilon=epsilon)
+                )
+            ).reg_ot_cost
+        )(y_arr)
+    return jax.vmap(row_costs)(x_arr)
+
+
+def sta_cost_matrix_rect(
+    x: np.ndarray,
+    y: np.ndarray,
+    epsilon: float = 0.05,
+) -> np.ndarray:
+    """Vectorized cost matrix for rectangularised series (after to_fixed_n).
+
+    Uses double jax.vmap for a single XLA kernel per test-train pair, replacing
+    the T_x×T_y Python dispatch loop in sta_cost_matrix.  Requires x, y to be
+    rectangular (no NaN) — falls back to sta_cost_matrix for ragged inputs.
+
+    Args:
+        x:       (T_x, N) float32 array — all values finite, positive.
+        y:       (T_y, N) float32 array.
+        epsilon: Sinkhorn regularisation.
+
+    Returns:
+        D: (T_x, T_y) float32 cost matrix.
+    """
+    x_jax = jnp.asarray(x, dtype=jnp.float32)
+    y_jax = jnp.asarray(y, dtype=jnp.float32)
+    return np.asarray(_sta_cost_matrix_jit(x_jax, y_jax, epsilon))
 
 
 def sta_distance(
@@ -153,12 +196,25 @@ def knn_predict(
         predictions: (N_test,) integer array.
     """
     labels = np.asarray(train_labels)
+
+    # Use fast double-vmap path when all series are rectangular (no NaN —
+    # guaranteed after to_fixed_n; reverts to loop for ragged inputs).
+    def _is_rect(s: np.ndarray) -> bool:
+        a = np.asarray(s, dtype=np.float32)
+        return bool(np.all(np.isfinite(a) & (a > 0)))
+
     preds = []
     for test in test_series:
-        dists = np.array([
-            sta_distance(test, tr, gamma=gamma, epsilon=epsilon)
-            for tr in train_series
-        ])
+        test_arr = np.asarray(test, dtype=np.float32)
+        dists = []
+        for tr in train_series:
+            tr_arr = np.asarray(tr, dtype=np.float32)
+            if _is_rect(test_arr) and _is_rect(tr_arr):
+                D = sta_cost_matrix_rect(test_arr, tr_arr, epsilon)
+            else:
+                D = sta_cost_matrix(test_arr, tr_arr, epsilon)
+            dists.append(float(sdtw_value(jnp.array(D), gamma)))
+        dists = np.array(dists)
         nn_idx = np.argsort(dists)[:k]
         nn_labels = labels[nn_idx]
         counts = np.bincount(nn_labels, minlength=int(labels.max()) + 1)

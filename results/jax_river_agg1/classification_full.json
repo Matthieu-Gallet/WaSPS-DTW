@@ -1,0 +1,369 @@
+{
+  "config": {
+    "dataset": {
+      "type": "river",
+      "family": "exponential",
+      "data_dir": "data/river",
+      "mode": "balanced",
+      "test_size": 0.2,
+      "max_time_steps": null,
+      "aggregate_days": 1
+    },
+    "classification": {
+      "gamma": 10.0,
+      "k_values": [
+        1
+      ],
+      "n_steps": 200,
+      "lr": 0.01,
+      "max_train_samples": -1,
+      "max_test_samples": -1,
+      "samples_per_step": 50,
+      "early_stop_patience": 20,
+      "early_stop_tol": 0.0001
+    },
+    "methods": [
+      "wasps",
+      "eucl_params",
+      "eucl_raw"
+    ],
+    "modes": [
+      "knn",
+      "barycenter"
+    ],
+    "n_seeds": 1,
+    "seed": 42,
+    "debug": true,
+    "output": {
+      "dir": "results/jax_river_agg1"
+    }
+  },
+  "summary": [
+    {
+      "method": "eucl_params",
+      "mode": "barycenter",
+      "k": null,
+      "n_seeds": 1,
+      "acc_mean": 0.425,
+      "acc_std": 0.0,
+      "f1_mean": 0.38201931814210327,
+      "f1_std": 0.0,
+      "time_mean": 1966.6779289245605,
+      "time_std": 0.0
+    },
+    {
+      "method": "eucl_params",
+      "mode": "knn",
+      "k": 1,
+      "n_seeds": 1,
+      "acc_mean": 0.7125,
+      "acc_std": 0.0,
+      "f1_mean": 0.7057724252491695,
+      "f1_std": 0.0,
+      "time_mean": 136.34541010856628,
+      "time_std": 0.0
+    },
+    {
+      "method": "eucl_raw",
+      "mode": "barycenter",
+      "k": null,
+      "n_seeds": 1,
+      "acc_mean": 0.375,
+      "acc_std": 0.0,
+      "f1_mean": 0.308943021186583,
+      "f1_std": 0.0,
+      "time_mean": 2013.5228788852692,
+      "time_std": 0.0
+    },
+    {
+      "method": "eucl_raw",
+      "mode": "knn",
+      "k": 1,
+      "n_seeds": 1,
+      "acc_mean": 0.6375,
+      "acc_std": 0.0,
+      "f1_mean": 0.6371956995358531,
+      "f1_std": 0.0,
+      "time_mean": 142.1636884212494,
+      "time_std": 0.0
+    },
+    {
+      "method": "wasps",
+      "mode": "barycenter",
+      "k": null,
+      "n_seeds": 1,
+      "acc_mean": 0.35,
+      "acc_std": 0.0,
+      "f1_mean": 0.2862056802846277,
+      "f1_std": 0.0,
+      "time_mean": 3890.575849533081,
+      "time_std": 0.0
+    },
+    {
+      "method": "wasps",
+      "mode": "knn",
+      "k": 1,
+      "n_seeds": 1,
+      "acc_mean": 0.7125,
+      "acc_std": 0.0,
+      "f1_mean": 0.7059214257993253,
+      "f1_std": 0.0,
+      "time_mean": 169.42216539382935,
+      "time_std": 0.0
+    }
+  ],
+  "per_seed": [
+    {
+      "accuracy": 0.7125,
+      "f1_weighted": 0.7059214257993253,
+      "confusion_matrix": [
+        [
+          20,
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          9,
+          3,
+          6
+        ],
+        [
+          0,
+          5,
+          14,
+          1
+        ],
+        [
+          1,
+          4,
+          1,
+          14
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "wasps",
+      "mode": "knn",
+      "k": 1,
+      "seed": 42,
+      "time_s": 169.42216539382935
+    },
+    {
+      "accuracy": 0.35,
+      "f1_weighted": 0.2862056802846277,
+      "confusion_matrix": [
+        [
+          19,
+          1,
+          0,
+          0
+        ],
+        [
+          10,
+          1,
+          3,
+          6
+        ],
+        [
+          12,
+          7,
+          1,
+          0
+        ],
+        [
+          4,
+          9,
+          0,
+          7
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "wasps",
+      "mode": "barycenter",
+      "k": null,
+      "seed": 42,
+      "time_s": 3890.575849533081,
+      "train_time_s": 3885.95907330513,
+      "infer_time_s": 4.61677622795105
+    },
+    {
+      "accuracy": 0.7125,
+      "f1_weighted": 0.7057724252491695,
+      "confusion_matrix": [
+        [
+          20,
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          11,
+          3,
+          5
+        ],
+        [
+          0,
+          1,
+          15,
+          4
+        ],
+        [
+          2,
+          3,
+          4,
+          11
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_params",
+      "mode": "knn",
+      "k": 1,
+      "seed": 42,
+      "time_s": 136.34541010856628
+    },
+    {
+      "accuracy": 0.425,
+      "f1_weighted": 0.38201931814210327,
+      "confusion_matrix": [
+        [
+          19,
+          1,
+          0,
+          0
+        ],
+        [
+          14,
+          3,
+          2,
+          1
+        ],
+        [
+          9,
+          0,
+          6,
+          5
+        ],
+        [
+          9,
+          2,
+          3,
+          6
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_params",
+      "mode": "barycenter",
+      "k": null,
+      "seed": 42,
+      "time_s": 1966.6779289245605,
+      "train_time_s": 1962.733370065689,
+      "infer_time_s": 3.94455885887146
+    },
+    {
+      "accuracy": 0.6375,
+      "f1_weighted": 0.6371956995358531,
+      "confusion_matrix": [
+        [
+          15,
+          2,
+          3,
+          0
+        ],
+        [
+          1,
+          15,
+          4,
+          0
+        ],
+        [
+          0,
+          6,
+          14,
+          0
+        ],
+        [
+          0,
+          8,
+          5,
+          7
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_raw",
+      "mode": "knn",
+      "k": 1,
+      "seed": 42,
+      "time_s": 142.1636884212494
+    },
+    {
+      "accuracy": 0.375,
+      "f1_weighted": 0.308943021186583,
+      "confusion_matrix": [
+        [
+          20,
+          0,
+          0,
+          0
+        ],
+        [
+          11,
+          3,
+          2,
+          4
+        ],
+        [
+          18,
+          0,
+          2,
+          0
+        ],
+        [
+          10,
+          3,
+          2,
+          5
+        ]
+      ],
+      "classes": [
+        0,
+        1,
+        3,
+        5
+      ],
+      "method": "eucl_raw",
+      "mode": "barycenter",
+      "k": null,
+      "seed": 42,
+      "time_s": 2013.5228788852692,
+      "train_time_s": 2009.2530977725983,
+      "infer_time_s": 4.269781112670898
+    }
+  ]
+}

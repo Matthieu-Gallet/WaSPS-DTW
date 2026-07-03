@@ -40,7 +40,8 @@ def _sdtw_fwd(D: jax.Array, gamma: float) -> jax.Array:
     """
     # m, n = D.shape
     n = D.shape[1]
-    INF = jnp.inf
+    dtype = D.dtype
+    INF = jnp.asarray(jnp.inf, dtype=dtype)
 
     def col_step(r_left, args):
         d_ij, r_above, r_diag = args
@@ -51,10 +52,10 @@ def _sdtw_fwd(D: jax.Array, gamma: float) -> jax.Array:
         # r_prev: R[i-1, :] shape (n+1,)
         # xs for inner scan: (D[i-1,j-1], R[i-1,j], R[i-1,j-1]) for j=1..n
         _, r_1n = jax.lax.scan(col_step, INF, (d_row, r_prev[1:], r_prev[:-1]))
-        r_row = jnp.concatenate([jnp.array([INF]), r_1n])
+        r_row = jnp.concatenate([jnp.array([INF], dtype=dtype), r_1n])
         return r_row, r_row
 
-    r_init = jnp.full(n + 1, INF).at[0].set(0.0)
+    r_init = jnp.full(n + 1, INF).at[0].set(jnp.zeros((), dtype=dtype))
     _, R_rows = jax.lax.scan(row_step, r_init, D)
     # R_rows: (m, n+1) = rows R[1..m, :]
     return jnp.concatenate([r_init[None], R_rows], axis=0)  # (m+1, n+1)
@@ -75,15 +76,18 @@ def _sdtw_backward(D: jax.Array, R_fwd: jax.Array, gamma: float) -> jax.Array:
     D: (m, n), R_fwd: (m+1, n+1) from _sdtw_fwd.
     """
     m, n = D.shape
+    dtype = D.dtype
 
     # Extend R to (m+2, n+2): borders at -inf, corner = R[m,n].
-    R_ext = jnp.full((m + 2, n + 2), -jnp.inf)
+    R_ext = jnp.full((m + 2, n + 2), jnp.asarray(-jnp.inf, dtype=dtype))
     R_ext = R_ext.at[:m + 1, :n + 1].set(R_fwd)
     R_ext = R_ext.at[m + 1, n + 1].set(R_fwd[m, n])
 
     # Pad D to (m+1, n+1): last row and col = 0.
-    D_pad = jnp.zeros((m + 1, n + 1))
+    D_pad = jnp.zeros((m + 1, n + 1), dtype=dtype)
     D_pad = D_pad.at[:m, :n].set(D)
+
+    zero = jnp.zeros((), dtype=dtype)
 
     def col_step_bwd(e_right, args):
         # carry e_right = E[i, j+1]
@@ -111,15 +115,15 @@ def _sdtw_backward(D: jax.Array, R_fwd: jax.Array, gamma: float) -> jax.Array:
         # Scan j from n to 1 (reverse: process in reversed xs order).
         xs = (e_bel[::-1], e_bel1[::-1], r_ij[::-1], r_i1j[::-1],
               r_ij1[::-1], r_i1j1[::-1], d_a[::-1], d_b[::-1], d_c[::-1])
-        _, e_rev = jax.lax.scan(col_step_bwd, 0.0, xs)
+        _, e_rev = jax.lax.scan(col_step_bwd, zero, xs)
         # e_rev[0]=E[i,n], ..., e_rev[n-1]=E[i,1]
         e_1n = e_rev[::-1]  # E[i, 1..n]
 
-        e_row = jnp.zeros(n + 2).at[1:n + 1].set(e_1n)
+        e_row = jnp.zeros(n + 2, dtype=dtype).at[1:n + 1].set(e_1n)
         return e_row, e_1n
 
     # Init: E[m+1, n+1] = 1, rest 0.
-    e_init = jnp.zeros(n + 2).at[n + 1].set(1.0)
+    e_init = jnp.zeros(n + 2, dtype=dtype).at[n + 1].set(jnp.ones((), dtype=dtype))
     i_range = jnp.arange(m, 0, -1)   # [m, m-1, ..., 1]
     _, E_rows = jax.lax.scan(row_step_bwd, e_init, i_range)
     # E_rows[k] = E[m-k, 1:n+1]; reverse rows → E[k] = E[k+1, 1:n+1]

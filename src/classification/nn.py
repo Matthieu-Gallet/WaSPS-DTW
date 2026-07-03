@@ -16,6 +16,7 @@ def knn_predict(
     cost_fn,
     gamma: float,
     k: int = 1,
+    dtype = jnp.float32,
 ) -> np.ndarray:
     """k-NN SoftDTW classifier.
 
@@ -26,12 +27,14 @@ def knn_predict(
         cost_fn:       Ground cost callable(a, b) → scalar.  Must expose .all_pairs.
         gamma:         SoftDTW regularisation.
         k:             Number of neighbours.
+        dtype:         Computation dtype.  float32 is sufficient for KNN (no self-term
+                       precision requirement).  Use float64 for WaSPS wide-range data.
 
     Returns:
         predictions: (N_test,) integer array.
     """
     labels = np.asarray(train_labels)
-    train_jax = [jnp.array(s, dtype=jnp.float32) for s in train_series]
+    train_jax = [jnp.array(s, dtype=dtype) for s in train_series]
 
     # Stack training series for vmap — requires homogeneous shape (T, p).
     shapes = [s.shape for s in train_jax]
@@ -57,7 +60,7 @@ def knn_predict(
 
     preds = []
     for s in test_series:
-        z = jnp.array(s, dtype=jnp.float32)
+        z = jnp.array(s, dtype=dtype)
         dists = np.array(dists_to_train(z))
         nn_idx = np.argsort(dists)[:k]
         nn_labels = labels[nn_idx]

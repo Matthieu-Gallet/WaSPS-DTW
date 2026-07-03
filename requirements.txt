@@ -9,4 +9,13 @@ netcdf4
 h5py
 tqdm
 huggingface_hub
-torch
+pyyaml
+# JAX 0.10.1 (CPU) — CUDA support requires ott-jax >= 0.7.0; sticking with CPU for stability
+jax>=0.10.1
+jaxlib>=0.10.1
+ott-jax>=0.6.0
+optax>=0.2.8
+pytest
+ipython
+jupyter
+ipykernel

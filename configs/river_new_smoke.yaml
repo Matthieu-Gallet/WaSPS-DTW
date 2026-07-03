@@ -1,0 +1,35 @@
+# River-new smoke test — T=8, fold=0 only, 3 methods × knn only
+# Run: python experiments/run_classification.py configs/river_new_smoke.yaml
+# Expected: <30s
+
+dataset:
+  type: river
+  family: exponential
+  data_dir: data/river_new/output_4
+  mode: balanced
+  max_time_steps: 8
+
+classification:
+  gamma: 1.0
+  k: 1
+  n_steps: 10
+  lr: 0.01
+  sta_epsilon: 0.05
+  samples_per_step: 20
+  max_train_samples: 10
+  max_test_samples: 10
+  early_stop_patience: 5
+  early_stop_tol: 1.0e-4
+
+methods: [wasps, eucl_params, eucl_raw]
+modes:   [knn]
+
+cross_validation:
+  n_splits: 5
+  fold: 0            # single fold for smoke test
+  group_aware: true
+
+seed: 42
+
+output:
+  dir: results/jax_river_new_smoke
