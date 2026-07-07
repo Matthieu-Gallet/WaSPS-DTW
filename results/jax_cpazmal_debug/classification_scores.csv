@@ -1,3 +1,0 @@
-method,mode,n_seeds,acc_mean,acc_std,f1_mean,f1_std,time_mean,time_std
-eucl_params,barycenter,1,1.0,0.0,1.0,0.0,6.38295578956604,0.0
-wasps,barycenter,1,1.0,0.0,1.0,0.0,11.069499015808105,0.0

@@ -12,10 +12,11 @@ from barycenter import fit_barycenter
 from softdtw import SoftDTW
 
 
-def _fit_one_class(cls, cls_series, softdtw, n_steps, lr, patience, min_rel_improve, verbose):
+def _fit_one_class(cls, cls_series, softdtw, n_steps, lr, patience, min_rel_improve, optimizer, verbose):
     """Fit a barycenter for one class (worker function for joblib)."""
     return cls, fit_barycenter(cls_series, softdtw, n_steps=n_steps, lr=lr,
-                               patience=patience, min_rel_improve=min_rel_improve, verbose=verbose)
+                               patience=patience, min_rel_improve=min_rel_improve,
+                               optimizer=optimizer, verbose=verbose)
 
 
 def fit_barycenters(
@@ -27,6 +28,7 @@ def fit_barycenters(
     n_jobs: int = 1,
     patience: int = 15,
     min_rel_improve: float = 1e-4,
+    optimizer: str = "sgd",
     verbose: bool = True,
 ) -> dict:
     """Fit one SoftDTW barycenter per class.
@@ -38,6 +40,7 @@ def fit_barycenters(
                           Note: joblib loky spawns separate processes, each with own JAX state.
         patience:         Early-stop patience (steps without relative improvement).  0 = off.
         min_rel_improve:  Minimum relative improvement to count as progress.
+        optimizer:        "sgd" (default) or "adam" — passed through to fit_barycenter.
         verbose:          Whether to print progress messages.
     Returns:
         barycenters: dict mapping class label → (T, n_params) numpy array.
@@ -45,7 +48,7 @@ def fit_barycenters(
     labels = np.asarray(train_labels)
     classes = sorted(set(labels.tolist()))
     if verbose:
-        print(f"Fitting barycenters for {len(classes)} classes: {classes} with {n_steps} steps, lr={lr}, patience={patience}, min_rel_improve={min_rel_improve}")
+        print(f"Fitting barycenters for {len(classes)} classes: {classes} with {n_steps} steps, lr={lr}, patience={patience}, min_rel_improve={min_rel_improve}, optimizer={optimizer}")
     class_series = {
         cls: [s for s, l in zip(train_series, labels) if l == cls]
         for cls in classes
@@ -55,7 +58,8 @@ def fit_barycenters(
         # Sequential path — avoids joblib overhead for small n_classes
         return {
             cls: fit_barycenter(class_series[cls], softdtw, n_steps=n_steps, lr=lr,
-                                patience=patience, min_rel_improve=min_rel_improve, verbose=verbose)
+                                patience=patience, min_rel_improve=min_rel_improve,
+                                optimizer=optimizer, verbose=verbose)
             for cls in classes
         }
 
@@ -63,7 +67,7 @@ def fit_barycenters(
     effective_jobs = min(len(classes), os.cpu_count() or 1) if n_jobs == -1 else n_jobs
     results = Parallel(n_jobs=effective_jobs, backend='loky')(
         delayed(_fit_one_class)(cls, class_series[cls], softdtw, n_steps, lr,
-                                patience, min_rel_improve, verbose=verbose)
+                                patience, min_rel_improve, optimizer, verbose=verbose)
         for cls in classes
     )
     return dict(results)

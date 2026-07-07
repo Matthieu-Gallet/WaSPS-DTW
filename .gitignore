@@ -17,3 +17,4 @@ data/**/*.npy
 results/**/*.npy
 results/**/*.pdf
 
+*.md

@@ -1,0 +1,35 @@
+# Experiment config — CPAZMaL 4-method comparison including STA
+# Run: python experiments/run_classification.py configs/cpazmal_sta.yaml
+#
+# Single split (n_splits=1), not K-fold: STA is O(T²) per pair, and 5-fold would
+# multiply the already-heavy per-split cost (CLAUDE.md: ~6.6h at T=24, 2 train/class)
+# by 5 — intractable. T≈29 here (full continuous year, no truncation needed — unlike
+# river which requires max_time_steps to make STA tractable at all).
+# Use configs/cpazmal.yaml (no STA, 5-fold) for the main K-fold result.
+
+dataset:
+  type: cpazmal
+  family: weibull
+  hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
+  max_groups_per_class: null
+
+classification:
+  gamma: 1.0
+  k: 1
+  n_steps: 200
+  lr: 0.005
+  sta_epsilon: 0.05
+  max_train_samples: 15   # tighter than cpazmal.yaml — STA dominates cost
+  max_test_samples: 15
+  samples_per_step: 100
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+
+methods: [wasps, eucl_params, eucl_raw, sta]
+modes:   [knn]          # STA barycenter omitted — too slow even at T≈29
+
+n_seeds: 1
+seed: 42
+
+output:
+  dir: results/jax_cpazmal_sta

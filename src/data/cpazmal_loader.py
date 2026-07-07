@@ -7,8 +7,9 @@ This module provides:
   Source: https://github.com/Matthieu-Gallet/CPAZMaL_dataset/blob/main/src/load_dataset.py
 - ``download_cpazmal``: Download the dataset from HuggingFace.
 - ``windows_to_time_series``: Reshape spatial windows (W, W, T) → (T, W²).
-- ``extract_time_series``: Extract windowed time series for classification,
-  adapted from ``RESSOURCES/scenarios.py::scenario_2_temporal_prediction_lstm``.
+- ``extract_time_series``: Extract one windowed time series per spatial sample,
+  with a geographic ``group`` index, for group-stratified K-fold classification
+  (mirrors ``data.river_loader.load_river_classification``).
 
 The output format of ``extract_time_series`` is compatible with the WaSPS-DTW
 pipeline (``WassersteinDistance``, ``sdtw_barycenter``, ``sgd_barycenter``).
@@ -24,15 +25,6 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from tqdm import tqdm
 from joblib import Parallel, delayed
-
-from .preprocess import clean_series
-
-# Note: estimation.py was merged into distributions.py; use distributions.weibull.fit_time_series
-# when replacing the dead _fit_weibull path below.
-try:
-    from sdtw.wasserstein_fast import estimate_weibull_fast as _fit_weibull  # type: ignore[import]
-except Exception:
-    _fit_weibull = None
 
 
 # =============================================================================
@@ -452,53 +444,6 @@ def download_cpazmal(save_dir: str, token: Optional[str] = None) -> str:
 # Reshape helper
 # =============================================================================
 
-def estimate_weibull_params(series: np.ndarray, min_valid: int = 4) -> np.ndarray:
-    """
-    Estimate per-timestep Weibull(k, λ_scale) parameters from a ``(T, W²)`` series.
-
-    Each row ``series[t]`` contains W² pixel values sampled at time step t.
-    These are treated as i.i.d. draws from a Weibull distribution, whose
-    parameters are estimated by the method of log-cumulants.
-
-    Args:
-        series:     Array of shape ``(T, W²)`` — output of :func:`windows_to_time_series`
-                    or ``extract_time_series``.
-        min_valid:  Minimum number of finite positive values required per row;
-                    rows with fewer values receive the column-wise mean.
-
-    Returns:
-        Array of shape ``(T, 2)`` where column-0 = k (shape), column-1 = λ (scale).
-    """
-    if _fit_weibull is None:
-        raise ImportError(
-            "sdtw.wasserstein_fast not available; complete Phase 3 (estimation.py) first."
-        )
-    try:
-        T = series.shape[0]
-    except AttributeError:
-        T = len(series)
-    params = np.zeros((T, 2), dtype=np.float64)
-
-    for t in range(T):
-        valid = clean_series(series[t])
-        if len(valid) >= min_valid:
-            k_hat, lam_hat = _fit_weibull(valid)
-            params[t, 0] = k_hat
-            params[t, 1] = lam_hat
-        else:
-            params[t, :] = np.nan
-
-    # Fill NaN rows with column-wise mean; fall back to (1.0, 1.0) if all NaN.
-    for col in range(2):
-        mask = np.isfinite(params[:, col])
-        if mask.sum() > 0 and (~mask).sum() > 0:
-            params[~mask, col] = params[mask, col].mean()
-        elif (~mask).sum() > 0:
-            params[:, col] = 1.0
-
-    return params
-
-
 def windows_to_time_series(window: np.ndarray) -> np.ndarray:
     """
     Reshape a spatial window to a time series compatible with WassersteinDistance.
@@ -531,25 +476,25 @@ def extract_time_series(
     min_valid_percentage: float = 50.0,
     orbit: str = 'DSC',
     polarization: str = 'HH',
-    train_start: str = '20200101',
-    train_end: str = '20201031',
-    predict_start: str = '20201101',
-    predict_end: str = '20201231',
+    start_date: str = '20200101',
+    end_date: str = '20201231',
     scale_type: str = 'amplitude',
     skip_optim_offset: bool = False,
     verbose: bool = True,
-    max_groups: Optional[int] = None,
+    exclude_classes: Tuple[str, ...] = ('STUDY', 'HAG'),
+    max_groups_per_class: Optional[int] = None,
 ) -> Dict:
     """
-    Extract windowed time series from the CPAZMaL dataset.
+    Extract windowed time series from the CPAZMaL dataset for classification.
 
-    This function partitions the data into a *training* period and a
-    *prediction* period, extracts overlapping spatial windows, and reshapes
-    each window ``(W, W, T)`` → ``(T, W²)`` so that it is directly usable
-    with ``WassersteinDistance`` and the Soft-DTW barycenter pipeline.
+    Each spatial window yields **one continuous time series** over
+    ``[start_date, end_date]``, reshaped ``(W, W, T)`` → ``(T, W²)``, paired with
+    a geographic ``group`` index. Use ``StratifiedGroupKFold`` on ``(y, groups)``
+    for K-fold classification — mirrors ``river_loader.load_river_classification``.
 
-    All classes except ``'STUDY'`` are included.  One sample per spatial
-    window is returned.
+    (Earlier versions of this function split the data into a *training* period
+    and a *prediction* period for a temporal-forecasting task; that framing is
+    gone — this is a classification loader now.)
 
     Args:
         loader: An ``MLDatasetLoader`` instance pointing to the HDF5 file.
@@ -559,37 +504,35 @@ def extract_time_series(
         min_valid_percentage: Min % of valid (non-nodata) pixels.
         orbit: SAR orbit direction (``'ASC'`` or ``'DSC'``).
         polarization: SAR polarisation (``'HH'`` or ``'HV'``).
-        train_start: Training period start (``'YYYYMMDD'``).
-        train_end: Training period end (``'YYYYMMDD'``).
-        predict_start: Prediction period start (``'YYYYMMDD'``).
-        predict_end: Prediction period end (``'YYYYMMDD'``).
+        start_date: Period start (``'YYYYMMDD'``).
+        end_date: Period end (``'YYYYMMDD'``).
         scale_type: Radiometric scaling (``'intensity'``, ``'amplitude'``,
             ``'log10'``).
         skip_optim_offset: If True, skip the window-offset optimisation step
             (faster but may yield fewer windows).
         verbose: Print progress and summary statistics.
-        max_groups: If set, process at most this many groups (useful for
-            smoke tests; ``None`` = all groups).
+        exclude_classes: Class names dropped from the learning set. ``'STUDY'``
+            is a non-semantic administrative class; ``'HAG'`` has too few
+            samples (45 samples / 28 groups in the live dataset) to be useful
+            for stratified K-fold.
+        max_groups_per_class: If set, keep at most this many groups **per
+            class** (not a flat global cap) — needed to build a multi-class
+            smoke-test subset. Groups are sorted alphabetically overall, and a
+            flat cap (the old ``max_groups``) only ever hits one class (e.g.
+            all ``'ABL*'`` groups) since class names cluster alphabetically.
+            ``None`` = all groups.
 
     Returns:
         Dict with:
 
-        - ``X_train``: object array ``(N,)`` of ``(T_train, W²)`` float64 arrays.
-        - ``X_predict``: object array ``(N,)`` of ``(T_predict, W²)`` float64 arrays.
+        - ``X``: object array ``(N,)`` of ``(T, W²)`` float64 arrays.
         - ``y``: int array ``(N,)`` — class label per sample.
         - ``groups``: int array ``(N,)`` — group index per sample.
-        - ``masks_train``: object array ``(N,)`` of ``(W, W, T_train)`` masks.
-        - ``masks_predict``: object array ``(N,)`` of ``(W, W, T_predict)`` masks.
-        - ``timestamps_train``: object array ``(N,)`` of timestamp lists.
-        - ``timestamps_predict``: object array ``(N,)`` of timestamp lists.
+        - ``masks``: object array ``(N,)`` of ``(W, W, T)`` masks.
+        - ``timestamps``: object array ``(N,)`` of timestamp lists.
         - ``class_names``: dict ``{int: str}`` mapping label → class name.
         - ``group_names``: dict ``{int: str}`` mapping group index → group name.
         - ``metadata``: dict with extraction parameters.
-
-    Notes:
-        Each element of ``X_train[i]`` has shape ``(T_train, W²)`` and can be
-        passed directly as the ``X`` argument to ``WassersteinDistance`` (or
-        to ``estimate_parameters_for_samples`` in ``classification_loader``).
     """
     if verbose:
         print(f"\n{'='*70}")
@@ -597,27 +540,32 @@ def extract_time_series(
         print(f"{'='*70}")
         print(f"  Window:      {window_size}×{window_size}")
         print(f"  Orbit:       {orbit}  |  Polarisation: {polarization}")
-        print(f"  Train:       {train_start} – {train_end}")
-        print(f"  Predict:     {predict_start} – {predict_end}")
+        print(f"  Period:      {start_date} – {end_date}")
         print(f"  Scale type:  {scale_type}")
+        print(f"  Excluded:    {list(exclude_classes)}")
         print(f"  Mask max:    ≤{max_mask_value} ({max_mask_percentage}%)\n")
 
-    learning_classes = [c for c in loader.classes if c != 'STUDY']
+    learning_classes = [c for c in loader.classes if c not in exclude_classes]
     class_to_int = {c: i for i, c in enumerate(learning_classes)}
-
-    all_groups = []
-    for cls in learning_classes:
-        all_groups.extend(loader.get_groups_by_class(cls))
-    unique_groups = sorted(set(all_groups))
-    if max_groups is not None:
-        unique_groups = unique_groups[:max_groups]
-    group_to_int = {g: i for i, g in enumerate(unique_groups)}
     group_to_class = loader.get_all_groups_with_classes()
 
-    X_train_all, X_predict_all = [], []
-    y_all, groups_all = [], []
-    masks_train_all, masks_predict_all = [], []
-    timestamps_train_all, timestamps_predict_all = [], []
+    if max_groups_per_class is not None:
+        # Per-class cap so a small smoke-test subset still spans every class —
+        # a flat global cap on the alphabetically-sorted list would not (class
+        # name prefixes cluster alphabetically, e.g. all 'ABL*' groups first).
+        unique_groups = sorted(
+            g for cls in learning_classes
+            for g in sorted(loader.get_groups_by_class(cls))[:max_groups_per_class]
+        )
+    else:
+        all_groups = []
+        for cls in learning_classes:
+            all_groups.extend(loader.get_groups_by_class(cls))
+        unique_groups = sorted(set(all_groups))
+    group_to_int = {g: i for i, g in enumerate(unique_groups)}
+
+    X_all, y_all, groups_all = [], [], []
+    masks_all, timestamps_all = [], []
 
     pbar = tqdm(unique_groups, desc="Groups", unit="grp")
     for group_name in pbar:
@@ -628,22 +576,12 @@ def extract_time_series(
             pbar.set_postfix_str(f"{group_name} ({class_name})")
 
         try:
-            data_train = loader.load_data(
+            data = loader.load_data(
                 group_name=group_name,
                 orbit=orbit,
                 polarisation=polarization,
-                start_date=train_start,
-                end_date=train_end,
-                normalize=False,
-                remove_nodata=True,
-                scale_type=scale_type,
-            )
-            data_predict = loader.load_data(
-                group_name=group_name,
-                orbit=orbit,
-                polarisation=polarization,
-                start_date=predict_start,
-                end_date=predict_end,
+                start_date=start_date,
+                end_date=end_date,
                 normalize=False,
                 remove_nodata=True,
                 scale_type=scale_type,
@@ -651,18 +589,15 @@ def extract_time_series(
         except (ValueError, KeyError):
             continue
 
-        img_train = data_train['images']       # (H, W, T_train)
-        mask_train = data_train['masks']
-        img_predict = data_predict['images']   # (H, W, T_predict)
-        mask_predict = data_predict['masks']
+        img = data['images']    # (H, W, T)
+        mask = data['masks']
 
-        if img_train.shape[2] == 0 or img_predict.shape[2] == 0:
+        if img.shape[2] == 0:
             continue
 
-        # Extract training windows (also returns positions used for prediction)
-        windows_train, wm_train, positions = loader.extract_windows(
-            image=img_train,
-            mask=mask_train,
+        windows, wm, _positions = loader.extract_windows(
+            image=img,
+            mask=mask,
             window_size=window_size,
             stride=window_size,
             max_mask_value=max_mask_value,
@@ -671,71 +606,36 @@ def extract_time_series(
             skip_optim_offset=skip_optim_offset,
         )
 
-        if windows_train is None:
+        if windows is None:
             continue
 
-        # Extract prediction windows at the same spatial positions
-        windows_predict_list, wm_predict_list, valid_indices = [], [], []
-        for idx, (y, x) in enumerate(positions):
-            if y + window_size > img_predict.shape[0] or x + window_size > img_predict.shape[1]:
-                continue
-            win_pred = img_predict[y:y+window_size, x:x+window_size, :]
-            wm_pred = mask_predict[y:y+window_size, x:x+window_size, :]
-            bad_pct = (
-                np.sum(np.any(wm_pred > max_mask_value, axis=-1))
-                / (window_size * window_size)
-                * 100
-            )
-            if bad_pct <= max_mask_percentage:
-                windows_predict_list.append(win_pred)
-                wm_predict_list.append(wm_pred)
-                valid_indices.append(idx)
-
-        if not windows_predict_list:
-            continue
-
-        windows_train = windows_train[valid_indices]
-        wm_train = wm_train[valid_indices]
-        windows_predict = np.array(windows_predict_list)
-        wm_predict = np.array(wm_predict_list)
-
-        ts_train = data_train['timestamps']
-        ts_predict = data_predict['timestamps']
+        ts = data['timestamps']
         cls_int = class_to_int[class_name]
         grp_int = group_to_int[group_name]
 
-        for k in range(len(windows_train)):
+        for k in range(len(windows)):
             # Reshape (W, W, T) → (T, W²) for WassersteinDistance compatibility
-            X_train_all.append(windows_to_time_series(windows_train[k]))
-            X_predict_all.append(windows_to_time_series(windows_predict[k]))
+            X_all.append(windows_to_time_series(windows[k]))
             y_all.append(cls_int)
             groups_all.append(grp_int)
-            masks_train_all.append(wm_train[k])
-            masks_predict_all.append(wm_predict[k])
-            timestamps_train_all.append(ts_train)
-            timestamps_predict_all.append(ts_predict)
+            masks_all.append(wm[k])
+            timestamps_all.append(ts)
 
-    if not X_train_all:
+    if not X_all:
         raise ValueError(
             "No windows were extracted. Check dataset path and parameters "
-            "(orbit, polarization, date ranges, mask thresholds)."
+            "(orbit, polarization, date range, mask thresholds)."
         )
 
-    X_train = np.empty(len(X_train_all), dtype=object)
-    X_predict = np.empty(len(X_predict_all), dtype=object)
-    for i in range(len(X_train_all)):
-        X_train[i] = X_train_all[i]
-        X_predict[i] = X_predict_all[i]
+    X = np.empty(len(X_all), dtype=object)
+    for i in range(len(X_all)):
+        X[i] = X_all[i]
 
-    masks_train = np.empty(len(masks_train_all), dtype=object)
-    masks_predict = np.empty(len(masks_predict_all), dtype=object)
-    ts_train_arr = np.empty(len(timestamps_train_all), dtype=object)
-    ts_predict_arr = np.empty(len(timestamps_predict_all), dtype=object)
-    for i in range(len(masks_train_all)):
-        masks_train[i] = masks_train_all[i]
-        masks_predict[i] = masks_predict_all[i]
-        ts_train_arr[i] = timestamps_train_all[i]
-        ts_predict_arr[i] = timestamps_predict_all[i]
+    masks = np.empty(len(masks_all), dtype=object)
+    ts_arr = np.empty(len(timestamps_all), dtype=object)
+    for i in range(len(masks_all)):
+        masks[i] = masks_all[i]
+        ts_arr[i] = timestamps_all[i]
 
     y = np.array(y_all, dtype=np.int32)
     groups = np.array(groups_all, dtype=np.int32)
@@ -743,36 +643,31 @@ def extract_time_series(
     if verbose:
         print(f"\n{'='*70}")
         print(f"Extraction complete:")
-        print(f"  Total samples (windows):  {len(X_train)}")
-        print(f"  X_train[0].shape:         {X_train[0].shape}  (T_train, W²)")
-        print(f"  X_predict[0].shape:       {X_predict[0].shape}  (T_predict, W²)")
+        print(f"  Total samples (windows):  {len(X)}")
+        print(f"  X[0].shape:               {X[0].shape}  (T, W²)")
         labels, counts = np.unique(y, return_counts=True)
         class_names_map = {v: k for k, v in class_to_int.items()}
         for lbl, cnt in zip(labels, counts):
             print(f"    Class {lbl:2d} ({class_names_map[lbl]:15s}): {cnt} samples")
 
     return {
-        'X_train': X_train,
-        'X_predict': X_predict,
+        'X': X,
         'y': y,
         'groups': groups,
-        'masks_train': masks_train,
-        'masks_predict': masks_predict,
-        'timestamps_train': ts_train_arr,
-        'timestamps_predict': ts_predict_arr,
+        'masks': masks,
+        'timestamps': ts_arr,
         'class_names': {v: k for k, v in class_to_int.items()},
         'group_names': {v: k for k, v in group_to_int.items()},
         'metadata': {
             'window_size': window_size,
             'orbit': orbit,
             'polarization': polarization,
-            'train_period': (train_start, train_end),
-            'predict_period': (predict_start, predict_end),
+            'period': (start_date, end_date),
             'scale_type': scale_type,
+            'exclude_classes': list(exclude_classes),
             'note': (
-                'X_train[i] and X_predict[i] have shape (T, W²). '
-                'Each row = W² pixel samples at time step t, '
-                'usable directly as input to WassersteinDistance.'
+                'X[i] has shape (T, W²). Each row = W² pixel samples at time '
+                'step t, usable directly as input to WassersteinDistance.'
             ),
         },
     }

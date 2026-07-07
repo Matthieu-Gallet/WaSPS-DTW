@@ -200,6 +200,7 @@ def _load_river(cfg: dict, seed: int, fold: Optional[int] = None) -> dict:
         samples_per_step = clf_cfg.get("samples_per_step"),
         aggregate_days   = ds.get("aggregate_days"),
         seed             = seed,
+        cv_seed          = int(cv.get("cv_seed", 42)),
     )
     return {
         "X_train":     data["X_train"],
@@ -214,81 +215,94 @@ def _load_river(cfg: dict, seed: int, fold: Optional[int] = None) -> dict:
 
 
 def _load_cpazmal(cfg: dict, seed: int = 42, fold: Optional[int] = None) -> dict:
+    """Load CPAZMaL as a classification dataset: one series per spatial window,
+    K-fold by geographic group (mirrors _load_river / river_loader.py:141-162).
+
+    `seed` only drives the sample-level RNG (`to_fixed_n` rectangularisation) —
+    NOT the fold assignment, which must stay fixed across seeds run against the
+    same fold (see cv_seed below). Otherwise "same fold, different seed" would
+    silently also reshuffle which groups are held out.
+    """
+    import json
     from data.cpazmal_loader import MLDatasetLoader, extract_time_series
     ds        = cfg["dataset"]
     hdf5_path = ds["hdf5_path"]
-    max_groups = ds.get("max_groups")
+    max_groups_per_class = ds.get("max_groups_per_class")
+    window_size = ds.get("window_size", 12)
     cache_dir  = Path(ds.get("cache_dir", "data/cpazmal"))
-    suffix     = "all" if max_groups is None else f"mg{max_groups}"
-    cx_train   = cache_dir / f"X_train_{suffix}.npy"
-    cx_pred    = cache_dir / f"X_predict_{suffix}.npy"
+    mgpc_part  = "all" if max_groups_per_class is None else f"mgpc{max_groups_per_class}"
+    suffix     = f"{mgpc_part}_w{window_size}"
+    cx         = cache_dir / f"X_{suffix}.npy"
     cy         = cache_dir / f"y_{suffix}.npy"
     cg         = cache_dir / f"groups_{suffix}.npy"
+    cmeta      = cache_dir / f"meta_{suffix}.json"
     clf_cfg    = cfg["classification"]
 
-    groups = None
-    if cx_train.exists():
-        print(f"[cpazmal] loading from cache (max_groups={max_groups})")
-        X_train = list(np.load(cx_train, allow_pickle=True))
-        X_test  = list(np.load(cx_pred,  allow_pickle=True))
+    if cx.exists():
+        print(f"[cpazmal] loading from cache (max_groups_per_class={max_groups_per_class})")
+        X       = list(np.load(cx, allow_pickle=True))
         labels  = np.load(cy)
-        if cg.exists():
-            groups = np.load(cg)
+        groups  = np.load(cg)
+        meta    = json.loads(cmeta.read_text()) if cmeta.exists() else {}
+        class_names = {int(k): v for k, v in meta.get("class_names", {}).items()}
     else:
-        print(f"[cpazmal] extracting from HDF5 (max_groups={max_groups}) …")
+        print(f"[cpazmal] extracting from HDF5 (max_groups_per_class={max_groups_per_class}) …")
         loader = MLDatasetLoader(hdf5_path)
-        data   = extract_time_series(loader, max_groups=max_groups)
-        X_train = list(data["X_train"])
-        X_test  = list(data["X_predict"])
+        data   = extract_time_series(loader, max_groups_per_class=max_groups_per_class,
+                                      window_size=window_size)
+        X       = list(data["X"])
         labels  = np.asarray(data["y"])
-        groups  = np.asarray(data["groups"]) if "groups" in data else None
+        groups  = np.asarray(data["groups"])
+        class_names = data["class_names"]
         cache_dir.mkdir(parents=True, exist_ok=True)
-        np.save(cx_train, np.array(X_train, dtype=object), allow_pickle=True)
-        np.save(cx_pred,  np.array(X_test,  dtype=object), allow_pickle=True)
+        np.save(cx, np.array(X, dtype=object), allow_pickle=True)
         np.save(cy, labels)
-        if groups is not None:
-            np.save(cg, groups)
+        np.save(cg, groups)
+        cmeta.write_text(json.dumps({
+            "class_names": {str(k): v for k, v in class_names.items()},
+            "group_names": {str(k): v for k, v in data["group_names"].items()},
+        }))
         print(f"[cpazmal] cache saved to {cache_dir}")
 
     n = clf_cfg.get("samples_per_step")
     if n is not None:
-        rng = np.random.default_rng(seed)
-        X_train = [to_fixed_n(s, n, rng) for s in X_train]
-        X_test  = [to_fixed_n(s, n, rng) for s in X_test]
+        sample_rng = np.random.default_rng(seed)
+        X = [to_fixed_n(s, n, sample_rng) for s in X]
 
-    cv       = cfg.get("cross_validation", {})
-    n_splits = int(cv.get("n_splits", 1))
+    cv          = cfg.get("cross_validation", {})
+    n_splits    = int(cv.get("n_splits", 1))
+    cv_seed     = int(cv.get("cv_seed", 42))  # fixed — decoupled from `seed` (sample RNG)
 
-    if n_splits > 1 and groups is not None:
-        # K-fold on CPAZMaL: concatenate both time periods, then GroupKFold by
-        # geographic group so all windows from one site go to the same fold.
+    if n_splits == 1:
+        from sklearn.model_selection import train_test_split
+        idx_train, idx_test = train_test_split(
+            np.arange(len(labels)), test_size=ds.get("test_size", 0.2),
+            random_state=cv_seed, stratify=labels,
+        )
+        idx_train, idx_test = np.sort(idx_train), np.sort(idx_test)
+    else:
         fold_idx = fold if fold is not None else int(cv.get("fold", 0))
-        from sklearn.model_selection import GroupKFold
-        X_all  = X_train + X_test
-        y_all  = np.concatenate([labels, labels])
-        g_all  = np.concatenate([groups, groups])
-        splits = list(GroupKFold(n_splits=n_splits).split(np.arange(len(y_all)), y_all, g_all))
-        if fold_idx >= len(splits):
+        if fold_idx >= n_splits:
             raise ValueError(f"fold={fold_idx} out of range (n_splits={n_splits})")
-        idx_tr, idx_te = splits[fold_idx]
-        return {
-            "X_train":     [X_all[i] for i in idx_tr],
-            "X_test":      [X_all[i] for i in idx_te],
-            "y_train":     y_all[idx_tr],
-            "y_test":      y_all[idx_te],
-            "class_names": {},
-            "metadata":    {},
-            "groups_train": g_all[idx_tr],
-            "groups_test":  g_all[idx_te],
-        }
+        group_aware = bool(cv.get("group_aware", True))
+        if group_aware:
+            from sklearn.model_selection import StratifiedGroupKFold
+            splitter = StratifiedGroupKFold(n_splits=n_splits, shuffle=False)
+            splits = list(splitter.split(np.arange(len(labels)), labels, groups))
+        else:
+            from sklearn.model_selection import StratifiedKFold
+            splitter = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=cv_seed)
+            splits = list(splitter.split(np.arange(len(labels)), labels))
+        idx_train, idx_test = splits[fold_idx]
+        idx_train, idx_test = np.sort(idx_train), np.sort(idx_test)
 
     return {
-        "X_train":     X_train,
-        "X_test":      X_test,
-        "y_train":     labels,
-        "y_test":      labels,
-        "class_names": {},
+        "X_train":     [X[i] for i in idx_train],
+        "X_test":      [X[i] for i in idx_test],
+        "y_train":     labels[idx_train],
+        "y_test":      labels[idx_test],
+        "class_names": class_names,
         "metadata":    {},
-        "groups_train": groups,
-        "groups_test":  groups,
+        "groups_train": groups[idx_train],
+        "groups_test":  groups[idx_test],
     }

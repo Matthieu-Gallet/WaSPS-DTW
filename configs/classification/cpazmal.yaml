@@ -1,15 +1,17 @@
-# Experiment config — CPAZMaL SAR classification (Weibull, 3 methods × 2 modes)
+# Experiment config — CPAZMaL SAR classification (Weibull, 3 methods × 2 modes, 5-fold CV)
 # Run: python experiments/run_classification.py configs/cpazmal.yaml
 #
-# First run extracts from HDF5 (slow); subsequent runs load from data/cpazmal/ cache.
-# After extraction, check T and per-timestep valid counts to tune samples_per_step.
-# To include STA: verify T is tractable, then add 'sta' to methods.
+# First run extracts from HDF5 (slow, single continuous series per window, HAG
+# excluded); subsequent runs load from data/cpazmal/ cache.
+# STA excluded here: 5-fold × its already-heavy per-split cost (CLAUDE.md: ~6.6h
+# for ONE split at T=24) is intractable. Use configs/cpazmal_sta.yaml instead
+# (single split, KNN-only, tight sample caps).
 
 dataset:
   type: cpazmal
   family: weibull
   hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
-  max_groups: null   # null = all groups; integer = limit for quick smoke-test
+  max_groups_per_class: null   # null = all groups; integer = per-class limit for a quick smoke-test
 
 classification:
   gamma: 1.0
@@ -23,12 +25,15 @@ classification:
   early_stop_patience: 20
   early_stop_tol: 1.0e-4
 
-# STA included: T_train=24 (biweekly SAR), O(T²)=576 — tractable at 20×20 samples.
-methods: [wasps, eucl_params, eucl_raw, sta]
+methods: [wasps, eucl_params, eucl_raw]
 modes:   [knn, barycenter]
 
-n_seeds: 1    # CPAZMaL uses a fixed spatial split; only one seed makes sense
-seed: 42
+cross_validation:
+  n_splits: 5
+  fold: -1           # -1 = loop over all 5 folds; 0..4 = specific fold
+  group_aware: true  # StratifiedGroupKFold — geographic groups disjoint across folds
+
+seed: 42   # used for to_fixed_n resampling / n_splits=1 fallback; does not affect fold membership
 
 output:
   dir: results/jax_cpazmal

@@ -1,0 +1,41 @@
+# River temporal-aggregation experiment — 7-day/weekly pooling (gamma=10)
+# T=365//7=52 timesteps, 50*7=350 raw values/timestep after pooling → samples_per_step=350
+# Run: python experiments/run_classification.py configs/river_agg.yaml
+#
+# Replaces river_agg1.yaml / river_agg2.yaml / river_agg4.yaml (aggregate_days=1/2/4):
+# this is the only variant actually used in practice (matches the aggregation used
+# in analysis/river_barycenter_agg4.ipynb, despite that notebook's filename — the
+# notebook's AGGREGATE_DAYS is 7, not 4; see RUN.md). To try a different pooling
+# window, edit `aggregate_days` below AND scale `samples_per_step` proportionally
+# (samples_per_step = 50 * aggregate_days, since pooling concatenates raw sample
+# columns across the pooled days — see _aggregate_days in river_loader.py).
+
+dataset:
+  type: river
+  family: exponential
+  data_dir: data/river
+  mode: balanced
+  test_size: 0.2
+  max_time_steps: null
+  aggregate_days: 7      # T=52 (weekly); see comment above to change
+
+classification:
+  gamma: 10.0
+  k_values: [1]
+  n_steps: 200
+  lr: 0.01
+  max_train_samples: -1
+  max_test_samples: -1
+  samples_per_step: 350  # 50 * aggregate_days
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+
+methods: [wasps, eucl_params, eucl_raw]
+modes:   [knn, barycenter]
+
+n_seeds: 1
+seed: 42
+debug: true
+
+output:
+  dir: results/jax_river_agg

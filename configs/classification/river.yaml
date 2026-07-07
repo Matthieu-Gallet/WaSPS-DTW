@@ -1,4 +1,4 @@
-# Experiment config — River-discharge classification (exponential, 3 methods × 2 modes)
+# Experiment config — River-discharge classification (exponential, 3 methods × 2 modes, 5-fold CV)
 # Run: python experiments/run_classification.py configs/river.yaml
 # For STA (4 methods, T reduced), use configs/river_sta.yaml instead.
 
@@ -6,9 +6,11 @@ dataset:
   type: river
   family: exponential
   data_dir: data/river
-  mode: balanced          # balanced: 400 samples, T=365 (daily), 4 classes
-                          # basic:    611 samples, T=52  (weekly)
-  test_size: 0.2
+  mode: balanced          # balanced: 800 samples, T=365 (daily), 4 classes, 183 geographic
+                          #           groups (groups_balanced.npy) — group counts per class
+                          #           are uneven (min 7 groups for class NG) → n_splits should
+                          #           not exceed 7; 5 is the default (see cross_validation below).
+                          # basic:    611 samples, T=52  (weekly), no groups file
   max_time_steps: null    # null = full T; integer = truncate (smoke tests)
 
 classification:
@@ -27,8 +29,13 @@ classification:
 methods: [wasps, eucl_params, eucl_raw]
 modes:   [knn, barycenter]
 
-n_seeds: 4
-seed: 42
+cross_validation:
+  n_splits: 5
+  fold: -1              # -1 = loop over all 5 folds; 0..4 = specific fold
+  group_aware: true      # StratifiedGroupKFold — geographic groups disjoint across folds
+  # n_seeds_per_fold: 1  # >1 = also vary the sample RNG (to_fixed_n) N times per fold
+
+seed: 42   # to_fixed_n resampling RNG; does not affect fold membership (see cv_seed)
 
 output:
   dir: results/jax_river

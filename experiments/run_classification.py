@@ -43,8 +43,7 @@ _SRC  = _HERE.parent / "src"
 sys.path.insert(0, str(_SRC))
 
 jax.config.update("jax_enable_x64", True)  # must precede jax.numpy usage
-import distributions
-from data.preprocess import clean_time_series, to_fixed_n
+from data.preprocess import to_fixed_n
 from baselines.sta_wrapper import knn_predict as sta_knn
 from classification.barycenter_clf import fit_barycenters, predict
 from classification.nn import knn_predict as sdtw_knn
@@ -273,17 +272,21 @@ def _run_one_seed(cfg: dict, seed: int, methods: list, fold: int | None = None) 
 
     # Raw downsampling: auto-compute N_min when samples_per_step is not set in config
     # but the method list includes raw-type methods (eucl_raw, sta).
-    # Computed independently for train and test — no information leakage.
+    # N_min itself is computed independently per split (no value/content leakage), but
+    # the SAME N is then applied to both — raw-vector costs (SqEuclidean, Sinkhorn) require
+    # equal-length vectors, so train/test must share one N regardless of which split's
+    # natural valid-count happens to be smaller.
     raw_methods = [m for m in methods if _METHODS[m]['repr'] == 'raw']
     if raw_methods and clf_cfg.get("samples_per_step") is None:
         from data_utils import compute_raw_n_min
         n_min_train = compute_raw_n_min(train_raw)
         n_min_test  = compute_raw_n_min(test_raw)
         if n_min_train > 0 and n_min_test > 0:
+            n_min = min(n_min_train, n_min_test)
             rng_raw = np.random.default_rng(seed)
-            train_raw = [to_fixed_n(s, n_min_train, rng_raw) for s in train_raw]
-            test_raw  = [to_fixed_n(s, n_min_test,  rng_raw) for s in test_raw]
-            print(f"[raw] auto N_min: train={n_min_train}  test={n_min_test}", flush=True)
+            train_raw = [to_fixed_n(s, n_min, rng_raw) for s in train_raw]
+            test_raw  = [to_fixed_n(s, n_min, rng_raw) for s in test_raw]
+            print(f"[raw] auto N_min: train={n_min_train}  test={n_min_test}  → using shared N={n_min}", flush=True)
 
     # Debug: dataset-level diagnostics (once, for the first seed only)
     _debug = cfg.get("debug", False)
@@ -298,6 +301,7 @@ def _run_one_seed(cfg: dict, seed: int, methods: list, fold: int | None = None) 
     k_values    = clf_cfg.get("k_values") or [clf_cfg.get("k", 1)]
     n_steps     = clf_cfg["n_steps"]
     lr          = clf_cfg["lr"]
+    optimizer   = clf_cfg.get("optimizer", "sgd")
     sta_epsilon = clf_cfg.get("sta_epsilon", 0.05)
     modes       = [m.lower() for m in cfg.get("modes", ["knn", "barycenter"])]
 
@@ -311,8 +315,6 @@ def _run_one_seed(cfg: dict, seed: int, methods: list, fold: int | None = None) 
             lbl = train_labels if split == 'train' else test_labels
             _repr_cache[(repr_type, split)] = build_repr(raw, lbl, repr_type, family)
         return _repr_cache[(repr_type, split)]
-
-    run_id = fold if fold is not None else seed
 
     for method in methods:
         repr_type = _METHODS[method]['repr']
@@ -347,6 +349,7 @@ def _run_one_seed(cfg: dict, seed: int, methods: list, fold: int | None = None) 
                 n_steps=n_steps, lr=lr,
                 patience=clf_cfg.get("early_stop_patience", 15),
                 min_rel_improve=clf_cfg.get("early_stop_tol", 1e-4),
+                optimizer=optimizer,
             )
             train_time = time.time() - t0
 
@@ -485,11 +488,18 @@ def main(config_path: str):
     cv       = cfg.get("cross_validation", {})
     n_splits = int(cv.get("n_splits", 1))
     fold_cfg = int(cv.get("fold", 0))
+    n_seeds_per_fold = int(cv.get("n_seeds_per_fold", 1))
 
-    # K-fold mode: fold=-1 → iterate over all folds (one seed); else use fixed fold
+    # Three repetition modes (see CLAUDE.md — fais attention entre les kfolds et les seeds):
+    #   fold-only    (n_splits>1, fold=-1, n_seeds_per_fold=1): one run per fold.
+    #   seed-only    (n_splits=1, or a fixed fold): one run per seed on the same split.
+    #   fold+seed    (n_splits>1, fold=-1, n_seeds_per_fold>1): nested — n_seeds_per_fold
+    #                runs per fold, varying only the sample-level RNG (to_fixed_n/subsample),
+    #                never the fold membership itself (see cv_seed in the loaders).
     if n_splits > 1 and fold_cfg < 0:
-        iterations = [(base_seed, f) for f in range(n_splits)]
-        print(f"[run] K-fold mode: n_splits={n_splits}  group_aware={cv.get('group_aware', False)}")
+        iterations = [(base_seed + s, f) for f in range(n_splits) for s in range(n_seeds_per_fold)]
+        print(f"[run] K-fold mode: n_splits={n_splits}  group_aware={cv.get('group_aware', False)}  "
+              f"n_seeds_per_fold={n_seeds_per_fold}")
     else:
         fold_arg = fold_cfg if n_splits > 1 else None
         iterations = [(seed, fold_arg) for seed in seeds]
@@ -499,7 +509,10 @@ def main(config_path: str):
 
     all_results = []
     for seed, fold in iterations:
-        tag = f"fold={fold}" if fold is not None else f"seed={seed}"
+        if fold is not None:
+            tag = f"fold={fold},seed={seed}" if n_seeds_per_fold > 1 else f"fold={fold}"
+        else:
+            tag = f"seed={seed}"
         print(f"\n[{tag}]", flush=True)
         all_results.extend(_run_one_seed(cfg, seed, methods, fold=fold))
 

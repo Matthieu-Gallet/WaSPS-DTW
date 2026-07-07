@@ -1,0 +1,21 @@
+[arm=A1 bary=wasps cap=flat5 est=mle floor=1e-05 opt=sgd fold=0 seed=42 class=0]
+Fitting barycenter of 5 series with 200 steps, lr=0.01, patience=20, min_rel_improve=0.0001
+  step    1/200  loss=17037.048133
+  step   21/200  loss=nan
+  early stop at step 21 (no improve for 20 steps)
+
+============================================================
+[arm=A1 bary=wasps cap=flat5 est=mle floor=1e-05 opt=sgd fold=0 seed=42 class=1]
+Fitting barycenter of 4 series with 200 steps, lr=0.01, patience=20, min_rel_improve=0.0001
+  step    1/200  loss=487062.773326
+  step   21/200  loss=nan
+  early stop at step 21 (no improve for 20 steps)
+
+============================================================
+[arm=A1 bary=wasps cap=flat5 est=mle floor=1e-05 opt=sgd fold=0 seed=42 class=5]
+Fitting barycenter of 5 series with 200 steps, lr=0.01, patience=20, min_rel_improve=0.0001
+  step    1/200  loss=12294.793025
+  step   21/200  loss=nan
+  early stop at step 21 (no improve for 20 steps)
+
+============================================================

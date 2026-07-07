@@ -63,6 +63,7 @@ def load_river_classification(
     samples_per_step: Optional[int] = None,
     aggregate_days: Optional[int] = None,
     seed: int = 42,
+    cv_seed: int = 42,
 ) -> dict:
     """Load prebuilt river-discharge classification .npy and produce a train/test split.
 
@@ -85,7 +86,14 @@ def load_river_classification(
                            ``to_fixed_n``.  Required for eucl_raw and STA.
                            ``None`` preserves NaN (params path only).
         aggregate_days:    Pool k consecutive timesteps into one before rectangularisation.
-        seed:              Random seed for the stratified split / to_fixed_n.
+        seed:              Random seed for the sample-level RNG (`to_fixed_n`
+                           rectangularisation) and for the `n_splits=1` holdout split.
+                           Does NOT affect which groups land in which K-fold (see cv_seed) —
+                           iterating seeds at a fixed fold must not also reshuffle the fold.
+        cv_seed:           Fixed seed for the K-fold split itself (`StratifiedKFold` fallback
+                           only — `StratifiedGroupKFold` is deterministic, shuffle=False).
+                           Decoupled from `seed` so that running multiple seeds against the
+                           same fold evaluates the same held-out groups each time.
 
     Returns:
         dict with keys:
@@ -148,13 +156,16 @@ def load_river_classification(
         if fold >= n_splits:
             raise ValueError(f"fold={fold} out of range (n_splits={n_splits})")
         if group_aware and groups is not None:
-            splitter = StratifiedGroupKFold(n_splits=n_splits)
+            # shuffle=False (explicit, not the default we happen to rely on): the fold
+            # assignment must be deterministic so that iterating `seed` at a fixed fold
+            # (see cv_seed above) doesn't also reshuffle which groups are held out.
+            splitter = StratifiedGroupKFold(n_splits=n_splits, shuffle=False)
             splits   = list(splitter.split(np.arange(len(Y)), Y, groups))
         else:
             if group_aware:
                 print("[warn] group_aware=True but no groups file found — "
                       "falling back to StratifiedKFold")
-            splitter = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+            splitter = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=cv_seed)
             splits   = list(splitter.split(np.arange(len(Y)), Y))
         idx_train, idx_test = splits[fold]
         idx_train = np.sort(idx_train)

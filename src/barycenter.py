@@ -1,4 +1,4 @@
-"""SoftDTW barycenter estimation via optax (adam) gradient descent.
+"""SoftDTW barycenter estimation via optax gradient descent (default: sgd; adam available).
 
 Objective: mean_i D_γ(z, x_i) where D_γ is the SoftDTW divergence.
   The −½SDTW(z,z) self-term lives inside SoftDTW.value_and_grad.
@@ -30,7 +30,7 @@ from softdtw import SoftDTW
 # ---------------------------------------------------------------------------
 
 def _step_body(z, opt_state, data_arr, sdtw, tx):
-    """One Adam step: map value_and_grad over N training series, update z.
+    """One optimizer step: map value_and_grad over N training series, update z.
 
     sdtw and tx are static (Python objects, not JAX arrays).  Keeping this
     function at module level means the same Python object is reused every call →
@@ -50,9 +50,16 @@ _step_jit = jax.jit(_step_body, static_argnums=(3, 4))
 
 
 @functools.lru_cache(maxsize=32)
-def _get_optimizer(lr: float) -> optax.GradientTransformation:
-    """Return a cached optax.adam for lr.  Same lr → same Python object → same JIT cache entry."""
-    return optax.sgd(lr)
+def _get_optimizer(lr: float, optimizer: str = "sgd") -> optax.GradientTransformation:
+    """Return a cached optax optimizer for (lr, optimizer).
+
+    Same (lr, optimizer) → same Python object → same JIT cache entry (see _step_jit).
+    """
+    if optimizer == "sgd":
+        return optax.sgd(lr)
+    if optimizer == "adam":
+        return optax.adam(lr)
+    raise ValueError(f"unknown optimizer {optimizer!r} (expected 'sgd' or 'adam')")
 
 
 # ---------------------------------------------------------------------------
@@ -69,6 +76,7 @@ def fit_barycenter(
     dtype = jnp.float64,
     patience: int = 15,
     min_rel_improve: float = 1e-4,
+    optimizer: str = "sgd",
 ) -> np.ndarray:
     """Fit a SoftDTW Fréchet barycenter of a list of parameter series.
 
@@ -78,14 +86,15 @@ def fit_barycenter(
     Args:
         series:           List of (T, n_params) arrays (data; not differentiated).
         softdtw:          SoftDTW instance (encodes cost, gamma, divergence, manual_grad).
-        n_steps:          Maximum Adam update steps.
-        lr:               Adam learning rate.
+        n_steps:          Maximum update steps.
+        lr:               Learning rate (optimizer selected via `optimizer`).
         init:             (T, n_params) initialisation; default = mean of series.
         verbose:          Print loss every 10% of n_steps.
         dtype:            JAX computation dtype.  Default float64.
         patience:         Stop early after this many steps without a relative improvement
                           of at least min_rel_improve.  0 = disabled.
         min_rel_improve:  Minimum relative loss improvement to count as progress.
+        optimizer:        "sgd" (default) or "adam".
 
     Returns:
         barycenter: (T, n_params) numpy array in parameter (p) space.
@@ -122,11 +131,12 @@ def fit_barycenter(
     data_z_stacked = to_unc(jnp.stack(series_jax))   # (N, T, n_params)
 
     # Use the module-level _step_jit (static on sdtw and tx) so that multiple calls
-    # to fit_barycenter with the same (softdtw, lr) share the XLA compiled kernel.
-    # In fit_barycenters, all classes use the same softdtw and lr → 1 compilation,
-    # N-1 cache hits.  _get_optimizer caches optax.adam(lr) so the same Python object
-    # is returned for the same lr → same id() → same static arg → same JIT cache key.
-    tx = _get_optimizer(lr)
+    # to fit_barycenter with the same (softdtw, lr, optimizer) share the XLA compiled
+    # kernel. In fit_barycenters, all classes use the same softdtw/lr/optimizer → 1
+    # compilation, N-1 cache hits.  _get_optimizer caches the optax transform so the
+    # same Python object is returned for the same (lr, optimizer) → same id() → same
+    # static arg → same JIT cache key.
+    tx = _get_optimizer(lr, optimizer)
     opt_state = tx.init(z_init)
     z = z_init
 
@@ -153,5 +163,7 @@ def fit_barycenter(
     # Clip to strictly positive: distribution parameters (β, λ, k) must be > 0.
     # For wasps, to_con = softplus which is always > 0, so this is a no-op.
     # For eucl_params/eucl_raw (identity bijector), the unconstrained optimizer can
-    # drift slightly negative; 1e-8 floor restores physical validity without bias.
-    return np.clip(np.asarray(to_con(z)), 1e-8, None)
+    # drift slightly negative; 1e-5 floor restores physical validity without bias.
+    # (Raised from 1e-8: at that magnitude the WaSPS exponential gradient ∝1/β³ is
+    # already ~1e24 — far past the point where a NaN would already have occurred.)
+    return np.clip(np.asarray(to_con(z)), 1e-5, None)

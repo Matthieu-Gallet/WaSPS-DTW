@@ -1,15 +1,18 @@
-# Debug smoke test — CPAZMaL (Weibull, barycenter mode only, max_groups=6)
+# Debug smoke test — CPAZMaL (Weibull, barycenter mode only, 2 groups/class)
 # Run: python experiments/run_classification.py configs/cpazmal_debug.yaml
 #
 # Enables debug=true: writes dataset_report.log + per-class histograms +
 # per-method barycenter plots to results/jax_cpazmal_debug/debug/.
-# max_groups=6 limits extraction to 6 groups for fast iteration (~3-4 min).
+# max_groups_per_class=2 limits extraction to 2 groups per class (~14 groups
+# total, all 7 learning classes represented) for fast iteration.
+# Classification task (single continuous series per window, HAG excluded) —
+# not the old train/predict temporal-prediction split.
 
 dataset:
   type: cpazmal
   family: weibull
   hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
-  max_groups: 6        # smoke test: only 6 groups (~3-4 min)
+  max_groups_per_class: 2   # smoke test: 2 groups/class, all classes represented
 
 classification:
   gamma: 1.0

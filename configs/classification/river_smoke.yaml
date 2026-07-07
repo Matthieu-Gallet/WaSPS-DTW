@@ -1,4 +1,4 @@
-# Smoke-test config — river (truncated, not for publication)
+# Smoke-test config — river (truncated, single fold, not for publication)
 # Run: python experiments/run_classification.py configs/river_smoke.yaml
 # STA excluded: even at T=8, STA KNN costs 25K Sinkhorn calls (~17 min).
 # Use configs/classification_smoke.yaml to smoke-test STA (T=4, n_steps=5).
@@ -8,7 +8,6 @@ dataset:
   family: exponential
   data_dir: data/river
   mode: balanced
-  test_size: 0.2
   max_time_steps: 8       # truncate to 8 timesteps
 
 classification:
@@ -19,11 +18,18 @@ classification:
   sta_epsilon: 0.05
   max_train_samples: 20
   max_test_samples: 20
+  samples_per_step: 50    # required — without it, train/test each auto-pick their own
+                           # N_min independently, which can differ and crash eucl_raw's
+                           # pairwise cost (mismatched vector lengths); see run_classification.py
 
 methods: [wasps, eucl_params, eucl_raw]   # STA excluded (too slow at T=8)
 modes:   [knn, barycenter]
 
-n_seeds: 2
+cross_validation:
+  n_splits: 5
+  fold: 0            # single fold for smoke test
+  group_aware: true
+
 seed: 42
 
 output:

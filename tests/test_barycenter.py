@@ -213,6 +213,28 @@ def test_no_manual_grad_parameter():
     assert 'manual_grad' not in sig.parameters
 
 
+def test_optimizer_param_defaults_to_sgd():
+    """fit_barycenter must expose an optimizer parameter defaulting to 'sgd'."""
+    import inspect
+    sig = inspect.signature(fit_barycenter)
+    assert 'optimizer' in sig.parameters
+    assert sig.parameters['optimizer'].default == 'sgd'
+
+
+def test_get_optimizer_sgd_and_adam():
+    """_get_optimizer must return distinct, working transforms for 'sgd' and 'adam'."""
+    from barycenter import _get_optimizer
+    import optax
+
+    tx_sgd = _get_optimizer(1e-2, "sgd")
+    tx_adam = _get_optimizer(1e-2, "adam")
+    assert isinstance(tx_sgd, optax.GradientTransformation)
+    assert isinstance(tx_adam, optax.GradientTransformation)
+
+    with pytest.raises(ValueError):
+        _get_optimizer(1e-2, "not_an_optimizer")
+
+
 # ---------------------------------------------------------------------------
 # Softplus chain rule — gradient correctness (spine)
 # ---------------------------------------------------------------------------

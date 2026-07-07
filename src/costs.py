@@ -46,11 +46,15 @@ from ott.geometry import costs
 def _inverse_softplus(x: jax.Array) -> jax.Array:
     """log(expm1(x)): numerically stable inverse of softplus for x > 0.
 
-    Clips input to [1e-8, 500] to avoid float64 overflow: expm1 overflows at x > ~709.78.
+    Clips input to [1e-5, 500] to avoid float64 overflow: expm1 overflows at x > ~709.78.
     For x > 500, softplus(500) ≈ 500 (identity approximation), so clipping at 500 preserves
-    large-parameter values faithfully while preventing NaN in the optimizer.
+    large-parameter values faithfully while preventing NaN in the optimizer. Lower bound
+    raised from 1e-8 to 1e-5: near-zero exponential-rate outliers (β→0, e.g. from an MLE fit
+    dominated by one large sample) drive the WaSPS gradient (∝1/β³, see gradient_X) to
+    astronomical magnitudes well before 1e-8 is reached — 1e-5 clips earlier, closer to
+    where the gradient blowup actually starts.
     """
-    return jnp.log(jnp.expm1(jnp.clip(x, 1e-8, 500.0)))
+    return jnp.log(jnp.expm1(jnp.clip(x, 1e-5, 500.0)))
 
 
 # ---------------------------------------------------------------------------

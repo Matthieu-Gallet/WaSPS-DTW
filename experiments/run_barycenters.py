@@ -78,6 +78,7 @@ def main(config_path: str):
             lr              = clf_cfg["lr"],
             patience        = clf_cfg.get("early_stop_patience", 15),
             min_rel_improve = clf_cfg.get("early_stop_tol", 1e-4),
+            optimizer       = clf_cfg.get("optimizer", "sgd"),
         )
         meta = {}
         for cls, arr in bary.items():
