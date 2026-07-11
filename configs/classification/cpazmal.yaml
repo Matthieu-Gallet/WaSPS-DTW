@@ -1,5 +1,9 @@
-# Experiment config — CPAZMaL SAR classification (Weibull, 3 methods × 2 modes, 5-fold CV)
-# Run: python experiments/run_classification.py configs/cpazmal.yaml
+# Experiment config — CPAZMaL SAR classification (Weibull, 3 methods × 2 modes,
+# 4-value gamma sweep × 4 seeds × 5-fold CV). Edited in place (2026-07-08) to become the
+# gamma-sensitivity study requested alongside experiments/run_barycenters.py's matching
+# cpazmal_bary.yaml — this changes the runtime/scope of what was previously documented as
+# a single-gamma "main K-fold result" run to ~80 iterations/method (~4x4x5).
+# Run: python experiments/run_classification.py configs/classification/cpazmal.yaml --n-jobs -1
 #
 # First run extracts from HDF5 (slow, single continuous series per window, HAG
 # excluded); subsequent runs load from data/cpazmal/ cache.
@@ -14,10 +18,13 @@ dataset:
   max_groups_per_class: null   # null = all groups; integer = per-class limit for a quick smoke-test
 
 classification:
-  gamma: 1.0
+  gamma: 1.0                          # fallback if gamma_values is removed
+  gamma_values: [1.0e-3, 1.0, 10.0, 1.0e+3]   # swept — see experiments/run_classification.py
   k: 1
   n_steps: 200
   lr: 0.005
+  optimizer: sgd           # deliberate default — see CLAUDE.md "Optimizer and parameter clamping"
+  estimator: log_cumulant  # matches sensitivity_cpazmal.yaml — see CLAUDE.md
   sta_epsilon: 0.05
   max_train_samples: 20   # same series-cap as river for fair comparison
   max_test_samples: 20
@@ -32,6 +39,8 @@ cross_validation:
   n_splits: 5
   fold: -1           # -1 = loop over all 5 folds; 0..4 = specific fold
   group_aware: true  # StratifiedGroupKFold — geographic groups disjoint across folds
+  n_seeds_per_fold: 4  # fold=-1 branch reads n_seeds_per_fold, NOT the top-level n_seeds —
+                        # 4 seeds × 5 folds = 20 (fold,seed) repetitions per (method,gamma[,k])
 
 seed: 42   # used for to_fixed_n resampling / n_splits=1 fallback; does not affect fold membership
 

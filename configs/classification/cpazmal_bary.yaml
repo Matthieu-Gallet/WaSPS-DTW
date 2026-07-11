@@ -1,0 +1,41 @@
+# Experiment config — CPAZMaL SAR BARYCENTER fitting + evaluation (Weibull,
+# 3 methods, 4-value gamma sweep × 4 seeds × 5-fold CV). New dedicated config (2026-07-08),
+# separate from configs/classification/cpazmal.yaml (which now drives run_classification.py's
+# KNN+barycenter gamma sweep) — this one drives experiments/run_barycenters.py, whose
+# distinguishing role is persisting the fitted barycenter .npy arrays (needed by
+# experiments/extract_bary_plots.py) in addition to computing the same F1/timing metrics.
+# Run: python experiments/run_barycenters.py configs/classification/cpazmal_bary.yaml --n-jobs -1
+
+dataset:
+  type: cpazmal
+  family: weibull
+  hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
+  max_groups_per_class: null
+
+classification:
+  gamma: 1.0                          # fallback if gamma_values is removed
+  gamma_values: [1.0e-3, 1.0, 10.0, 1.0e+3]   # swept — see experiments/run_barycenters.py
+  n_steps: 200
+  lr: 0.005
+  optimizer: sgd           # deliberate default — see CLAUDE.md "Optimizer and parameter clamping"
+  estimator: log_cumulant  # matches sensitivity_cpazmal.yaml — see CLAUDE.md
+  sta_epsilon: 0.05
+  max_train_samples: 20
+  max_test_samples: 20
+  samples_per_step: 100   # rectangularise raw SAR arrays to (T, 100); min valid~105
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+
+# STA excluded: O(T²) — even worse in barycenter mode (O(T²) Sinkhorn calls per gradient step).
+methods: [wasps, eucl_params, eucl_raw]
+
+cross_validation:
+  n_splits: 5
+  fold: -1
+  group_aware: true
+  n_seeds_per_fold: 4    # 4 seeds × 5 folds = 20 (fold,seed) repetitions per (method,gamma)
+
+seed: 42
+
+output:
+  dir: results/jax_cpazmal_bary

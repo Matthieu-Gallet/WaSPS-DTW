@@ -8,6 +8,7 @@ xarray
 netcdf4
 h5py
 tqdm
+psutil
 huggingface_hub
 pyyaml
 # JAX 0.10.1 (CPU) — CUDA support requires ott-jax >= 0.7.0; sticking with CPU for stability

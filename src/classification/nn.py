@@ -6,7 +6,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
-from softdtw import sdtw_value
+from softdtw import SoftDTW
 
 
 def knn_predict(
@@ -17,6 +17,7 @@ def knn_predict(
     gamma: float,
     k: int = 1,
     dtype = jnp.float32,
+    is_divergence: bool = False,
 ) -> np.ndarray:
     """k-NN SoftDTW classifier.
 
@@ -29,12 +30,19 @@ def knn_predict(
         k:             Number of neighbours.
         dtype:         Computation dtype.  float32 is sufficient for KNN (no self-term
                        precision requirement).  Use float64 for WaSPS wide-range data.
+        is_divergence: Use D_gamma(z,x) = SDTW(z,x) - 1/2 SDTW(z,z) - 1/2 SDTW(x,x)
+                       instead of plain SDTW(z,x) as the neighbour distance. Default
+                       False reduces exactly to the prior plain-SDTW behaviour (see
+                       SoftDTW.value(), src/softdtw.py) — zero regression for existing
+                       callers. When cost_fn is WaSPS, True auto-forces
+                       cost_fn.log_correction=True (same coupling as barycenter fitting).
 
     Returns:
         predictions: (N_test,) integer array.
     """
     labels = np.asarray(train_labels)
     train_jax = [jnp.array(s, dtype=dtype) for s in train_series]
+    softdtw = SoftDTW(cost_fn, gamma, is_divergence=is_divergence, manual_grad=False)
 
     # Stack training series for vmap — requires homogeneous shape (T, p).
     shapes = [s.shape for s in train_jax]
@@ -47,14 +55,14 @@ def knn_predict(
         def dists_to_train(z: jax.Array) -> jax.Array:
             """vmap over training set: (N_train,) distances."""
             return jax.vmap(
-                lambda x: sdtw_value(cost_fn.all_pairs(z, x), gamma)
+                lambda x: softdtw.value(z, x)
             )(train_stacked)
     else:
         # Fallback: list comprehension (works for variable shapes)
         @jax.jit
         def dists_to_train(z: jax.Array) -> jax.Array:
             return jnp.stack([
-                sdtw_value(cost_fn.all_pairs(z, x), gamma)
+                softdtw.value(z, x)
                 for x in train_jax
             ])
 

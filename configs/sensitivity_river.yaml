@@ -1,15 +1,19 @@
 # Sensitivity analysis config — river (real data only, no synthetic sweeps)
-# Run: python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml --scenario <name>
-# Scenarios: grid_knn, grid_bary, sweep_n_samples, sweep_n_train, sweep_decimation, final_comparison
-# final_comparison also needs: --cpazmal-config configs/sensitivity_cpazmal.yaml
+# grid_knn/grid_bary now run via experiments/run_optim_hyper.py (hyperparameter
+# calibration — a distinct concern from the sensitivity sweeps below); this file's
+# grid_knn/grid_bary blocks are unchanged, just read by a different script.
+# Run: python experiments/run_optim_hyper.py --config configs/sensitivity_river.yaml --scenario grid_knn
+#      python experiments/run_optim_hyper.py --config configs/sensitivity_river.yaml --scenario grid_bary
+#      python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml --scenario <name>
+# Scenarios (run_sensitivity.py): sweep_n_samples, sweep_n_train, sweep_decimation
+# final_comparison has moved to experiments/run_full_baseline.py + configs/full_baseline.yaml
+# (single config covering both river and cpazmal, 5 random seeds, no k-fold — see that file).
 #
-# Order to run: grid_knn, grid_bary  →  (writes results/jax_sensitivity/best_params.json)
-#               sweep_n_samples, sweep_n_train, sweep_decimation  (read best_params.json)
-#               final_comparison  (independent — fixed gamma/k, not calibrated)
+# Order to run: grid_knn, grid_bary (run_optim_hyper.py) → writes results/jax_sensitivity/best_params.json
+#               sweep_n_samples, sweep_n_train, sweep_decimation (run_sensitivity.py, read best_params.json)
 #
-# aggregate_days=7 (T=52) applies to EVERY scenario here (dataset-level, not just
-# final_comparison) — keeps T consistent across the whole sensitivity study and
-# keeps STA tractable in final_comparison.
+# aggregate_days=7 (T=52) applies to EVERY scenario here (dataset-level) — keeps T
+# consistent across the whole sensitivity study.
 
 dataset:
   type: river
@@ -22,13 +26,19 @@ dataset:
 classification:
   gamma: 1.0             # overridden per grid point by grid_knn/grid_bary
   k: 1
-  n_steps: 500
+  n_steps: 250
   lr: 0.01
   sta_epsilon: 0.05
   samples_per_step: 50
   early_stop_patience: 20
   early_stop_tol: 1.0e-4
   optimizer: sgd
+  estimator: log_cumulant   # 'params' methods (wasps, eucl_params) only — see RUN.md;
+                            # log_cumulant is markedly less prone to WaSPS barycenter
+                            # NaN/collapse than the pipeline's mle default (this session's
+                            # MLE-vs-log-cumulant diagnostic + a direct comparison: at
+                            # matching lr/gamma, mle gave wasps/bary f1=0.096 vs log_cumulant's
+                            # notebook result of f1=0.441 on a single split)
 
 cross_validation:
   n_splits: 5
@@ -41,40 +51,37 @@ seed: 42
 
 sensitivity:
   methods: [wasps, eucl_params, eucl_raw]   # STA excluded from grids/sweeps (O(T²) cost)
-  n_steps_bary: 500                          # barycenter fit steps used by grid_bary + bary-mode sweeps
+  n_steps_bary: 75                           # barycenter fit steps used by grid_bary + bary-mode sweeps
+                                              # reduced from 250 (2026-07-10), per-user request to lighten
+                                              # the upcoming sensitivity pipeline run
 
   grid_knn:
     k_values:     [1, 5, 22, 100]             # geomspace(1, 100, 4), rounded
-    gamma_values: [1.0e-4, 1.0, 10.0, 1.0e4]
+    gamma_values: [1.0e-4, 1.0, 10.0, 1.0e+4]  # NOTE: PyYAML's safe_load parses "1.0e4"
+                                                # (no sign on exponent) as a STRING, not
+                                                # a float — always write signed exponents.
     max_train_per_class: 80
     max_test_per_class: 20
 
   grid_bary:
     lr_values:    [0.001, 0.005, 0.01, 0.05, 0.1]
-    gamma_values: [1.0e-4, 1.0, 10.0, 1.0e4]
+    gamma_values: [1.0e-4, 1.0, 10.0, 1.0e+4]
     max_train_per_class: 80
     max_test_per_class: 20
 
   sweep_n_samples:
-    values: [5, 8, 15, 25, 40, 48]   # min_valid=5 floor .. to_fixed_n's natural per-series ceiling
+    values: [5, 15, 50, 150, 500]   # back-ported from the pass2 calibration run (2026-07-08)
     max_train_per_class: 80
     max_test_per_class: 20
 
   sweep_n_train:
-    values: [2, 4, 6, 8, 12, 16, 24]   # samples per class (train) — k clamps automatically at low N
+    values: [2, 5, 15, 45, 100]   # samples per class (train) — k clamps automatically at low N;
+                                  # back-ported from the pass2 calibration run (2026-07-08)
     samples_per_step: 48
     max_test_per_class: 20
 
   sweep_decimation:
     fractions: [0.0, 0.05, 0.10, 0.20, 0.30, 0.50]
-    samples_per_step: 48
-    max_train_per_class: 80
-    max_test_per_class: 20
-
-  final_comparison:
-    methods: [wasps, eucl_params, eucl_raw, sta]
-    gamma: 1.0       # fixed, shared across all 4 methods — not calibrated (STA has no grid_knn entry)
-    k: 1
     samples_per_step: 48
     max_train_per_class: 80
     max_test_per_class: 20

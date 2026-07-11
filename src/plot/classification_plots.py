@@ -1174,14 +1174,23 @@ def plot_barycenter_debug(
     """
     setup_ieee_style()
 
-    is_raw = method in ('eucl_raw', 'sta')
+    is_raw = method in ('eucl_raw', 'eucl_raw_nodiv', 'sta')
     T = barycenter.shape[0]
     t_axis = np.arange(T)
+
+    # For exponential wasps/eucl_params, invert rate β → mean 1/β so the curve is in
+    # the same λ (discharge, m³/s) units/trend as eucl_raw's raw amplitude, mirroring
+    # the existing pattern in plot_class_pair_barycenters (this module, column 0 only —
+    # exponential has a single parameter, so "column 0" and "all columns" coincide).
+    invert_to_lambda = (family == 'exponential'
+                        and method in ('wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv'))
 
     # Default param names
     if param_names is None:
         if is_raw:
             param_names = ['spatial mean (raw samples)']
+        elif invert_to_lambda:
+            param_names = ['λ  (1/β, mean discharge)']
         elif family == 'exponential':
             param_names = ['rate β  (1/β = mean)']
         else:  # weibull
@@ -1200,8 +1209,11 @@ def plot_barycenter_debug(
     else:
         n_params = barycenter.shape[1]
         n_plots  = n_params
-        series_vals = [s[:, p] for p in range(n_plots) for s in class_series]
+        # (sample traces are read directly from class_series inside the plotting loop
+        # below, with the same inversion applied there — not from a precomputed list)
         bary_vals   = [barycenter[:, p] for p in range(n_plots)]
+        if invert_to_lambda:
+            bary_vals = [1.0 / np.maximum(v, 1e-10) for v in bary_vals]
         y_labels    = (param_names + ['param'])[:n_plots]
 
     # Barcenter colour — method-specific
@@ -1232,9 +1244,12 @@ def plot_barycenter_debug(
 
         # Sample traces
         for i in sel_idx:
-            vals = series_vals[p_idx * len(class_series) + i] if not is_raw else series_vals[i]
-            if not is_raw:
+            if is_raw:
+                vals = series_vals[i]
+            else:
                 vals = class_series[i][:, p_idx]
+                if invert_to_lambda:
+                    vals = 1.0 / np.maximum(vals, 1e-10)
             ax.plot(t_axis, vals,
                     color='black', alpha=_al_s, linewidth=_lw_s)
 

@@ -1,98 +1,57 @@
 #!/bin/bash
+# Meta script: launches the full WaSPS-DTW experiment suite sequentially, with
+# timestamped logging per step. Replaces the pre-feat/jax-refonte version of this
+# script (stale: referenced removed src/experiments/*.py entry points and a
+# nonexistent `venv/` — this repo uses `.venv/`, set up via setup_venv.sh).
+#
+# The 7 config files this suite drives:
+#   configs/sensitivity_river.yaml / sensitivity_cpazmal.yaml   (grid search + sweeps)
+#   configs/classification/river.yaml / cpazmal.yaml            (KNN+bary gamma sweep)
+#   configs/classification/river_bary.yaml / cpazmal_bary.yaml  (barycenter fit+eval+save)
+#   configs/full_baseline.yaml                                  (final KNN-only baseline)
+#
+# Order matters: run_optim_hyper.py's grid_knn/grid_bary must run before
+# run_sensitivity.py's sweeps (which read the best_params.json grid search writes).
+# Everything else is independent and could be reordered/parallelised across
+# machines if needed — kept sequential here for simplicity and log clarity.
 
-# Script pour lancer toutes les expériences séquentiellement avec plots
+set -e
+cd "$(dirname "$0")"
+source .venv/bin/activate
 
-# Activation de l'environnement virtuel
-source /home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/venv/bin/activate
+_step() {
+    local name="$1"
+    shift
+    echo "=== $name started $(date) ===" | tee -a run_all_experiments.log
+    "$@"
+    echo "=== $name done $(date) ===" | tee -a run_all_experiments.log
+}
 
-# Variables de sélection des classifications (regime hydro — désactivé pour cette session CPAZMaL)
-classif1=False  # one-shot
-classif2=False  # kfold
-classif3=False  # gamma-sens
-classif4=False  # sample-sens
+echo "=== run_all_experiments.sh started $(date) ===" | tee run_all_experiments.log
 
-# Classifications conditionnelles
-if [ "$classif1" = "True" ]; then
-    echo "Lancement du mode one-shot avec plots..."
-    python src/experiments/sdtw_barycenter_classification.py --mode one-shot --plot-barycenters --n-samples-plot 20
-fi
+# --- 1. Hyperparameter grid search (calibration) ---------------------------
+_step "river/grid_knn"    python experiments/run_optim_hyper.py --config configs/sensitivity_river.yaml   --scenario grid_knn  --n-jobs -1
+_step "river/grid_bary"   python experiments/run_optim_hyper.py --config configs/sensitivity_river.yaml   --scenario grid_bary --n-jobs -1
+_step "cpazmal/grid_knn"  python experiments/run_optim_hyper.py --config configs/sensitivity_cpazmal.yaml --scenario grid_knn  --n-jobs -1
+_step "cpazmal/grid_bary" python experiments/run_optim_hyper.py --config configs/sensitivity_cpazmal.yaml --scenario grid_bary --n-jobs -1
 
-if [ "$classif2" = "True" ]; then
-    echo "Lancement du mode kfold..."
-    python src/experiments/sdtw_barycenter_classification.py --mode kfold --n-splits 5
-fi
+# --- 2. Sensitivity sweeps (read best_params.json from step 1) -------------
+_step "river/sweep_n_samples"    python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml   --scenario sweep_n_samples   --n-jobs -1
+_step "river/sweep_n_train"      python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml   --scenario sweep_n_train     --n-jobs -1
+_step "river/sweep_decimation"   python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml   --scenario sweep_decimation  --n-jobs -1
+_step "cpazmal/sweep_n_samples"  python experiments/run_sensitivity.py --config configs/sensitivity_cpazmal.yaml --scenario sweep_n_samples   --n-jobs -1
+_step "cpazmal/sweep_n_train"    python experiments/run_sensitivity.py --config configs/sensitivity_cpazmal.yaml --scenario sweep_n_train     --n-jobs -1
+_step "cpazmal/sweep_decimation" python experiments/run_sensitivity.py --config configs/sensitivity_cpazmal.yaml --scenario sweep_decimation  --n-jobs -1
 
-if [ "$classif3" = "True" ]; then
-    echo "Lancement du mode gamma-sens..."
-    python src/experiments/sdtw_barycenter_classification.py --mode gamma-sens --gamma-values 0.001,0.01,0.1,1.0,10.0,100.0,1000.0 --n-splits 5
-fi
+# --- 3. Classification gamma sweep (KNN + barycenter, independent of 1-2) --
+_step "river/classification"   python experiments/run_classification.py configs/classification/river.yaml   --n-jobs -1
+_step "cpazmal/classification"  python experiments/run_classification.py configs/classification/cpazmal.yaml  --n-jobs -1
 
-if [ "$classif4" = "True" ]; then
-    echo "Lancement du mode sample-sens..."
-    python src/experiments/sdtw_barycenter_classification.py --mode sample-sens --sample-sizes 0.05,0.1,0.2,0.4,0.6,0.8,1.0 --n-splits 5
-fi
+# --- 4. Barycenter fit + evaluate + export (independent of 1-3) ------------
+_step "river/barycenters"   python experiments/run_barycenters.py configs/classification/river_bary.yaml   --n-jobs -1
+_step "cpazmal/barycenters"  python experiments/run_barycenters.py configs/classification/cpazmal_bary.yaml  --n-jobs -1
 
-# =============================================================================
-# CPAZMaL SAR classification (Weibull)
-# Dataset:  W=8 (64 px), T=56 (Jan 2020 – Dec 2021), HH, excl. HAG+ICA
-# Balance:  strict subsample to minority class count (LAC ~60 → all classes equal)
-# SGD:      lr=0.05, epochs=20, batch_size=4
-# Plots:    confusion matrices + barycenters at γ=1e-4 and γ=100
-# =============================================================================
-cpazmal_compare=True   # 3-method comparison: euclidean_raw / euclidean_params / wasserstein_weibull
-cpazmal_kmedoid=False   # Weibull-only kmedoid (SGD + divergence)
-cpazmal_shapelet=False  # Learning shapelets (~10-20 min)
+# --- 5. Final baseline comparison (KNN-only, both datasets, div vs nodiv) --
+_step "full_baseline" python experiments/run_full_baseline.py --config configs/full_baseline.yaml --n-jobs -1
 
-# Strict balance: subsample each class to the count of the smallest class (LAC)
-CPAZMAL_BALANCE="--balance-mode subsample"
-CPAZMAL_SGD="--sgd-epochs 20 --sgd-lr 0.05"
-CPAZMAL_DATA="--window-size 8 --train-end 20211231 --predict-start 20220101 --predict-end 20221231 --exclude-classes HAG,ICA"
-CPAZMAL_PLOT="--plot-gammas 0.0001,100.0"
-
-if [ "$cpazmal_compare" = "True" ]; then
-    echo "Lancement CPAZMaL compare (3 méthodes: euc_raw / euc_params / wasserstein_weibull)..."
-    python src/experiments/cpazmal_classification.py --mode compare \
-        $CPAZMAL_DATA $CPAZMAL_BALANCE $CPAZMAL_SGD $CPAZMAL_PLOT
-fi
-
-if [ "$cpazmal_kmedoid" = "True" ]; then
-    echo "Lancement CPAZMaL kmedoid..."
-    python src/experiments/cpazmal_classification.py --mode kmedoid \
-        $CPAZMAL_DATA $CPAZMAL_BALANCE $CPAZMAL_SGD
-fi
-
-if [ "$cpazmal_shapelet" = "True" ]; then
-    echo "Lancement CPAZMaL shapelet..."
-    python src/experiments/cpazmal_classification.py --mode shapelet \
-        $CPAZMAL_DATA $CPAZMAL_BALANCE $CPAZMAL_SGD
-fi
-
-# =============================================================================
-# CPAZMaL sensitivity analysis — ntrain and gamma sweeps only (no W re-extraction)
-# =============================================================================
-cpazmal_sens_ntrain=True  # n_train sweep: effect of training set size
-cpazmal_sens_gamma=True   # gamma sweep: effect of Soft-DTW regularisation
-
-if [ "$cpazmal_sens_ntrain" = "True" ]; then
-    echo "Lancement CPAZMaL sensitivity — ntrain sweep…"
-    python src/experiments/cpazmal_sensitivity.py --sub-exp ntrain \
-        --sgd-epochs 20 --n-seeds 1
-fi
-
-if [ "$cpazmal_sens_gamma" = "True" ]; then
-    echo "Lancement CPAZMaL sensitivity — gamma sweep…"
-    python src/experiments/cpazmal_sensitivity.py --sub-exp gamma \
-        --sgd-epochs 20
-fi
-
-# =============================================================================
-# Model fit robustness (river discharge)
-# =============================================================================
-robustness=False  # Trace F1 vs. model-fit quality (varies exponential KS threshold)
-
-if [ "$robustness" = "True" ]; then
-    echo "Lancement model_fit_robustness..."
-    python src/experiments/model_fit_robustness.py
-fi
-
-echo "Toutes les expériences sont terminées. Résultats dans results/regime_classification/ et autres dossiers results/"
+echo "=== ALL DONE $(date) ===" | tee -a run_all_experiments.log

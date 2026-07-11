@@ -1,0 +1,42 @@
+# Experiment config — River-discharge BARYCENTER fitting + evaluation (exponential,
+# 3 methods, 4-value gamma sweep × 4 seeds × 5-fold CV). New dedicated config (2026-07-08),
+# separate from configs/classification/river.yaml (which now drives run_classification.py's
+# KNN+barycenter gamma sweep) — this one drives experiments/run_barycenters.py, whose
+# distinguishing role is persisting the fitted barycenter .npy arrays (needed by
+# experiments/extract_bary_plots.py) in addition to computing the same F1/timing metrics.
+# Run: python experiments/run_barycenters.py configs/classification/river_bary.yaml --n-jobs -1
+
+dataset:
+  type: river
+  family: exponential
+  data_dir: data/river
+  mode: balanced          # see configs/classification/river.yaml for class/group counts
+  max_time_steps: null
+
+classification:
+  gamma: 1.0                          # fallback if gamma_values is removed
+  gamma_values: [1.0e-3, 1.0, 10.0, 1.0e+3]   # swept — see experiments/run_barycenters.py
+  n_steps: 200
+  lr: 0.01
+  optimizer: sgd           # deliberate default — see CLAUDE.md "Optimizer and parameter clamping"
+  estimator: log_cumulant  # markedly less prone to WaSPS barycenter NaN/collapse than 'mle' — see CLAUDE.md
+  sta_epsilon: 0.05
+  max_train_samples: 20
+  max_test_samples: 20
+  samples_per_step: 50    # rectangularise raw arrays to (T, 50) — required for eucl_raw
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+
+# STA excluded: O(T²) — even worse in barycenter mode (O(T²) Sinkhorn calls per gradient step).
+methods: [wasps, eucl_params, eucl_raw]
+
+cross_validation:
+  n_splits: 5
+  fold: -1
+  group_aware: true
+  n_seeds_per_fold: 4    # 4 seeds × 5 folds = 20 (fold,seed) repetitions per (method,gamma)
+
+seed: 42
+
+output:
+  dir: results/jax_river_bary

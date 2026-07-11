@@ -42,11 +42,15 @@ def _valid_samples(x: np.ndarray) -> np.ndarray:
 
 # JIT-compiled Sinkhorn call.  Shapes must be consistent within a call to
 # knn_predict; epsilon is a traced value so different callers can use their own.
-# Using reduced max_iterations (500) vs OTT default (2000) for CPU tractability.
+# Using reduced max_iterations (5) vs OTT default (2000) for CPU tractability
+# (was 500 -> 10 on 2026-07-08; -> 5 on 2026-07-10 after run_full_baseline.py's
+# cpazmal STA batch OOM'd at n_jobs=4 despite the pool-teardown-between-methods
+# mitigation — cutting Sinkhorn iterations per call further reduces the compute
+# (and apparent RSS growth) per worker over a batch's ~thousands of dispatches).
 @jax.jit
 def _sinkhorn_jit(x_pts, y_pts, epsilon):
     geom = pointcloud.PointCloud(x_pts, y_pts, epsilon=epsilon)
-    return sinkhorn.Sinkhorn(max_iterations=500)(linear_problem.LinearProblem(geom)).reg_ot_cost
+    return sinkhorn.Sinkhorn(max_iterations=5)(linear_problem.LinearProblem(geom)).reg_ot_cost
 
 
 def _ot_cost(x_samples: np.ndarray, y_samples: np.ndarray, epsilon: float) -> float:
@@ -71,7 +75,7 @@ def make_cost_fn(epsilon: float):
     """
     def cost_fn(a: jax.Array, b: jax.Array) -> jax.Array:
         geom = pointcloud.PointCloud(a.reshape(-1, 1), b.reshape(-1, 1), epsilon=epsilon)
-        return sinkhorn.Sinkhorn(max_iterations=10)(
+        return sinkhorn.Sinkhorn(max_iterations=5)(
             linear_problem.LinearProblem(geom)
         ).reg_ot_cost
     return cost_fn
@@ -116,7 +120,7 @@ def _sta_cost_matrix_jit(x_arr: jax.Array, y_arr: jax.Array, epsilon: float) -> 
     """
     def row_costs(xi):
         return jax.vmap(
-            lambda yj: sinkhorn.Sinkhorn(max_iterations=500)(
+            lambda yj: sinkhorn.Sinkhorn(max_iterations=5)(
                 linear_problem.LinearProblem(
                     pointcloud.PointCloud(xi.reshape(-1, 1), yj.reshape(-1, 1), epsilon=epsilon)
                 )

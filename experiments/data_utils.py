@@ -27,13 +27,16 @@ def build_repr(
     labels: np.ndarray,
     repr_type: str,
     family: str,
+    estimator: str = 'mle',
 ) -> tuple[list, np.ndarray]:
     """Build method representation from raw series.
 
-    For 'params': estimates distribution parameters via MLE. Series whose
-    fit_time_series result contains any NaN (e.g. timesteps with no valid
-    samples after clean_time_series) are excluded; their labels are dropped too.
-    For 'raw': returns series as-is (NaN already handled by to_fixed_n in loader).
+    For 'params': estimates distribution parameters via `estimator` ('mle' or
+    'log_cumulant', see distributions.py). Series whose fit_time_series result
+    contains any NaN (e.g. timesteps with no valid samples after
+    clean_time_series) are excluded; their labels are dropped too.
+    For 'raw': returns series as-is (NaN already handled by to_fixed_n in loader),
+    `estimator` is unused (raw representation has no distribution fit).
 
     Returns:
         (repr_list, filtered_labels) — filtered_labels aligns with repr_list.
@@ -43,14 +46,14 @@ def build_repr(
     if repr_type == 'params':
         dist = distributions.get(family)
         all_params = [
-            dist.fit_time_series(clean_time_series(s), dtype=np.float64)
+            dist.fit_time_series(clean_time_series(s), dtype=np.float64, method=estimator)
             for s in raw_series
         ]
         valid = np.array([not np.isnan(p).any() for p in all_params])
         n_dropped = int((~valid).sum())
         if n_dropped > 0:
             print(f"[warn] build_repr: dropped {n_dropped}/{len(raw_series)} series "
-                  f"with NaN params (timesteps where MLE failed)")
+                  f"with NaN params (timesteps where {estimator} failed)", flush=True)
         return [p for p, v in zip(all_params, valid) if v], labels[valid]
     # raw path — NaN handled upstream by to_fixed_n; return as-is
     return raw_series, labels
@@ -239,14 +242,14 @@ def _load_cpazmal(cfg: dict, seed: int = 42, fold: Optional[int] = None) -> dict
     clf_cfg    = cfg["classification"]
 
     if cx.exists():
-        print(f"[cpazmal] loading from cache (max_groups_per_class={max_groups_per_class})")
+        print(f"[cpazmal] loading from cache (max_groups_per_class={max_groups_per_class})", flush=True)
         X       = list(np.load(cx, allow_pickle=True))
         labels  = np.load(cy)
         groups  = np.load(cg)
         meta    = json.loads(cmeta.read_text()) if cmeta.exists() else {}
         class_names = {int(k): v for k, v in meta.get("class_names", {}).items()}
     else:
-        print(f"[cpazmal] extracting from HDF5 (max_groups_per_class={max_groups_per_class}) …")
+        print(f"[cpazmal] extracting from HDF5 (max_groups_per_class={max_groups_per_class}) …", flush=True)
         loader = MLDatasetLoader(hdf5_path)
         data   = extract_time_series(loader, max_groups_per_class=max_groups_per_class,
                                       window_size=window_size)
@@ -262,7 +265,7 @@ def _load_cpazmal(cfg: dict, seed: int = 42, fold: Optional[int] = None) -> dict
             "class_names": {str(k): v for k, v in class_names.items()},
             "group_names": {str(k): v for k, v in data["group_names"].items()},
         }))
-        print(f"[cpazmal] cache saved to {cache_dir}")
+        print(f"[cpazmal] cache saved to {cache_dir}", flush=True)
 
     n = clf_cfg.get("samples_per_step")
     if n is not None:

@@ -1,16 +1,19 @@
 """Sensitivity analysis on REAL data (river + CPAZMaL) — no synthetic sweeps.
 
 Scenarios (select with --scenario):
-  grid_knn          — k×gamma grid per method (river), replicated over K-fold groups
-  grid_bary         — lr×gamma grid per method (river), replicated over K-fold groups
   sweep_n_samples   — N samples/timestep sweep at calibrated params (river)
   sweep_n_train     — N samples/class sweep at calibrated params (river)
   sweep_decimation  — decimation (temporal misalignment) sweep at calibrated params (river)
-  final_comparison  — 4 methods incl. STA, KNN only, fixed gamma/k, river + CPAZMaL
 
-Config-driven: configs/sensitivity_river.yaml (+ sensitivity_cpazmal.yaml for the
-CPAZMaL half of final_comparison) select methods/values per scenario — default
-methods are all 3 non-STA methods, except final_comparison which includes STA.
+Distinct from experiments/run_optim_hyper.py (grid_knn/grid_bary — hyperparameter
+CALIBRATION, a different concern from these sensitivity SWEEPS): this file reads the
+best_params.json that run_optim_hyper.py writes and holds (k,gamma)/(lr,gamma) fixed
+at their calibrated values while sweeping a single axis (N samples/timestep, N
+train/class, or decimation fraction). final_comparison (4 methods incl. STA, KNN-only,
+fixed gamma/k, both datasets) has moved to experiments/run_full_baseline.py.
+
+Config-driven: configs/sensitivity_river.yaml / configs/sensitivity_cpazmal.yaml select
+methods/values per scenario — default methods are all 3 non-STA methods.
 
 Repetition is via K-fold groups (StratifiedGroupKFold) combined with
 `cross_validation.n_seeds_per_fold` (>1) — mean±std is taken across all (fold, seed)
@@ -18,38 +21,47 @@ combinations. See cv_seed/sample_seed decoupling in river_loader.py / data_utils
 the fold split itself never changes with seed; only to_fixed_n/subsample RNG does —
 so `n_seeds_per_fold` is a genuine extra repetition axis, not a reshuffle of folds.
 
-STA excluded from grid_knn/grid_bary/sweep_* (cost: O(T²) per pair) — present only
-in final_comparison. River loads at aggregate_days=7 (T=52, matching
-analysis/river_barycenter_agg4.ipynb) for ALL scenarios (not just final_comparison),
-set once in sensitivity_river.yaml's dataset block — this keeps STA tractable in
-final_comparison and keeps every other scenario's T consistent with it.
+STA excluded from all 3 sweeps (cost: O(T²) per pair) — present only in
+run_full_baseline.py. River loads at aggregate_days=7 (T=52, matching
+analysis/river_barycenter_agg4.ipynb), set once in sensitivity_river.yaml's dataset
+block — keeps every scenario's T consistent with the calibration grids.
 
 Sample caps: `max_train_samples`/`max_test_samples` (total, matching river.yaml/
 cpazmal.yaml convention) OR `max_train_per_class`/`max_test_per_class` (auto-multiplied
-by the number of classes actually present in that fold) — the latter is what
-final_comparison uses for its "≤50/class" requirement. The loader itself
+by the number of classes actually present in that fold). The loader itself
 (load_dataset) does NOT apply either cap; _load_and_cap does, mirroring
 run_classification.py's _run_one_seed.
 
-Parallelization: grid points (grid_knn/grid_bary) run as independent joblib jobs,
-each evaluating all folds sequentially inside the worker. Do NOT nest this with
-fit_barycenters' own per-class joblib parallelism (n_jobs=1 there) — JAX + nested
-joblib multiprocessing is a known hang/slowdown risk.
+Parallelization: sweep values run as independent joblib jobs, each evaluating all folds
+sequentially inside the worker. Barycenter-mode sweep points nest fit_barycenters' own
+per-class joblib parallelism (n_jobs=4 there, see experiment_common._eval_bary) — with
+5-6 outer sweep values, an unbounded outer --n-jobs (-1 → os.cpu_count() workers
+regardless of task count) combined with the inner n_jobs=4 risks the same
+uncapped-nesting OOM that crashed the machine during run_full_baseline.py's STA phase
+at n_jobs=5 (2026-07-09/10). --n-jobs now defaults to 4 (outer) — bounded 4×4=16
+worst case.
+
+Output per scenario: an aggregate CSV (f1_mean/f1_std/n_folds_ok + train/test/
+total time means) AND a `*_detail.csv` with one row per sweep value × (fold, seed) —
+individual F1, a per-class F1 breakdown (f1_class_<c> columns), and
+train_time/test_time/total_time for that single run. train_time covers everything
+that only touches the training data (representation build, plus fit_barycenters for
+bary mode); test_time covers everything needing the test set (representation build +
+the KNN/predict call). Timings are measured inside joblib workers running under
+n_jobs>1 — not clean absolute numbers under contention, but comparable to each other
+within the same run.
 
 Usage:
-    python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml --scenario grid_knn
-    python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml --scenario grid_bary
     python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml --scenario sweep_n_samples \\
         --best-params results/jax_sensitivity/best_params.json
-    python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml \\
-        --cpazmal-config configs/sensitivity_cpazmal.yaml --scenario final_comparison
+    python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml --scenario sweep_n_train
+    python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml --scenario sweep_decimation
 """
 
 from __future__ import annotations
 
 import copy
-import csv
-import json
+import os
 import sys
 from pathlib import Path
 
@@ -58,283 +70,14 @@ import yaml
 from joblib import Parallel, delayed
 
 _HERE = Path(__file__).parent
-_SRC  = _HERE.parent / "src"
-sys.path.insert(0, str(_SRC))
 sys.path.insert(0, str(_HERE))
 
-from baselines.sta_wrapper import knn_predict as sta_knn
-from classification.nn import knn_predict as sdtw_knn
-from classification.barycenter_clf import fit_barycenters, predict
-
-from data_utils import build_repr, load_dataset, subsample as _subsample
-from method_defs import _METHODS, make_cost_fn as _make_cost_fn, make_softdtw_bary as _make_softdtw_bary
+from experiment_common import (
+    _log, _load_and_cap, _iterations, _eval_knn, _eval_bary,
+    _write_csv, _write_detail_csv, _time_summary, _detail_row, _load_best_params,
+)
 
 _ALL_METHODS_NO_STA = ['wasps', 'eucl_params', 'eucl_raw']
-_ALL_METHODS        = ['wasps', 'eucl_params', 'eucl_raw', 'sta']
-
-
-# ---------------------------------------------------------------------------
-# Fold loading — one fold of real data, with per-scenario overrides + caps
-# ---------------------------------------------------------------------------
-
-def _load_and_cap(base_cfg: dict, fold: int, seed: int,
-                  dataset_overrides: dict = None, classification_overrides: dict = None) -> dict:
-    """Load one K-fold split with scenario-specific overrides, then apply the
-    train/test sample cap — load_dataset itself does NOT do this (only
-    run_classification.py's _run_one_seed does, via the same _subsample call).
-
-    `max_train_per_class`/`max_test_per_class` (if present) take priority over
-    `max_train_samples`/`max_test_samples` and are multiplied by the number of
-    classes actually present in that split.
-    """
-    cfg = copy.deepcopy(base_cfg)
-    cfg["dataset"].update(dataset_overrides or {})
-    clf = {**cfg["classification"], **(classification_overrides or {})}
-    cfg["classification"] = clf
-
-    data = load_dataset(cfg, seed=seed, fold=fold)
-    rng = np.random.default_rng(seed)
-
-    max_train = clf.get("max_train_samples", -1)
-    if "max_train_per_class" in clf:
-        max_train = clf["max_train_per_class"] * len(np.unique(data["y_train"]))
-    max_test = clf.get("max_test_samples", -1)
-    if "max_test_per_class" in clf:
-        max_test = clf["max_test_per_class"] * len(np.unique(data["y_test"]))
-
-    X_train, y_train = _subsample(data["X_train"], data["y_train"], max_train, rng)
-    X_test,  y_test  = _subsample(data["X_test"],  data["y_test"],  max_test,  rng)
-    return {"X_train": X_train, "y_train": y_train, "X_test": X_test, "y_test": y_test}
-
-
-def _n_splits(base_cfg: dict) -> int:
-    return int(base_cfg.get("cross_validation", {}).get("n_splits", 5))
-
-
-def _iterations(base_cfg: dict, base_seed: int) -> list:
-    """(seed, fold) pairs — mirrors run_classification.py's n_seeds_per_fold
-    convention. Fold assignment is seed-independent (cv_seed drives it); only the
-    to_fixed_n/subsample RNG varies with seed, so this is a genuine repetition axis
-    on top of K-fold, not a reshuffle of which groups are held out."""
-    n_splits = _n_splits(base_cfg)
-    n_seeds_per_fold = int(base_cfg.get("cross_validation", {}).get("n_seeds_per_fold", 1))
-    return [(base_seed + s, f) for f in range(n_splits) for s in range(n_seeds_per_fold)]
-
-
-# ---------------------------------------------------------------------------
-# k clamp — required everywhere k meets a reduced training pool (calibration
-# grid, sweep_n_train at small N, final_comparison's sample cap)
-# ---------------------------------------------------------------------------
-
-def _clamp_k(k: int, n_train: int) -> int:
-    return max(1, min(k, n_train - 1))
-
-
-# ---------------------------------------------------------------------------
-# Per-method evaluation for one fold — mirrors run_classification.py's
-# per-method dispatch (STA branch, build_repr, fit_barycenters/predict)
-# ---------------------------------------------------------------------------
-
-def _f1(preds, truth) -> float:
-    from sklearn.metrics import f1_score
-    return float(f1_score(truth, preds, average="weighted", zero_division=0))
-
-
-def _eval_knn(method: str, family: str, sta_epsilon: float,
-             train_raw: list, train_labels: np.ndarray,
-             test_raw: list, test_labels: np.ndarray,
-             gamma: float, k: int) -> float:
-    repr_type = _METHODS[method]['repr']
-    train_repr, train_repr_l = build_repr(train_raw, train_labels, repr_type, family)
-    test_repr,  test_repr_l  = build_repr(test_raw,  test_labels,  repr_type, family)
-    if len(train_repr) == 0 or len(test_repr) == 0:
-        # Degenerate point (e.g. samples_per_step too small → all series NaN'd out
-        # by build_repr for this fold/class). Expected at sweep extremes — record
-        # NaN rather than crashing sdtw_knn's jnp.stack([]) or f1_score on empty input.
-        return float('nan')
-    k_eff = _clamp_k(k, len(train_repr))
-    if method == 'sta':
-        preds = sta_knn(train_raw, train_labels, test_raw, gamma=gamma, epsilon=sta_epsilon, k=k_eff)
-        truth = test_labels
-    else:
-        cost_fn = _make_cost_fn(method, family, sta_epsilon)
-        preds = sdtw_knn(train_repr, train_repr_l, test_repr, cost_fn=cost_fn, gamma=gamma, k=k_eff)
-        truth = test_repr_l
-    return _f1(preds, truth)
-
-
-def _eval_bary(method: str, family: str, sta_epsilon: float,
-              train_raw: list, train_labels: np.ndarray,
-              test_raw: list, test_labels: np.ndarray,
-              gamma: float, lr: float, n_steps: int, optimizer: str = "sgd",
-              patience: int = 15, min_rel_improve: float = 1e-4) -> float:
-    repr_type = _METHODS[method]['repr']
-    train_repr, train_repr_l = build_repr(train_raw, train_labels, repr_type, family)
-    test_repr,  test_repr_l  = build_repr(test_raw,  test_labels,  repr_type, family)
-    if len(train_repr) == 0 or len(test_repr) == 0:
-        # Same rationale as _eval_knn: total emptiness would crash fit_barycenters/
-        # predict's jnp.stack([]) on the class or barycenter list — record NaN instead.
-        return float('nan')
-    softdtw_bary = _make_softdtw_bary(method, family, sta_epsilon, gamma)
-    cost_fn      = _make_cost_fn(method, family, sta_epsilon)
-    bary = fit_barycenters(train_repr, train_repr_l, softdtw_bary,
-                           n_steps=n_steps, lr=lr, optimizer=optimizer,
-                           patience=patience, min_rel_improve=min_rel_improve,
-                           n_jobs=1, verbose=False)  # n_jobs=1: caller may already be in a joblib worker
-    preds = predict(test_repr, bary, cost_fn, gamma)
-    return _f1(preds, test_repr_l)
-
-
-# ---------------------------------------------------------------------------
-# CSV / JSON helpers
-# ---------------------------------------------------------------------------
-
-def _write_csv(path: Path, fields: list, rows: list):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
-        w.writeheader()
-        w.writerows(rows)
-
-
-def _load_best_params(path: str) -> dict:
-    """{"knn": {method: {"k":.., "gamma":..}}, "bary": {method: {"lr":.., "gamma":..}}}"""
-    return json.loads(Path(path).read_text())
-
-
-def _merge_best_params(out_dir: Path, key: str, values: dict):
-    """Merge `values` under `key` into out_dir/best_params.json (create if absent)."""
-    path = out_dir / "best_params.json"
-    data = json.loads(path.read_text()) if path.exists() else {}
-    data[key] = values
-    path.write_text(json.dumps(data, indent=2))
-
-
-# ---------------------------------------------------------------------------
-# grid_knn — k×gamma calibration grid (river), per method
-# ---------------------------------------------------------------------------
-
-def _grid_point_knn(base_cfg: dict, method: str, family: str, sta_epsilon: float,
-                    k: int, gamma: float, iterations: list,
-                    dataset_overrides: dict, classification_overrides: dict) -> tuple:
-    """One (k, gamma) grid point for one method, averaged over all (fold, seed)
-    combinations. Runs as a single joblib job — iterations are sequential inside here.
-
-    Returns (f1_mean, n_ok) — nan-safe: a degenerate (fold, seed) (see _eval_knn)
-    contributes NaN, excluded from the mean rather than poisoning it.
-    """
-    f1s = []
-    for seed, fold in iterations:
-        data = _load_and_cap(base_cfg, fold, seed, dataset_overrides, classification_overrides)
-        f1s.append(_eval_knn(method, family, sta_epsilon,
-                             data["X_train"], data["y_train"],
-                             data["X_test"],  data["y_test"], gamma, k))
-    f1s = np.array(f1s)
-    n_ok = int(np.sum(~np.isnan(f1s)))
-    f1_mean = float(np.nanmean(f1s)) if n_ok > 0 else float('nan')
-    return f1_mean, n_ok
-
-
-def grid_knn(base_cfg: dict, out_dir: Path, methods: list, k_values: list, gamma_values: list,
-            classification_overrides: dict, seed: int, n_jobs: int = -1) -> dict:
-    """k×gamma grid per method (river), parallelized over grid points.
-
-    Returns {method: {"k": best_k, "gamma": best_gamma, "f1": best_f1}}.
-    """
-    family      = base_cfg["dataset"]["family"]
-    sta_epsilon = base_cfg["classification"].get("sta_epsilon", 0.05)
-    iterations  = _iterations(base_cfg, seed)
-    best_params = {}
-
-    for method in methods:
-        grid = [(k, g) for k in k_values for g in gamma_values]
-        results = Parallel(n_jobs=n_jobs, backend='loky')(
-            delayed(_grid_point_knn)(base_cfg, method, family, sta_epsilon, k, g,
-                                     iterations, {}, classification_overrides)
-            for k, g in grid
-        )
-        f1_means = [r[0] for r in results]
-        n_oks    = [r[1] for r in results]
-        rows = [{"k": k, "gamma": g, "f1_mean": f1, "n_folds_ok": n}
-                for (k, g), f1, n in zip(grid, f1_means, n_oks)]
-        _write_csv(out_dir / f"sensitivity_grid_knn_{method}.csv",
-                  ["k", "gamma", "f1_mean", "n_folds_ok"], rows)
-
-        valid_idx = [i for i, f in enumerate(f1_means) if not np.isnan(f)]
-        if not valid_idx:
-            raise RuntimeError(f"grid_knn: all grid points NaN for method={method} "
-                              "— check data availability / sample caps")
-        best_idx = max(valid_idx, key=lambda i: f1_means[i])
-        best_k, best_gamma = grid[best_idx]
-        best_params[method] = {"k": best_k, "gamma": best_gamma, "f1": f1_means[best_idx]}
-        print(f"[grid_knn] {method}: best k={best_k} gamma={best_gamma:.4g} "
-              f"f1={f1_means[best_idx]:.3f} ({n_oks[best_idx]}/{len(iterations)} runs)", flush=True)
-
-    _merge_best_params(out_dir, "knn", best_params)
-    return best_params
-
-
-# ---------------------------------------------------------------------------
-# grid_bary — lr×gamma calibration grid (river), per method
-# ---------------------------------------------------------------------------
-
-def _grid_point_bary(base_cfg: dict, method: str, family: str, sta_epsilon: float,
-                     lr: float, gamma: float, iterations: list, n_steps: int,
-                     optimizer: str, dataset_overrides: dict, classification_overrides: dict) -> tuple:
-    """Returns (f1_mean, n_ok) — nan-safe, see _grid_point_knn."""
-    patience        = base_cfg["classification"].get("early_stop_patience", 15)
-    min_rel_improve = base_cfg["classification"].get("early_stop_tol", 1e-4)
-    f1s = []
-    for seed, fold in iterations:
-        data = _load_and_cap(base_cfg, fold, seed, dataset_overrides, classification_overrides)
-        f1s.append(_eval_bary(method, family, sta_epsilon,
-                              data["X_train"], data["y_train"],
-                              data["X_test"],  data["y_test"], gamma, lr, n_steps, optimizer,
-                              patience, min_rel_improve))
-    f1s = np.array(f1s)
-    n_ok = int(np.sum(~np.isnan(f1s)))
-    f1_mean = float(np.nanmean(f1s)) if n_ok > 0 else float('nan')
-    return f1_mean, n_ok
-
-
-def grid_bary(base_cfg: dict, out_dir: Path, methods: list, lr_values: list, gamma_values: list,
-             classification_overrides: dict, seed: int, n_steps: int,
-             optimizer: str = "sgd", n_jobs: int = -1) -> dict:
-    """lr×gamma grid per method (river), parallelized over grid points.
-
-    Returns {method: {"lr": best_lr, "gamma": best_gamma, "f1": best_f1}}.
-    """
-    family      = base_cfg["dataset"]["family"]
-    sta_epsilon = base_cfg["classification"].get("sta_epsilon", 0.05)
-    iterations  = _iterations(base_cfg, seed)
-    best_params = {}
-
-    for method in methods:
-        grid = [(lr, g) for lr in lr_values for g in gamma_values]
-        results = Parallel(n_jobs=n_jobs, backend='loky')(
-            delayed(_grid_point_bary)(base_cfg, method, family, sta_epsilon, lr, g,
-                                      iterations, n_steps, optimizer, {}, classification_overrides)
-            for lr, g in grid
-        )
-        f1_means = [r[0] for r in results]
-        n_oks    = [r[1] for r in results]
-        rows = [{"lr": lr, "gamma": g, "f1_mean": f1, "n_folds_ok": n}
-                for (lr, g), f1, n in zip(grid, f1_means, n_oks)]
-        _write_csv(out_dir / f"sensitivity_grid_bary_{method}.csv",
-                  ["lr", "gamma", "f1_mean", "n_folds_ok"], rows)
-
-        valid_idx = [i for i, f in enumerate(f1_means) if not np.isnan(f)]
-        if not valid_idx:
-            raise RuntimeError(f"grid_bary: all grid points NaN for method={method} "
-                              "— check data availability / sample caps")
-        best_idx = max(valid_idx, key=lambda i: f1_means[i])
-        best_lr, best_gamma = grid[best_idx]
-        best_params[method] = {"lr": best_lr, "gamma": best_gamma, "f1": f1_means[best_idx]}
-        print(f"[grid_bary] {method}: best lr={best_lr:.4g} gamma={best_gamma:.4g} "
-              f"f1={f1_means[best_idx]:.3f} ({n_oks[best_idx]}/{len(iterations)} runs)", flush=True)
-
-    _merge_best_params(out_dir, "bary", best_params)
-    return best_params
 
 
 # ---------------------------------------------------------------------------
@@ -344,15 +87,18 @@ def grid_bary(base_cfg: dict, out_dir: Path, methods: list, lr_values: list, gam
 def _sweep_value_across_folds(base_cfg: dict, method: str, mode: str, iterations: list,
                               gamma: float, k: int, lr: float, n_steps: int, optimizer: str,
                               dataset_overrides: dict, classification_overrides: dict,
-                              decimate_fraction: float = None) -> list:
+                              decimate_fraction: float = None, tag_prefix: str = None) -> list:
     """One sweep value (e.g. one N, one n_train cap, one decimation fraction) for
-    one method/mode, evaluated per (fold, seed). Returns list of per-run F1s."""
+    one method/mode, evaluated per (fold, seed). Returns a list of per-iteration
+    records: {"seed", "fold", "f1", "f1_per_class", "train_time", "test_time",
+    "total_time"}."""
     family      = base_cfg["dataset"]["family"]
     sta_epsilon = base_cfg["classification"].get("sta_epsilon", 0.05)
     patience        = base_cfg["classification"].get("early_stop_patience", 15)
     min_rel_improve = base_cfg["classification"].get("early_stop_tol", 1e-4)
-    f1s = []
-    for seed, fold in iterations:
+    estimator       = base_cfg["classification"].get("estimator", "mle")
+    records = []
+    for i, (seed, fold) in enumerate(iterations):
         data = _load_and_cap(base_cfg, fold, seed, dataset_overrides, classification_overrides)
         X_train, X_test = data["X_train"], data["X_test"]
         if decimate_fraction is not None:
@@ -360,14 +106,16 @@ def _sweep_value_across_folds(base_cfg: dict, method: str, mode: str, iterations
             X_train = decimate_series(X_train, decimate_fraction, rng)
             X_test  = decimate_series(X_test,  decimate_fraction, rng)
         if mode == 'knn':
-            f1 = _eval_knn(method, family, sta_epsilon, X_train, data["y_train"],
-                          X_test, data["y_test"], gamma, k)
+            res = _eval_knn(method, family, sta_epsilon, X_train, data["y_train"],
+                            X_test, data["y_test"], gamma, k, estimator)
         else:
-            f1 = _eval_bary(method, family, sta_epsilon, X_train, data["y_train"],
-                           X_test, data["y_test"], gamma, lr, n_steps, optimizer,
-                           patience, min_rel_improve)
-        f1s.append(f1)
-    return f1s
+            # tag only the first (fold,seed) per sweep value — see grid_bary's analogous choice
+            tag = tag_prefix if (tag_prefix is not None and i == 0) else None
+            res = _eval_bary(method, family, sta_epsilon, X_train, data["y_train"],
+                             X_test, data["y_test"], gamma, lr, n_steps, optimizer,
+                             patience, min_rel_improve, estimator, tag)
+        records.append({"seed": seed, "fold": fold, **res})
+    return records
 
 
 def decimate_series(series: list, fraction: float, rng: np.random.Generator) -> list:
@@ -393,7 +141,7 @@ def _run_sweep(base_cfg: dict, out_dir: Path, methods: list, best_params: dict, 
     iterations = _iterations(base_cfg, seed)
     for mode, params_key in (('knn', 'knn'), ('barycenter', 'bary')):
         if params_key not in best_params:
-            print(f"[{out_prefix}] skipping mode={mode}: no '{params_key}' in best_params", flush=True)
+            _log(f"[{out_prefix}] skipping mode={mode}: no '{params_key}' in best_params")
             continue
         for method in methods:
             if method not in best_params[params_key]:
@@ -409,21 +157,33 @@ def _run_sweep(base_cfg: dict, out_dir: Path, methods: list, best_params: dict, 
                 jobs.append(delayed(_sweep_value_across_folds)(
                     base_cfg, method, mode, iterations, gamma, k, lr, n_steps, optimizer,
                     {}, overrides, decimate_fraction=(val if decimate else None),
+                    tag_prefix=f"{out_prefix}_{method}_{value_name}{val}",
                 ))
-            results = Parallel(n_jobs=n_jobs, backend='loky')(jobs)
+            results = Parallel(n_jobs=n_jobs, backend='loky', verbose=10)(jobs)
 
-            rows = []
-            for val, f1s in zip(values, results):
-                f1s = np.array(f1s)
+            summary_rows, detail_rows = [], []
+            for val, records in zip(values, results):
+                f1s = np.array([r["f1"] for r in records])
                 n_ok = int(np.sum(~np.isnan(f1s)))
-                f1_mean = float(np.nanmean(f1s)) if n_ok > 0 else float('nan')
-                f1_std  = float(np.nanstd(f1s))  if n_ok > 0 else float('nan')
-                rows.append({value_name: val, "f1_mean": f1_mean, "f1_std": f1_std, "n_folds_ok": n_ok})
+                summary_rows.append({
+                    value_name: val,
+                    "f1_mean": float(np.nanmean(f1s)) if n_ok > 0 else float('nan'),
+                    "f1_std":  float(np.nanstd(f1s))  if n_ok > 0 else float('nan'),
+                    "n_folds_ok": n_ok,
+                    **_time_summary(records),
+                })
+                detail_rows.extend(_detail_row(r, **{value_name: val}, seed=r["seed"], fold=r["fold"])
+                                   for r in records)
+
             csv_path = out_dir / f"sensitivity_{out_prefix}_{method}_{mode}.csv"
-            _write_csv(csv_path, [value_name, "f1_mean", "f1_std", "n_folds_ok"], rows)
-            print(f"[{out_prefix}] {method}/{mode}: " +
-                  "  ".join(f"{value_name}={r[value_name]}:f1={r['f1_mean']:.3f}±{r['f1_std']:.3f}"
-                           for r in rows), flush=True)
+            _write_csv(csv_path, [value_name, "f1_mean", "f1_std", "n_folds_ok",
+                                  "train_time_mean", "test_time_mean", "total_time_mean"], summary_rows)
+            _write_detail_csv(out_dir / f"sensitivity_{out_prefix}_{method}_{mode}_detail.csv",
+                              [value_name, "seed", "fold", "f1", "train_time", "test_time", "total_time"],
+                              detail_rows)
+            _log(f"[{out_prefix}] {method}/{mode}: " +
+                 "  ".join(f"{value_name}={r[value_name]}:f1={r['f1_mean']:.3f}±{r['f1_std']:.3f}"
+                          for r in summary_rows))
 
 
 def sweep_n_samples(base_cfg: dict, out_dir: Path, methods: list, values: list,
@@ -461,71 +221,29 @@ def sweep_decimation(base_cfg: dict, out_dir: Path, methods: list, fractions: li
 
 
 # ---------------------------------------------------------------------------
-# final_comparison — 4 methods incl. STA, KNN only, shared gamma/k, both datasets
-# ---------------------------------------------------------------------------
-
-def final_comparison(river_cfg: dict, cpazmal_cfg: dict, out_dir: Path,
-                     methods: list, gamma: float, k: int, seed: int, n_jobs: int = -1) -> None:
-    """4-method (incl. STA) KNN-only comparison, one shared (gamma, k) — NOT a
-    per-method calibrated value, since STA has no calibrated pair (excluded from
-    grid_knn/grid_bary). River uses aggregate_days=7 (T=52) specifically so STA
-    stays tractable; CPAZMaL uses its natural full-year series (T≈29, no
-    truncation needed)."""
-    for name, cfg in (("river", river_cfg), ("cpazmal", cpazmal_cfg)):
-        if cfg is None:
-            print(f"[final_comparison] skipping {name}: no config provided", flush=True)
-            continue
-        fc = cfg["sensitivity"]["final_comparison"]
-        family      = cfg["dataset"]["family"]
-        sta_epsilon = cfg["classification"].get("sta_epsilon", 0.05)
-        iterations  = _iterations(cfg, seed)
-        dataset_overrides = {k2: v for k2, v in fc.items()
-                             if k2 in ("aggregate_days", "max_time_steps")}
-        classification_overrides = {k2: v for k2, v in fc.items()
-                                    if k2 not in ("aggregate_days", "max_time_steps", "methods")}
-
-        def _one_iter(seed_i, fold):
-            data = _load_and_cap(cfg, fold, seed_i, dataset_overrides, classification_overrides)
-            row = {}
-            for method in methods:
-                row[method] = _eval_knn(method, family, sta_epsilon,
-                                        data["X_train"], data["y_train"],
-                                        data["X_test"],  data["y_test"], gamma, k)
-            return row
-
-        fold_rows = Parallel(n_jobs=n_jobs, backend='loky')(
-            delayed(_one_iter)(seed_i, fold) for seed_i, fold in iterations
-        )
-        rows = []
-        for m in methods:
-            vals = np.array([r[m] for r in fold_rows])
-            n_ok = int(np.sum(~np.isnan(vals)))
-            f1_mean = float(np.nanmean(vals)) if n_ok > 0 else float('nan')
-            f1_std  = float(np.nanstd(vals))  if n_ok > 0 else float('nan')
-            rows.append({"method": m, "f1_mean": f1_mean, "f1_std": f1_std, "n_folds_ok": n_ok})
-        _write_csv(out_dir / f"sensitivity_final_comparison_{name}.csv",
-                  ["method", "f1_mean", "f1_std", "n_folds_ok"], rows)
-        print(f"[final_comparison/{name}] " +
-              "  ".join(f"{r['method']}={r['f1_mean']:.3f}±{r['f1_std']:.3f}" for r in rows),
-              flush=True)
-
-
-# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="WaSPS-DTW sensitivity analysis (real data)")
+    parser = argparse.ArgumentParser(description="WaSPS-DTW sensitivity sweeps (real data)")
     parser.add_argument("--config", required=True, help="e.g. configs/sensitivity_river.yaml")
-    parser.add_argument("--cpazmal-config", default=None, help="required for --scenario final_comparison")
     parser.add_argument("--scenario", required=True,
-                        choices=["grid_knn", "grid_bary", "sweep_n_samples", "sweep_n_train",
-                                 "sweep_decimation", "final_comparison"])
+                        choices=["sweep_n_samples", "sweep_n_train", "sweep_decimation"])
     parser.add_argument("--best-params", default=None,
-                        help="path to best_params.json from grid_knn/grid_bary (required for sweep_*)")
+                        help="path to best_params.json from run_optim_hyper.py's "
+                             "grid_knn/grid_bary (defaults to out_dir/best_params.json)")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--n-jobs", type=int, default=-1)
+    parser.add_argument("--n-jobs", type=int, default=4,
+                        help="capped at 4 by default (was -1) — see module docstring "
+                             "'Parallelization' for the nested outer×inner risk this bounds")
+    parser.add_argument("--debug", action="store_true",
+                        help="log per-(fold,seed) resolved params (T, aggregate_days/"
+                             "window_size, samples_per_step, n_train/n_test) to the log file")
+    parser.add_argument("--verbose", action="store_true",
+                        help="save barycenter arrays (.npz) + plots (.png) to "
+                             "out_dir/bary_debug/ for the first (fold,seed) of every "
+                             "sweep value in bary mode")
     args = parser.parse_args()
 
     with open(args.config) as f:
@@ -537,49 +255,42 @@ def main():
     n_steps = sens.get("n_steps_bary", 100)
     optimizer = cfg.get("classification", {}).get("optimizer", "sgd")
 
-    if args.scenario == "grid_knn":
-        s = sens["grid_knn"]
-        grid_knn(cfg, out_dir, methods, s["k_values"], s["gamma_values"],
-                classification_overrides={k: v for k, v in s.items()
-                                          if k not in ("k_values", "gamma_values")},
-                seed=args.seed, n_jobs=args.n_jobs)
+    os.environ["EXPERIMENT_LOG_FILE"] = str(out_dir / "sensitivity.log")
+    if args.debug:
+        os.environ["EXPERIMENT_DEBUG"] = "1"
+    if args.verbose:
+        os.environ["EXPERIMENT_VERBOSE"] = "1"
+    _log(f"===== scenario={args.scenario} config={args.config} seed={args.seed} "
+         f"n_jobs={args.n_jobs} debug={args.debug} verbose={args.verbose} =====")
+    _log(f"methods={methods} n_steps_bary={n_steps} optimizer={optimizer} "
+         f"estimator={cfg['classification'].get('estimator', 'mle')} "
+         f"n_splits={cfg.get('cross_validation', {}).get('n_splits')} "
+         f"n_seeds_per_fold={cfg.get('cross_validation', {}).get('n_seeds_per_fold', 1)} "
+         f"dataset={cfg['dataset'].get('type')} "
+         f"aggregate_days={cfg['dataset'].get('aggregate_days')} "
+         f"window_size={cfg['dataset'].get('window_size')}")
 
-    elif args.scenario == "grid_bary":
-        s = sens["grid_bary"]
-        grid_bary(cfg, out_dir, methods, s["lr_values"], s["gamma_values"],
-                 classification_overrides={k: v for k, v in s.items()
-                                           if k not in ("lr_values", "gamma_values")},
-                 seed=args.seed, n_steps=n_steps, optimizer=optimizer, n_jobs=args.n_jobs)
+    if args.best_params is None:
+        args.best_params = str(out_dir / "best_params.json")
+    best_params = _load_best_params(args.best_params)
+    s = sens[args.scenario]
+    if args.scenario == "sweep_n_samples":
+        sweep_n_samples(cfg, out_dir, methods, s["values"], best_params, args.seed,
+                        n_steps, optimizer,
+                        fixed_overrides={k: v for k, v in s.items() if k != "values"},
+                        n_jobs=args.n_jobs)
+    elif args.scenario == "sweep_n_train":
+        sweep_n_train(cfg, out_dir, methods, s["values"], best_params, args.seed,
+                     n_steps, optimizer,
+                     fixed_overrides={k: v for k, v in s.items() if k != "values"},
+                     n_jobs=args.n_jobs)
+    else:
+        sweep_decimation(cfg, out_dir, methods, s["fractions"], best_params, args.seed,
+                        n_steps, optimizer,
+                        fixed_overrides={k: v for k, v in s.items() if k != "fractions"},
+                        n_jobs=args.n_jobs)
 
-    elif args.scenario in ("sweep_n_samples", "sweep_n_train", "sweep_decimation"):
-        if args.best_params is None:
-            args.best_params = str(out_dir / "best_params.json")
-        best_params = _load_best_params(args.best_params)
-        s = sens[args.scenario]
-        if args.scenario == "sweep_n_samples":
-            sweep_n_samples(cfg, out_dir, methods, s["values"], best_params, args.seed,
-                            n_steps, optimizer,
-                            fixed_overrides={k: v for k, v in s.items() if k != "values"},
-                            n_jobs=args.n_jobs)
-        elif args.scenario == "sweep_n_train":
-            sweep_n_train(cfg, out_dir, methods, s["values"], best_params, args.seed,
-                         n_steps, optimizer,
-                         fixed_overrides={k: v for k, v in s.items() if k != "values"},
-                         n_jobs=args.n_jobs)
-        else:
-            sweep_decimation(cfg, out_dir, methods, s["fractions"], best_params, args.seed,
-                            n_steps, optimizer,
-                            fixed_overrides={k: v for k, v in s.items() if k != "fractions"},
-                            n_jobs=args.n_jobs)
-
-    elif args.scenario == "final_comparison":
-        cpazmal_cfg = None
-        if args.cpazmal_config:
-            with open(args.cpazmal_config) as f:
-                cpazmal_cfg = yaml.safe_load(f)
-        fc = sens["final_comparison"]
-        final_comparison(cfg, cpazmal_cfg, out_dir, fc.get("methods", _ALL_METHODS),
-                         fc["gamma"], fc["k"], seed=args.seed, n_jobs=args.n_jobs)
+    _log(f"===== scenario={args.scenario} done =====")
 
 
 if __name__ == "__main__":

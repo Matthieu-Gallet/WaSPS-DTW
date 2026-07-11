@@ -1,13 +1,19 @@
-# Sensitivity analysis config — CPAZMaL, used ONLY as the second dataset for the
-# final_comparison scenario (grids/sweeps are river-only per plan §3).
-# Run: python experiments/run_sensitivity.py --config configs/sensitivity_river.yaml \
-#          --cpazmal-config configs/sensitivity_cpazmal.yaml --scenario final_comparison
+# Sensitivity analysis config — CPAZMaL. Mirrors sensitivity_river.yaml's scenarios
+# (grid_knn, grid_bary via run_optim_hyper.py; sweep_n_samples, sweep_n_train,
+# sweep_decimation via run_sensitivity.py) using the SAME hyperparameter grids/sweep
+# values for direct cross-dataset comparability. final_comparison has moved to
+# experiments/run_full_baseline.py + configs/full_baseline.yaml (single config
+# covering both river and cpazmal, 5 random seeds, no k-fold — see that file).
 #
-# NOTE: `methods`/`gamma`/`k` below are NOT read for this dataset — final_comparison()
-# takes those from the river config's sensitivity.final_comparison block (the single
-# shared values used for both datasets) and only reads this file's final_comparison
-# block for dataset-level overrides (samples_per_step, per-class caps). Kept here
-# anyway so the file is self-describing / usable standalone if that changes.
+#   python experiments/run_optim_hyper.py --config configs/sensitivity_cpazmal.yaml --scenario grid_knn
+#   python experiments/run_optim_hyper.py --config configs/sensitivity_cpazmal.yaml --scenario grid_bary
+#   python experiments/run_sensitivity.py --config configs/sensitivity_cpazmal.yaml --scenario sweep_n_samples
+#   ... (sweep_n_train, sweep_decimation)
+#
+# `output.dir` is deliberately DIFFERENT from sensitivity_river.yaml's — grid_knn/grid_bary
+# write best_params.json under this dir when this file is the primary --config; sharing
+# river's dir would silently overwrite one dataset's calibrated (k,gamma)/(lr,gamma) with
+# the other's.
 
 dataset:
   type: cpazmal
@@ -17,35 +23,59 @@ dataset:
   window_size: 12
 
 classification:
-  gamma: 1.0
+  gamma: 1.0             # overridden per grid point by grid_knn/grid_bary
   k: 1
-  n_steps: 500
+  n_steps: 250
   lr: 0.005
   sta_epsilon: 0.05
   samples_per_step: 100
   early_stop_patience: 20
   early_stop_tol: 1.0e-4
   optimizer: sgd
+  estimator: log_cumulant   # matches sensitivity_river.yaml — see comment there
 
 cross_validation:
   n_splits: 5
   fold: -1
   group_aware: true
   cv_seed: 42
-  n_seeds_per_fold: 2    # 2 seeds × 5 folds = 10 runs
+  n_seeds_per_fold: 2    # 2 seeds × 5 folds = 10 runs per grid point / sweep value
 
 seed: 42
 
 sensitivity:
-  final_comparison:
-    methods: [wasps, eucl_params, eucl_raw, sta]   # unused here, see NOTE above
-    gamma: 1.0                                     # unused here, see NOTE above
-    k: 1                                            # unused here, see NOTE above
-    # No aggregate_days: CPAZMaL's natural full-year series is already T≈29 — no
-    # truncation needed to keep STA tractable (river needs aggregate_days=7 instead).
-    samples_per_step: 48
+  methods: [wasps, eucl_params, eucl_raw]   # STA excluded — same rationale as river
+  n_steps_bary: 75   # reduced from 250 (2026-07-10), see sensitivity_river.yaml comment
+
+  grid_knn:
+    k_values:     [1, 5, 22, 100]             # same grid as river, for comparability
+    gamma_values: [1.0e-4, 1.0, 10.0, 1.0e+4]  # NOTE: PyYAML parses unsigned-exponent
+                                                # "1.0e4" as a STRING — always sign the exponent.
+    max_train_per_class: 80
+    max_test_per_class: 20
+
+  grid_bary:
+    lr_values:    [0.001, 0.005, 0.01, 0.05, 0.1]
+    gamma_values: [1.0e-4, 1.0, 10.0, 1.0e+4]
+    max_train_per_class: 80
+    max_test_per_class: 20
+
+  sweep_n_samples:
+    values: [5, 15, 50, 150, 500]   # same values as river, for comparability;
+                                    # back-ported from the pass2 calibration run (2026-07-08)
+    max_train_per_class: 80
+    max_test_per_class: 20
+
+  sweep_n_train:
+    values: [2, 5, 15, 45, 100]   # back-ported from the pass2 calibration run (2026-07-08)
+    samples_per_step: 100
+    max_test_per_class: 20
+
+  sweep_decimation:
+    fractions: [0.0, 0.05, 0.10, 0.20, 0.30, 0.50]
+    samples_per_step: 100
     max_train_per_class: 80
     max_test_per_class: 20
 
 output:
-  dir: results/jax_sensitivity
+  dir: results/jax_sensitivity_cpazmal

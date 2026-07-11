@@ -1,0 +1,75 @@
+# configs/full_baseline.yaml — "final" method comparison (replaces run_sensitivity.py's
+# old final_comparison scenario, moved to experiments/run_full_baseline.py). KNN-only,
+# 4 random seeds (holdout, no k-fold — just shuffle + select), single file covering BOTH
+# river and cpazmal (each in its own dataset/classification sub-block) so one invocation
+# handles both datasets, unlike the old final_comparison's --cpazmal-config two-file split.
+#
+# Methods: the 3 base methods (wasps, eucl_params, eucl_raw) + STA, PLUS a _nodiv
+# variant of each of the 3 base methods — non-divergence evaluation (is_divergence=False,
+# and for wasps also log_correction=False) via KNN itself (src/classification/nn.py
+# gained an is_divergence flag on 2026-07-08 specifically for this comparison —
+# previously is_divergence only affected barycenter fitting/predict, so a naive
+# eucl_params_nodiv would have been indistinguishable from eucl_params in a KNN-only
+# comparison; see experiments/method_defs.py for the exact wiring). STA has no
+# divergence concept, no _nodiv variant.
+#
+# Run: ./run_full_baseline_sweep.sh (preferred — one OS process per dataset×gamma, full
+# memory reclaim between them) or directly:
+#   python experiments/run_full_baseline.py --config configs/full_baseline.yaml --n-jobs 4
+
+methods: [wasps, wasps_nodiv, eucl_params, eucl_params_nodiv, eucl_raw, eucl_raw_nodiv, sta]
+n_seeds: 4     # random holdout seeds — no k-fold (see experiments/run_full_baseline.py).
+               # Reduced from 5 (2026-07-09) alongside n_jobs, to bound STA worker RSS —
+               # see run_full_baseline.py module docstring "Memory management".
+               # NOTE: gamma=1.0's existing results (already in the CSVs) were computed
+               # with n_seeds=5 and are NOT recomputed by this change (skip-if-present
+               # logic keys on (method,gamma) only) — new gamma values use n_seeds=4.
+estimator: log_cumulant
+
+river:
+  dataset:
+    type: river
+    family: exponential
+    data_dir: data/river
+    mode: balanced
+    max_time_steps: null
+    aggregate_days: 7        # T=52 — keeps STA tractable, see CLAUDE.md STA complexity warning
+  classification:
+    gamma: 1.0                # fallback when gamma_values is absent — not calibrated (STA/nodiv have no grid_knn entry)
+    gamma_values: [1.0e-2, 1.0, 1.0e+2]   # sweep — run_full_baseline.py skips (method,gamma) pairs already in the CSV
+                                           # narrowed from [1e-3, 1, 1e3] (2026-07-09) after a machine crash
+                                           # during gamma=1e3's STA. Note: STA cost (Sinkhorn on the pairwise
+                                           # cost matrix, O(T^2) calls) does NOT depend on gamma — only the
+                                           # cheap softDTW recursion over that matrix does — so STA takes the
+                                           # same ~3700s/seed at any gamma. The crash was more likely caused by
+                                           # sustained heavy load (STA back-to-back across 2 gamma values, ~1h+
+                                           # each, 5 parallel workers) than by gamma=1e3 itself.
+    k: 1
+    sta_epsilon: 0.05
+    samples_per_step: 48    # already ≤48, unchanged
+    max_train_per_class: 10  # reduced from 80 (2026-07-08) — keeps STA tractable at T=52
+    max_test_per_class: 20
+
+cpazmal:
+  dataset:
+    type: cpazmal
+    family: weibull
+    hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
+    max_groups_per_class: null
+    window_size: 12
+    # No aggregate_days: CPAZMaL's natural full-year series is already T≈29 — no
+    # truncation needed to keep STA tractable (river needs aggregate_days=7 instead).
+  classification:
+    gamma: 1.0
+    gamma_values: [1.0e-2, 1.0, 1.0e+2]   # sweep — narrowed, see river block comment above
+    k: 1
+    sta_epsilon: 0.05
+    samples_per_step: 64    # raised from 48 (2026-07-10), per-user request
+    max_train_per_class: 15  # raised from 10 (2026-07-10) — cpazmal has 7 classes vs river's
+    max_test_per_class: 25   # 4, so equal per-class caps still meant ~2x river's total sample
+                              # count (70/140 vs 40/80); STA OOM'd at n_jobs=4 after ~28min
+                              # (river's equivalent batch ran fine twice) — user asked for
+                              # 15/25 explicitly rather than reverting to a lower total
+
+output:
+  dir: results/jax_full_baseline
