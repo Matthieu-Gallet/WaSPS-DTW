@@ -1,0 +1,51 @@
+# Experiment 3 — cpazmal decimation sweep, barycenter mode, divergence methods + STA, at the
+# per-method optimal gamma found by Experiment 1bis (results/gamma_search/cpazmal/best_params.json).
+#
+# dataset/classification blocks copied verbatim from configs/exp1_baseline.yaml's cpazmal:
+# block (window_size:9, samples_per_step:48, max_train_per_class:15, max_test_per_class:25 —
+# NOT sensitivity_cpazmal.yaml's window_size:12/100/80/20) so Experiment 3 runs in exactly the
+# same setting as Experiment 1bis, only decimation varies. Single holdout fold, 5 seeds — not
+# the old 5-fold x 2-seeds/fold design. cross_validation.n_splits MUST be explicit here: unlike
+# what an earlier draft of this config assumed, an absent cross_validation block does NOT
+# default to holdout in _iterations()/_n_splits() — it defaults to n_splits=5 (K-fold), which
+# silently ran Experiment 3 in the wrong CV scheme the first time this config was used.
+# sweep_decimation.fractions copied from configs/sensitivity_cpazmal.yaml, unchanged.
+#
+# Run: ./exp3_decimation.sh (preferred) or directly:
+#   python experiments/run_exp3_decimation.py --config configs/exp3_decimation.yaml \
+#       --gamma-search-dir results/gamma_search --n-jobs 4 --sta-n-jobs 2
+
+dataset:
+  type: cpazmal
+  family: weibull
+  hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
+  max_groups_per_class: null
+  window_size: 9
+
+classification:
+  k: 1
+  sta_epsilon: 0.05
+  samples_per_step: 48
+  max_train_per_class: 15
+  max_test_per_class: 25
+  lr: 0.05
+  n_steps_bary: 75
+  optimizer: sgd
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+  estimator: log_cumulant
+
+n_seeds: 5
+cross_validation:
+  n_splits: 1
+
+sensitivity:
+  n_steps_bary: 75
+  sweep_decimation:
+    fractions: [0.0, 0.05, 0.10, 0.20, 0.30, 0.50]
+    samples_per_step: 48
+    max_train_per_class: 15
+    max_test_per_class: 25
+
+output:
+  dir: results/jax_exp3_decimation

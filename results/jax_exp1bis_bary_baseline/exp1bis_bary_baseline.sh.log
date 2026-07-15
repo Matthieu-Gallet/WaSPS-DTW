@@ -1,0 +1,412 @@
+===== 2026-07-14 23:57:10 exp1bis_bary_baseline starting =====
+----- river -----
+[23:57:11] ===== full_baseline config=configs/exp1_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[23:57:11] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv', 'sta'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv', 'sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 10000.0, 'eucl_params_nodiv': 10000.0, 'eucl_raw': 100.0, 'eucl_raw_nodiv': 100.0, 'sta': 0.0001}
+[23:57:11] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[23:57:13] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:13]   [river] gamma=10000.0 method=wasps mode=barycenter seed=42 data loaded in 0.63s (n_train=105 n_test=160)
+[23:57:13] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:13]   [river] gamma=10000.0 method=wasps mode=barycenter seed=45 data loaded in 0.62s (n_train=105 n_test=160)
+[23:57:13] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:13]   [river] gamma=10000.0 method=wasps mode=barycenter seed=44 data loaded in 0.64s (n_train=105 n_test=160)
+[23:57:14] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:14]   [river] gamma=10000.0 method=wasps mode=barycenter seed=43 data loaded in 0.67s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 4/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:20]   [river] gamma=10000.0 mode=barycenter seed=42 finished wasps in 6.4s (f1=0.499)
+[23:57:20]   [river] gamma=10000.0 mode=barycenter seed=44 finished wasps in 6.4s (f1=0.458)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    8.6s remaining:   12.9s
+[23:57:20]   [river] gamma=10000.0 mode=barycenter seed=43 finished wasps in 6.5s (f1=0.401)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    8.8s remaining:    5.8s
+[23:57:20]   [river] gamma=10000.0 mode=barycenter seed=45 finished wasps in 6.6s (f1=0.527)
+[23:57:20] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:20]   [river] gamma=10000.0 method=wasps mode=barycenter seed=46 data loaded in 0.49s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:22]   [river] gamma=10000.0 mode=barycenter seed=46 finished wasps in 1.9s (f1=0.457)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   11.0s finished
+[23:57:24] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps batch done in 11.0s peak_rss=9215MB (avg/job=2304MB)
+[23:57:24] [full_baseline/river] gamma=100.0 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[23:57:26] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:26]   [river] gamma=100.0 method=wasps_nodiv mode=barycenter seed=44 data loaded in 0.57s (n_train=105 n_test=160)
+[23:57:26] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:26]   [river] gamma=100.0 method=wasps_nodiv mode=barycenter seed=42 data loaded in 0.57s (n_train=105 n_test=160)
+[23:57:26] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:26]   [river] gamma=100.0 method=wasps_nodiv mode=barycenter seed=45 data loaded in 0.56s (n_train=105 n_test=160)
+[23:57:26] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:26]   [river] gamma=100.0 method=wasps_nodiv mode=barycenter seed=43 data loaded in 0.59s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:31]   [river] gamma=100.0 mode=barycenter seed=43 finished wasps_nodiv in 4.9s (f1=0.398)
+[warn] build_repr: dropped 4/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:31]   [river] gamma=100.0 mode=barycenter seed=42 finished wasps_nodiv in 5.1s (f1=0.503)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    7.3s remaining:   11.0s
+[23:57:31]   [river] gamma=100.0 mode=barycenter seed=45 finished wasps_nodiv in 5.3s (f1=0.520)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    7.5s remaining:    5.0s
+[23:57:32]   [river] gamma=100.0 mode=barycenter seed=44 finished wasps_nodiv in 5.4s (f1=0.462)
+[23:57:32] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:32]   [river] gamma=100.0 method=wasps_nodiv mode=barycenter seed=46 data loaded in 0.52s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:33]   [river] gamma=100.0 mode=barycenter seed=46 finished wasps_nodiv in 1.2s (f1=0.455)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:    9.0s finished
+[23:57:34] [full_baseline/river] gamma=100.0 mode=barycenter method=wasps_nodiv batch done in 9.0s peak_rss=8945MB (avg/job=2236MB)
+[23:57:34] [full_baseline/river] gamma=10000.0 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[23:57:37] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:37]   [river] gamma=10000.0 method=eucl_params mode=barycenter seed=43 data loaded in 0.58s (n_train=105 n_test=160)
+[23:57:37] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:37]   [river] gamma=10000.0 method=eucl_params mode=barycenter seed=44 data loaded in 0.59s (n_train=105 n_test=160)
+[23:57:37] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:37]   [river] gamma=10000.0 method=eucl_params mode=barycenter seed=42 data loaded in 0.58s (n_train=105 n_test=160)
+[23:57:37] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:37]   [river] gamma=10000.0 method=eucl_params mode=barycenter seed=45 data loaded in 0.60s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 4/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:43]   [river] gamma=10000.0 mode=barycenter seed=43 finished eucl_params in 6.3s (f1=0.301)
+[23:57:43]   [river] gamma=10000.0 mode=barycenter seed=42 finished eucl_params in 6.4s (f1=0.242)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    8.7s remaining:   13.0s
+[23:57:43]   [river] gamma=10000.0 mode=barycenter seed=44 finished eucl_params in 6.5s (f1=0.306)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    8.8s remaining:    5.8s
+[23:57:43]   [river] gamma=10000.0 mode=barycenter seed=45 finished eucl_params in 6.6s (f1=0.274)
+[23:57:44] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:44]   [river] gamma=10000.0 method=eucl_params mode=barycenter seed=46 data loaded in 0.50s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:45]   [river] gamma=10000.0 mode=barycenter seed=46 finished eucl_params in 1.8s (f1=0.207)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   11.0s finished
+[23:57:47] [full_baseline/river] gamma=10000.0 mode=barycenter method=eucl_params batch done in 11.0s peak_rss=9084MB (avg/job=2271MB)
+[23:57:47] [full_baseline/river] gamma=10000.0 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[23:57:49] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:49]   [river] gamma=10000.0 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 0.63s (n_train=105 n_test=160)
+[23:57:49] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:49]   [river] gamma=10000.0 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 0.65s (n_train=105 n_test=160)
+[23:57:49] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:49]   [river] gamma=10000.0 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 0.64s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[23:57:49] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:49]   [river] gamma=10000.0 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 0.68s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 4/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:55]   [river] gamma=10000.0 mode=barycenter seed=44 finished eucl_params_nodiv in 5.5s (f1=0.314)
+[23:57:55]   [river] gamma=10000.0 mode=barycenter seed=45 finished eucl_params_nodiv in 5.5s (f1=0.290)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    7.9s remaining:   11.8s
+[23:57:55]   [river] gamma=10000.0 mode=barycenter seed=42 finished eucl_params_nodiv in 5.6s (f1=0.251)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    7.9s remaining:    5.3s
+[23:57:55]   [river] gamma=10000.0 mode=barycenter seed=43 finished eucl_params_nodiv in 5.6s (f1=0.289)
+[23:57:55] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:57:55]   [river] gamma=10000.0 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 0.47s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/160 series with NaN params (timesteps where log_cumulant failed)
+[23:57:57]   [river] gamma=10000.0 mode=barycenter seed=46 finished eucl_params_nodiv in 1.3s (f1=0.196)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:    9.7s finished
+[23:57:58] [full_baseline/river] gamma=10000.0 mode=barycenter method=eucl_params_nodiv batch done in 9.7s peak_rss=8926MB (avg/job=2232MB)
+[23:57:58] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[23:58:00] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:00]   [river] gamma=100.0 method=eucl_raw mode=barycenter seed=43 data loaded in 0.60s (n_train=105 n_test=160)
+[23:58:00] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:00]   [river] gamma=100.0 method=eucl_raw mode=barycenter seed=42 data loaded in 0.59s (n_train=105 n_test=160)
+[23:58:00] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:00]   [river] gamma=100.0 method=eucl_raw mode=barycenter seed=44 data loaded in 0.64s (n_train=105 n_test=160)
+[23:58:01] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:01]   [river] gamma=100.0 method=eucl_raw mode=barycenter seed=45 data loaded in 0.64s (n_train=105 n_test=160)
+[23:58:07]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_raw in 6.9s (f1=0.330)
+[23:58:07]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_raw in 7.0s (f1=0.338)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    9.3s remaining:   14.0s
+[23:58:08]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_raw in 7.1s (f1=0.264)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    9.4s remaining:    6.3s
+[23:58:08]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_raw in 7.0s (f1=0.257)
+[23:58:08] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:08]   [river] gamma=100.0 method=eucl_raw mode=barycenter seed=46 data loaded in 0.49s (n_train=105 n_test=160)
+[23:58:10]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_raw in 1.7s (f1=0.353)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   11.6s finished
+[23:58:11] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_raw batch done in 11.6s peak_rss=9096MB (avg/job=2274MB)
+[23:58:11] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[23:58:13] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:13]   [river] gamma=100.0 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 0.59s (n_train=105 n_test=160)
+[23:58:14] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:14]   [river] gamma=100.0 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 0.60s (n_train=105 n_test=160)
+[23:58:14] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:14]   [river] gamma=100.0 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 0.62s (n_train=105 n_test=160)
+[23:58:14] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:14]   [river] gamma=100.0 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 0.62s (n_train=105 n_test=160)
+[23:58:19]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_raw_nodiv in 5.9s (f1=0.256)
+[23:58:19]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_raw_nodiv in 6.0s (f1=0.338)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    8.3s remaining:   12.4s
+[23:58:20]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_raw_nodiv in 6.0s (f1=0.330)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    8.3s remaining:    5.6s
+[23:58:20]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_raw_nodiv in 6.1s (f1=0.264)
+[23:58:20] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:20]   [river] gamma=100.0 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 0.52s (n_train=105 n_test=160)
+[23:58:21]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_raw_nodiv in 1.2s (f1=0.361)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   10.0s finished
+[23:58:23] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_raw_nodiv batch done in 10.0s peak_rss=8971MB (avg/job=2243MB)
+[23:58:23] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=2)]: Using backend LokyBackend with 2 concurrent workers.
+[23:58:25] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:25]   [river] gamma=0.0001 method=sta mode=barycenter seed=43 data loaded in 0.54s (n_train=105 n_test=160)
+[23:58:25] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[23:58:25]   [river] gamma=0.0001 method=sta mode=barycenter seed=42 data loaded in 0.54s (n_train=105 n_test=160)
+[03:05:45]   [river] gamma=0.0001 mode=barycenter seed=42 finished sta in 11240.0s (f1=0.245)
+[Parallel(n_jobs=2)]: Done   1 tasks      | elapsed: 187.4min
+[03:05:46]   [river] gamma=0.0001 mode=barycenter seed=43 finished sta in 11240.8s (f1=0.298)
+[03:05:46] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[03:05:46]   [river] gamma=0.0001 method=sta mode=barycenter seed=44 data loaded in 0.56s (n_train=105 n_test=160)
+[03:05:46] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[03:05:46]   [river] gamma=0.0001 method=sta mode=barycenter seed=45 data loaded in 0.46s (n_train=105 n_test=160)
+[06:12:08]   [river] gamma=0.0001 mode=barycenter seed=45 finished sta in 11181.9s (f1=0.284)
+[Parallel(n_jobs=2)]: Done   3 out of   5 | elapsed: 373.8min remaining: 249.2min
+[06:12:09] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[06:12:09]   [river] gamma=0.0001 method=sta mode=barycenter seed=46 data loaded in 0.57s (n_train=105 n_test=160)
+[06:12:29]   [river] gamma=0.0001 mode=barycenter seed=44 finished sta in 11203.5s (f1=0.307)
+[07:45:14]   [river] gamma=0.0001 mode=barycenter seed=46 finished sta in 5585.0s (f1=0.391)
+[Parallel(n_jobs=2)]: Done   5 out of   5 | elapsed: 466.9min finished
+[07:45:14] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta batch done in 28011.1s peak_rss=3147MB (avg/job=1573MB)
+[07:45:14] [full_baseline/river] eucl_params@g=10000/barycenter=0.266±0.037(n=5)  eucl_params_nodiv@g=10000/barycenter=0.268±0.041(n=5)  eucl_raw@g=100/barycenter=0.308±0.040(n=5)  eucl_raw_nodiv@g=100/barycenter=0.310±0.042(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.468±0.043(n=5)  wasps_nodiv@g=100/barycenter=0.468±0.043(n=5)
+[07:45:14] [full_baseline] saved barycenter+sample plot data to results/jax_exp1bis_bary_baseline/river_bary_data.npy
+[07:45:14] ===== full_baseline done =====
+[done] wrote results/jax_exp1bis_bary_baseline/results/exp1bis_river.tex
+[07:45:17] [dump_arrays] saved series+labels (n_train=105 n_test=160) to results/jax_exp1bis_bary_baseline/river_series.npy
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[07:45:21] [dump_arrays] barycenters fitted for wasps (gamma=1e+04)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[07:45:21] [dump_arrays] barycenters fitted for wasps_nodiv (gamma=100)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[07:45:23] [dump_arrays] barycenters fitted for eucl_params (gamma=1e+04)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[07:45:24] [dump_arrays] barycenters fitted for eucl_params_nodiv (gamma=1e+04)
+[07:45:27] [dump_arrays] barycenters fitted for eucl_raw (gamma=100)
+[07:45:28] [dump_arrays] barycenters fitted for eucl_raw_nodiv (gamma=100)
+[09:13:03] [dump_arrays] barycenters fitted for sta (gamma=0.0001)
+[09:13:03] [dump_arrays] saved barycenters for 7 methods to results/jax_exp1bis_bary_baseline/river_barycenters.npy
+----- cpazmal -----
+[09:13:05] ===== full_baseline config=configs/exp1_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[09:13:05] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv', 'sta'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv', 'sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 10.0, 'eucl_params_nodiv': 1.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[09:13:05] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:13:13] [load] fold=None seed=45 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:13]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=45 data loaded in 6.18s (n_train=105 n_test=175)
+[09:13:13] [load] fold=None seed=42 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:13] [load] fold=None seed=44 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:13]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=42 data loaded in 6.44s (n_train=105 n_test=175)
+[09:13:13]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=44 data loaded in 6.41s (n_train=105 n_test=175)
+[09:13:13] [load] fold=None seed=43 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:13]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=43 data loaded in 6.42s (n_train=105 n_test=175)
+[09:13:23]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps in 9.7s (f1=0.625)
+[09:13:23]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps in 9.9s (f1=0.575)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   17.7s remaining:   26.5s
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:13:23]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps in 9.8s (f1=0.658)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   17.8s remaining:   11.9s
+[09:13:23]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps in 10.0s (f1=0.591)
+[09:13:28] [load] fold=None seed=46 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:28]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=46 data loaded in 5.34s (n_train=105 n_test=175)
+[09:13:32]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps in 3.4s (f1=0.584)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   26.5s finished
+[09:13:33] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps batch done in 26.5s peak_rss=11077MB (avg/job=2769MB)
+[09:13:33] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:13:41] [load] fold=None seed=45 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:41]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=45 data loaded in 6.38s (n_train=105 n_test=175)
+[09:13:41] [load] fold=None seed=43 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:41]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=43 data loaded in 6.41s (n_train=105 n_test=175)
+[09:13:41] [load] fold=None seed=44 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:41]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=44 data loaded in 6.44s (n_train=105 n_test=175)
+[09:13:41] [load] fold=None seed=42 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:41]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=42 data loaded in 6.46s (n_train=105 n_test=175)
+[09:13:49]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps_nodiv in 7.5s (f1=0.584)
+[09:13:49]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps_nodiv in 7.5s (f1=0.589)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   15.5s remaining:   23.3s
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:13:49]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps_nodiv in 7.6s (f1=0.650)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   15.7s remaining:   10.5s
+[09:13:49]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps_nodiv in 7.7s (f1=0.629)
+[09:13:54] [load] fold=None seed=46 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:13:54]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=46 data loaded in 5.26s (n_train=105 n_test=175)
+[09:13:56]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps_nodiv in 2.1s (f1=0.597)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   23.0s finished
+[09:13:58] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv batch done in 23.0s peak_rss=10699MB (avg/job=2675MB)
+[09:13:58] [full_baseline/cpazmal] gamma=10.0 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:14:05] [load] fold=None seed=42 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:05]   [cpazmal] gamma=10.0 method=eucl_params mode=barycenter seed=42 data loaded in 6.23s (n_train=105 n_test=175)
+[09:14:05] [load] fold=None seed=44 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:05]   [cpazmal] gamma=10.0 method=eucl_params mode=barycenter seed=44 data loaded in 6.24s (n_train=105 n_test=175)
+[09:14:06] [load] fold=None seed=43 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:06]   [cpazmal] gamma=10.0 method=eucl_params mode=barycenter seed=43 data loaded in 6.44s (n_train=105 n_test=175)
+[09:14:06] [load] fold=None seed=45 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:06]   [cpazmal] gamma=10.0 method=eucl_params mode=barycenter seed=45 data loaded in 6.45s (n_train=105 n_test=175)
+[09:14:12]   [cpazmal] gamma=10.0 mode=barycenter seed=44 finished eucl_params in 6.6s (f1=0.406)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:14:12]   [cpazmal] gamma=10.0 mode=barycenter seed=43 finished eucl_params in 6.5s (f1=0.369)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   14.5s remaining:   21.8s
+[09:14:12]   [cpazmal] gamma=10.0 mode=barycenter seed=42 finished eucl_params in 6.7s (f1=0.335)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   14.6s remaining:    9.7s
+[09:14:12]   [cpazmal] gamma=10.0 mode=barycenter seed=45 finished eucl_params in 6.7s (f1=0.424)
+[09:14:17] [load] fold=None seed=46 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:17]   [cpazmal] gamma=10.0 method=eucl_params mode=barycenter seed=46 data loaded in 5.11s (n_train=105 n_test=175)
+[09:14:19]   [cpazmal] gamma=10.0 mode=barycenter seed=46 finished eucl_params in 1.7s (f1=0.353)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   21.3s finished
+[09:14:20] [full_baseline/cpazmal] gamma=10.0 mode=barycenter method=eucl_params batch done in 21.3s peak_rss=10410MB (avg/job=2602MB)
+[09:14:20] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:14:28] [load] fold=None seed=44 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:28]   [cpazmal] gamma=1.0 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 6.08s (n_train=105 n_test=175)
+[09:14:28] [load] fold=None seed=42 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:28] [load] fold=None seed=43 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:28]   [cpazmal] gamma=1.0 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 6.09s (n_train=105 n_test=175)
+[09:14:28]   [cpazmal] gamma=1.0 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 6.10s (n_train=105 n_test=175)
+[09:14:28] [load] fold=None seed=45 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:28]   [cpazmal] gamma=1.0 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 6.38s (n_train=105 n_test=175)
+[09:14:34]   [cpazmal] gamma=1.0 mode=barycenter seed=44 finished eucl_params_nodiv in 5.6s (f1=0.349)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:14:34]   [cpazmal] gamma=1.0 mode=barycenter seed=43 finished eucl_params_nodiv in 5.7s (f1=0.336)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   13.3s remaining:   20.0s
+[09:14:34]   [cpazmal] gamma=1.0 mode=barycenter seed=42 finished eucl_params_nodiv in 5.7s (f1=0.395)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   13.4s remaining:    8.9s
+[09:14:34]   [cpazmal] gamma=1.0 mode=barycenter seed=45 finished eucl_params_nodiv in 5.4s (f1=0.440)
+[09:14:39] [load] fold=None seed=46 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:39]   [cpazmal] gamma=1.0 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 5.10s (n_train=105 n_test=175)
+[09:14:40]   [cpazmal] gamma=1.0 mode=barycenter seed=46 finished eucl_params_nodiv in 1.3s (f1=0.350)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   19.7s finished
+[09:14:42] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_params_nodiv batch done in 19.7s peak_rss=10489MB (avg/job=2622MB)
+[09:14:42] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:14:50] [load] fold=None seed=42 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:50] [load] fold=None seed=43 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:50]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=42 data loaded in 6.43s (n_train=105 n_test=175)
+[09:14:50]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=43 data loaded in 6.44s (n_train=105 n_test=175)
+[09:14:50] [load] fold=None seed=44 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:50]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=44 data loaded in 6.45s (n_train=105 n_test=175)
+[09:14:50] [load] fold=None seed=45 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:14:50]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=45 data loaded in 6.48s (n_train=105 n_test=175)
+[09:14:56]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw in 6.5s (f1=0.613)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:14:56]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw in 6.7s (f1=0.731)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   14.8s remaining:   22.2s
+[09:14:56]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw in 6.7s (f1=0.590)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   14.8s remaining:    9.9s
+[09:14:56]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw in 6.9s (f1=0.722)
+[09:15:02] [load] fold=None seed=46 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:02]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=46 data loaded in 5.30s (n_train=105 n_test=175)
+[09:15:03]   [cpazmal] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw in 1.5s (f1=0.730)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   21.5s finished
+[09:15:05] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw batch done in 21.5s peak_rss=10533MB (avg/job=2633MB)
+[09:15:05] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:15:12] [load] fold=None seed=44 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:12]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 6.16s (n_train=105 n_test=175)
+[09:15:13] [load] fold=None seed=43 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:13]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 6.40s (n_train=105 n_test=175)
+[09:15:13] [load] fold=None seed=45 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:13]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 6.43s (n_train=105 n_test=175)
+[09:15:13] [load] fold=None seed=42 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:13]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 6.73s (n_train=105 n_test=175)
+[09:15:18]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw_nodiv in 5.8s (f1=0.731)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:15:18]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw_nodiv in 5.7s (f1=0.613)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   13.7s remaining:   20.5s
+[09:15:18]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw_nodiv in 5.7s (f1=0.590)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   13.7s remaining:    9.2s
+[09:15:19]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw_nodiv in 5.6s (f1=0.722)
+[09:15:23] [load] fold=None seed=46 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:23]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 5.17s (n_train=105 n_test=175)
+[09:15:25]   [cpazmal] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw_nodiv in 1.2s (f1=0.730)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   20.0s finished
+[09:15:26] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv batch done in 20.0s peak_rss=10439MB (avg/job=2610MB)
+[09:15:26] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=2)]: Using backend LokyBackend with 2 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[09:15:33] [load] fold=None seed=42 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:33]   [cpazmal] gamma=0.0001 method=sta mode=barycenter seed=42 data loaded in 5.32s (n_train=105 n_test=175)
+[09:15:33] [load] fold=None seed=43 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[09:15:33]   [cpazmal] gamma=0.0001 method=sta mode=barycenter seed=43 data loaded in 5.37s (n_train=105 n_test=175)
+[10:06:41]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished sta in 3067.9s (f1=0.597)
+[Parallel(n_jobs=2)]: Done   1 tasks      | elapsed: 51.2min
+[cpazmal] loading from cache (max_groups_per_class=None)
+[10:06:41]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished sta in 3068.6s (f1=0.647)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[10:06:46] [load] fold=None seed=44 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[10:06:46]   [cpazmal] gamma=0.0001 method=sta mode=barycenter seed=44 data loaded in 5.26s (n_train=105 n_test=175)
+[10:06:47] [load] fold=None seed=45 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[10:06:47]   [cpazmal] gamma=0.0001 method=sta mode=barycenter seed=45 data loaded in 5.14s (n_train=105 n_test=175)
+[10:57:51]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished sta in 3064.8s (f1=0.678)
+[Parallel(n_jobs=2)]: Done   3 out of   5 | elapsed: 102.4min remaining: 68.3min
+[cpazmal] loading from cache (max_groups_per_class=None)
+[10:57:51]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished sta in 3064.7s (f1=0.565)
+[10:57:57] [load] fold=None seed=46 T=29 aggregate_days=None window_size=9 samples_per_step=48 n_train=105 (cap=105) n_test=175 (cap=175) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[10:57:57]   [cpazmal] gamma=0.0001 method=sta mode=barycenter seed=46 data loaded in 5.20s (n_train=105 n_test=175)
+[11:18:31]   [cpazmal] gamma=0.0001 mode=barycenter seed=46 finished sta in 1234.4s (f1=0.679)
+[Parallel(n_jobs=2)]: Done   5 out of   5 | elapsed: 123.1min finished
+[11:18:32] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=sta batch done in 7384.9s peak_rss=4158MB (avg/job=2079MB)
+[11:18:32] [full_baseline/cpazmal] eucl_params@g=10/barycenter=0.378±0.033(n=5)  eucl_params_nodiv@g=1/barycenter=0.374±0.039(n=5)  eucl_raw@g=0.0001/barycenter=0.677±0.062(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.677±0.062(n=5)  sta@g=0.0001/barycenter=0.633±0.045(n=5)  wasps@g=0.01/barycenter=0.606±0.031(n=5)  wasps_nodiv@g=0.01/barycenter=0.610±0.026(n=5)
+[11:18:32] ===== full_baseline done =====
+[done] wrote results/jax_exp1bis_bary_baseline/results/exp1bis_cpazmal.tex
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:18:38] [dump_arrays] saved series+labels (n_train=105 n_test=175) to results/jax_exp1bis_bary_baseline/cpazmal_series.npy
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:18:49] [dump_arrays] barycenters fitted for wasps (gamma=0.01)
+[11:18:51] [dump_arrays] barycenters fitted for wasps_nodiv (gamma=0.01)
+[11:18:52] [dump_arrays] barycenters fitted for eucl_params (gamma=10)
+[11:18:53] [dump_arrays] barycenters fitted for eucl_params_nodiv (gamma=1)
+[11:18:55] [dump_arrays] barycenters fitted for eucl_raw (gamma=0.0001)
+[11:18:56] [dump_arrays] barycenters fitted for eucl_raw_nodiv (gamma=0.0001)
+[11:39:24] [dump_arrays] barycenters fitted for sta (gamma=0.0001)
+[11:39:24] [dump_arrays] saved barycenters for 7 methods to results/jax_exp1bis_bary_baseline/cpazmal_barycenters.npy
+[11:39:26] [exp1-plot] fitting narrow STA barycenter (2 classes, n_train=52, n_steps=15) …
+[11:48:42] [exp1-plot] STA barycenter fit done, f1=0.619
+[11:48:43] [exp1-plot] wrote results/jax_exp1bis_bary_baseline/results/exp1_river_bary_NG.pdf
+[11:48:44] [exp1-plot] wrote results/jax_exp1bis_bary_baseline/results/exp1_river_bary_PN.pdf
+===== 2026-07-15 11:48:44 exp1bis_bary_baseline done =====

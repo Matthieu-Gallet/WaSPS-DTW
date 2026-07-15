@@ -232,9 +232,13 @@ def _load_cpazmal(cfg: dict, seed: int = 42, fold: Optional[int] = None) -> dict
     hdf5_path = ds["hdf5_path"]
     max_groups_per_class = ds.get("max_groups_per_class")
     window_size = ds.get("window_size", 12)
+    scale_type  = ds.get("scale_type", "amplitude")
     cache_dir  = Path(ds.get("cache_dir", "data/cpazmal"))
     mgpc_part  = "all" if max_groups_per_class is None else f"mgpc{max_groups_per_class}"
-    suffix     = f"{mgpc_part}_w{window_size}"
+    # scale_type suffix only appended when non-default, so existing amplitude
+    # caches (w9/w12/...) stay valid and don't trigger a spurious re-extraction.
+    scale_suffix = "" if scale_type == "amplitude" else f"_{scale_type}"
+    suffix     = f"{mgpc_part}_w{window_size}{scale_suffix}"
     cx         = cache_dir / f"X_{suffix}.npy"
     cy         = cache_dir / f"y_{suffix}.npy"
     cg         = cache_dir / f"groups_{suffix}.npy"
@@ -249,10 +253,11 @@ def _load_cpazmal(cfg: dict, seed: int = 42, fold: Optional[int] = None) -> dict
         meta    = json.loads(cmeta.read_text()) if cmeta.exists() else {}
         class_names = {int(k): v for k, v in meta.get("class_names", {}).items()}
     else:
-        print(f"[cpazmal] extracting from HDF5 (max_groups_per_class={max_groups_per_class}) …", flush=True)
+        print(f"[cpazmal] extracting from HDF5 (max_groups_per_class={max_groups_per_class}, "
+              f"window_size={window_size}, scale_type={scale_type}) …", flush=True)
         loader = MLDatasetLoader(hdf5_path)
         data   = extract_time_series(loader, max_groups_per_class=max_groups_per_class,
-                                      window_size=window_size)
+                                      window_size=window_size, scale_type=scale_type)
         X       = list(data["X"])
         labels  = np.asarray(data["y"])
         groups  = np.asarray(data["groups"])

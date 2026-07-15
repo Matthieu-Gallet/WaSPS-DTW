@@ -127,6 +127,19 @@ def fit_weibull_mle(x: np.ndarray) -> tuple[float, float]:
     return k_hat, lam_hat
 
 
+def fit_weibull_fixed_k(x: np.ndarray, k: float) -> tuple[float, float]:
+    """Weibull scale λ via MLE with shape k FIXED (not estimated).
+
+    Closed form for known shape: λ̂ = (mean(x^k))^(1/k) (standard result —
+    maximizes the Weibull log-likelihood in λ at fixed k). Returns (k, λ̂)
+    unchanged/estimated respectively, for interface parity with
+    fit_weibull_mle/fit_weibull_log_cumulant.
+    """
+    x = np.asarray(x, dtype=np.float64)
+    lam_hat = float(np.mean(x ** k) ** (1.0 / k))
+    return float(k), lam_hat
+
+
 # ---------------------------------------------------------------------------
 # Distribution classes
 # ---------------------------------------------------------------------------
@@ -188,7 +201,13 @@ class Weibull:
         return (k / lam) * z ** (k - 1.0) * jnp.exp(-(z ** k))
 
     def estimate(self, sample: np.ndarray, method: str = 'mle') -> tuple[float, float]:
-        """Fit (k, λ) from a 1-D sample (already cleaned)."""
+        """Fit (k, λ) from a 1-D sample (already cleaned).
+
+        method='fixed_k<value>' (e.g. 'fixed_k2') fixes the shape to <value>
+        and only estimates λ — see fit_weibull_fixed_k.
+        """
+        if method.startswith('fixed_k'):
+            return fit_weibull_fixed_k(sample, float(method[len('fixed_k'):]))
         if method == 'log_cumulant':
             return fit_weibull_log_cumulant(sample)
         return fit_weibull_mle(sample)
@@ -208,8 +227,8 @@ class Weibull:
                 UserWarning,
                 stacklevel=2,
             )
-        if method not in ('mle', 'log_cumulant'):
-            raise ValueError(f"method must be 'mle' or 'log_cumulant', got '{method}'")
+        if method not in ('mle', 'log_cumulant') and not method.startswith('fixed_k'):
+            raise ValueError(f"method must be 'mle', 'log_cumulant', or 'fixed_k<value>', got '{method}'")
         rows = _to_rows(series)
         params = np.full((len(rows), 2), np.nan, dtype=dtype)
         for t, row in enumerate(rows):

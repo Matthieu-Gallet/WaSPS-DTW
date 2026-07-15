@@ -274,10 +274,21 @@ def _eval_bary(method: str, family: str, sta_epsilon: float,
               test_raw: list, test_labels: np.ndarray,
               gamma: float, lr: float, n_steps: int, optimizer: str = "sgd",
               patience: int = 15, min_rel_improve: float = 1e-4,
-              estimator: str = 'mle', tag: str = None) -> dict:
+              estimator: str = 'mle', tag: str = None, bary_n_jobs: int = 4,
+              return_arrays: bool = False) -> dict:
     """Returns {"f1", "f1_per_class", "train_time", "test_time", "total_time"}.
     train_time = train repr build + fit_barycenters (the actual training cost);
-    test_time = test repr build + predict (the only cost depending on the test set)."""
+    test_time = test repr build + predict (the only cost depending on the test set).
+
+    bary_n_jobs: class-level parallelism inside fit_barycenters — defaults to 4
+    (unchanged behavior for existing callers). Callers that already parallelize
+    over an outer axis (e.g. run_full_baseline.py's per-seed batch) should pass a
+    smaller value for expensive per-class costs (STA) to avoid nested-parallelism
+    RSS blowup (outer_n_jobs x bary_n_jobs worker processes).
+
+    return_arrays: when True, also returns "bary"/"train_repr"/"train_labels"/
+    "test_repr"/"test_labels" — used to build a consolidated plotting dataset
+    (e.g. run_full_baseline.py's bary_data.npy) without a second fit."""
     repr_type = _METHODS[method]['repr']
     t0 = time.time()
     train_repr, train_repr_l = build_repr(train_raw, train_labels, repr_type, family, estimator)
@@ -288,7 +299,7 @@ def _eval_bary(method: str, family: str, sta_epsilon: float,
     bary = fit_barycenters(train_repr, train_repr_l, softdtw_bary,
                            n_steps=n_steps, lr=lr, optimizer=optimizer,
                            patience=patience, min_rel_improve=min_rel_improve,
-                           n_jobs=4, verbose=False)  # class-level parallelism capped at 4
+                           n_jobs=bary_n_jobs, verbose=False)
     t_train = time.time() - t0
     if tag is not None:
         _save_bary_debug(tag, bary, train_repr, train_repr_l, family=family, method=method)
@@ -299,7 +310,14 @@ def _eval_bary(method: str, family: str, sta_epsilon: float,
         return _nan_eval_result()
     preds = predict(test_repr, bary, cost_fn, gamma)
     t_test = time.time() - t1
-    return _make_eval_result(preds, test_repr_l, t_train, t_test)
+    result = _make_eval_result(preds, test_repr_l, t_train, t_test)
+    if return_arrays:
+        result["bary"] = bary
+        result["train_repr"] = train_repr
+        result["train_labels"] = train_repr_l
+        result["test_repr"] = test_repr
+        result["test_labels"] = test_repr_l
+    return result
 
 
 # ---------------------------------------------------------------------------

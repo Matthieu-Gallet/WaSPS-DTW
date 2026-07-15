@@ -183,6 +183,77 @@ def _group_mean_std(rows: list, key_fn, value_key: str) -> dict:
            for k, v in groups.items()}
 
 
+def render_metric_rows_table(methods: list, row_specs: list,
+                             caption: str = None, label: str = None) -> str:
+    """row_specs: [(row_label, {method: formatted_str}), ...] — rows=metric,
+    columns=method. Used by Experiment 1's per-mode summary table (F1 / time /
+    RAM, one fixed gamma, no sweep axis)."""
+    lines = [
+        r"\begin{table}[htbp]",
+        r"\centering",
+        r"\begin{NiceTabular}{l" + "c" * len(methods) + "}",
+        r"\toprule",
+        r"Metric & " + " & ".join(_latex_escape(m) for m in methods) + r" \\",
+        r"\midrule",
+    ]
+    for row_label, values in row_specs:
+        row_cells = [values.get(m, "--") for m in methods]
+        lines.append(f"{_latex_escape(row_label)} & " + " & ".join(row_cells) + r" \\")
+    lines.append(r"\bottomrule")
+    lines.append(r"\end{NiceTabular}")
+    if caption:
+        lines.append(f"\\caption{{{caption}}}")
+    if label:
+        lines.append(f"\\label{{{label}}}")
+    lines.append(r"\end{table}")
+    return "\n".join(lines)
+
+
+def table_from_exp1_detail(detail_csv: Path, mode: str, dataset_label: str = None,
+                           label_prefix: str = None) -> str:
+    """Experiment 1's fixed-gamma detail CSV (method x mode x seed) -> one
+    NiceTabular table for the given mode: columns=method (7), rows=F1 mean+-std,
+    total time mean+-std, RAM mean (no std — rss_mb is batch-granular, not
+    per-seed, see run_full_baseline.py module docstring)."""
+    with open(detail_csv, newline="") as f:
+        all_rows = list(csv.DictReader(f))
+    rows = [r for r in all_rows if r.get("mode", "knn") == mode]
+
+    # Always show all 7 methods as columns (union across modes in this CSV) — a
+    # method absent from THIS mode (e.g. sta, excluded from barycenter fitting;
+    # see run_full_baseline.py module docstring) still gets a column, rendered
+    # "--", so the knn and barycenter subtables line up column-for-column.
+    all_methods = {r["method"] for r in all_rows}
+    methods = [m for m in _FULL_BASELINE_METHOD_ORDER if m in all_methods]
+    methods += sorted(all_methods - set(methods))
+    if not rows:
+        return render_metric_rows_table(
+            methods, [("F1", {}), ("Time (s)", {}), ("RAM (MB)", {})],
+            caption=f"{dataset_label or ''} --- {mode}", label=None)
+
+    f1 = _group_mean_std(rows, lambda r: r["method"], "f1")
+    time = _group_mean_std(rows, lambda r: r["method"], "total_time")
+    ram = _group_mean_std(rows, lambda r: r["method"], "rss_mb")
+
+    f1_fmt = {m: _fmt(*f1.get(m, (float('nan'), float('nan')))) for m in methods}
+    time_fmt = {m: _fmt(*time.get(m, (float('nan'), float('nan')))) for m in methods}
+    ram_fmt = {m: (f"{ram[m][0]:.0f}" if m in ram else "--") for m in methods}
+
+    prefix = f"{dataset_label} --- " if dataset_label else ""
+    mode_label = "KNN" if mode == "knn" else "Barycenter"
+    return render_metric_rows_table(
+        methods, [("F1", f1_fmt), ("Time (s)", time_fmt), ("RAM (MB)", ram_fmt)],
+        caption=f"{prefix}{mode_label}", label=f"{label_prefix}_{mode}" if label_prefix else None)
+
+
+def tables_from_exp1_detail(detail_csv: Path, dataset_label: str = None,
+                            label_prefix: str = None) -> str:
+    """Both mode subtables (knn, barycenter) for one dataset's exp1 detail CSV."""
+    knn_table = table_from_exp1_detail(detail_csv, "knn", dataset_label, label_prefix)
+    bary_table = table_from_exp1_detail(detail_csv, "barycenter", dataset_label, label_prefix)
+    return knn_table + "\n\n" + bary_table + "\n"
+
+
 def tables_from_full_baseline_detail(detail_csv: Path, dataset_label: str = None,
                                      label_prefix: str = None) -> str:
     """run_full_baseline.py's full_baseline_<name>_detail.csv (one row per
@@ -241,6 +312,18 @@ def main():
     p3.add_argument("--dataset-label", default=None)
     p3.add_argument("--label-prefix", default=None)
 
+    p4 = sub.add_parser("exp1",
+                        help="per-method gamma summary table(s) (F1/time/RAM x method) "
+                             "from Experiment 1 / 1bis's detail CSV")
+    p4.add_argument("--detail-csv", required=True)
+    p4.add_argument("--out", required=True)
+    p4.add_argument("--dataset-label", default=None)
+    p4.add_argument("--label-prefix", default=None)
+    p4.add_argument("--mode", default=None, choices=[None, "knn", "barycenter"],
+                    help="single-subtable output for this mode only (Experiment 1 / 1bis, "
+                         "each single-mode) — omit for the old 2-subtable knn+barycenter "
+                         "combined format (back-compat)")
+
     args = parser.parse_args()
 
     if args.kind == "classif":
@@ -250,6 +333,15 @@ def main():
         tex = tables_from_full_baseline_detail(Path(args.detail_csv),
                                                dataset_label=args.dataset_label,
                                                label_prefix=args.label_prefix)
+    elif args.kind == "exp1":
+        if args.mode:
+            tex = table_from_exp1_detail(Path(args.detail_csv), args.mode,
+                                         dataset_label=args.dataset_label,
+                                         label_prefix=args.label_prefix)
+        else:
+            tex = tables_from_exp1_detail(Path(args.detail_csv),
+                                          dataset_label=args.dataset_label,
+                                          label_prefix=args.label_prefix)
     else:
         tex = table_from_sensitivity_dir(Path(args.dir), args.scenario, args.mode,
                                          caption=args.caption, label=args.label)

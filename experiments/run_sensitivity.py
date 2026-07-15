@@ -102,7 +102,7 @@ def _sweep_value_across_folds(base_cfg: dict, method: str, mode: str, iterations
         data = _load_and_cap(base_cfg, fold, seed, dataset_overrides, classification_overrides)
         X_train, X_test = data["X_train"], data["X_test"]
         if decimate_fraction is not None:
-            rng = np.random.default_rng(seed * 1000 + fold)
+            rng = np.random.default_rng(seed * 1000 + (fold if fold is not None else 0))
             X_train = decimate_series(X_train, decimate_fraction, rng)
             X_test  = decimate_series(X_test,  decimate_fraction, rng)
         if mode == 'knn':
@@ -111,9 +111,13 @@ def _sweep_value_across_folds(base_cfg: dict, method: str, mode: str, iterations
         else:
             # tag only the first (fold,seed) per sweep value — see grid_bary's analogous choice
             tag = tag_prefix if (tag_prefix is not None and i == 0) else None
+            # bary_n_jobs=1: this function already runs inside an outer Parallel (across
+            # sweep values, see _run_sweep) — the _eval_bary default of 4 would nest
+            # dangerously (outer_n_jobs x 4 processes), the same pattern documented as
+            # having OOM'd this machine before (see run_full_baseline.py module docstring).
             res = _eval_bary(method, family, sta_epsilon, X_train, data["y_train"],
                              X_test, data["y_test"], gamma, lr, n_steps, optimizer,
-                             patience, min_rel_improve, estimator, tag)
+                             patience, min_rel_improve, estimator, tag, bary_n_jobs=1)
         records.append({"seed": seed, "fold": fold, **res})
     return records
 

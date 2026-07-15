@@ -1,73 +1,64 @@
-"""Final method-comparison baseline — KNN-only, both datasets, divergence vs non-divergence.
+"""Method-comparison baseline — both datasets, divergence vs non-divergence, KNN and/or
+barycenter mode. Shared engine behind exp1_knn_baseline.sh and exp1bis_bary_baseline.sh
+(each: per-method gamma from experiments/optimize_gamma.py's best_params.json, both
+datasets, single mode).
 
-Replaces experiments/run_sensitivity.py's old `final_comparison` scenario. Reads a
-SINGLE config (configs/full_baseline.yaml) covering both river and cpazmal in their own
-`river:`/`cpazmal:` sub-blocks — unlike the old final_comparison, which needed a second
-`--cpazmal-config` file.
+Per-method gamma (2026-07-14): `--gamma-by-method-json <path> --gamma-by-method-key
+{knn,bary}` loads `{method: {"gamma":..}}` from a best_params.json (the schema
+experiments/optimize_gamma.py / run_optim_hyper.py's grid_knn/grid_bary already write) and
+uses each method's own optimal gamma instead of sweeping `gamma_values`. See
+`run_full_baseline()`'s `gamma_by_method` param — when None (default), behavior is
+identical to the gamma-sweep path below.
 
-Methods: wasps/eucl_params/eucl_raw + STA (the original final_comparison scope), plus a
-`_nodiv` variant of each of the 3 non-STA methods — is_divergence=False (and, for wasps,
-log_correction=False) — to evaluate divergence vs non-divergence KNN performance. This
-required adding an `is_divergence` flag to src/classification/nn.py's knn_predict
-(2026-07-08): previously is_divergence only affected barycenter fitting/predict, so a
-naive eucl_params_nodiv would have been indistinguishable from eucl_params in a KNN-only
-comparison. See experiments/method_defs.py for exactly which methods get
-is_divergence=True vs False.
+Methods: wasps/eucl_params/eucl_raw + STA, plus a `_nodiv` variant of each of the 3
+non-STA methods (is_divergence=False, and for wasps also log_correction=False) — see
+experiments/method_defs.py for exactly which methods get is_divergence=True vs False.
 
-Repetition: `n_seeds` (top-level int, default 4) independent random holdout splits — NO
-k-fold (each dataset's cross_validation is forced to n_splits=1 internally, regardless
-of what the dataset's own classification config would otherwise use elsewhere) — "shuffle
-+ select" per the user's request, not StratifiedGroupKFold.
+Modes: `--modes knn,barycenter` (default knn only, matching this script's original
+scope). STA is excluded from barycenter mode by default (`--bary-methods` controls the
+method list actually fit as barycenters) — CLAUDE.md's STA complexity warning + an
+empirical timing gate on this machine (2 gradient steps on ONE cpazmal fold, 15
+train/class × 7 classes, T=29, still running past 150s) confirm STA-barycenter is not
+tractable at Experiment 1's scale (5 seeds × 2 datasets). STA-KNN remains tractable (the
+Sinkhorn cost matrix is O(T²) but built once per pair, no gradient loop) and stays in
+the default method list for knn mode.
+
+Seed-level resume (2026-07-12): resumption is keyed on (method, gamma, mode, seed), not
+(method, gamma) — bumping n_seeds and re-running only computes the missing seeds and
+recomputes the mean/std over the full old+new seed set, so "keep 4 seeds, add 6 more"
+does not silently no-op (the previous (method,gamma)-only key would skip everything
+once any seed existed).
 
 Gamma sweep: a dataset's `classification.gamma_values` (list) sweeps gamma instead of
-using the single `classification.gamma` scalar — output rows/detail rows gain a `gamma`
-column. Re-running is incremental: a (method, gamma) pair already present in the summary
-CSV (from a prior run) is skipped unless --force, so e.g. adding two new gamma values for
-a dataset that already has results for gamma=1.0 only computes the new ones and merges
-them into the existing CSV rather than recomputing (and clobbering) everything.
-
+using the single `classification.gamma` scalar — output rows gain a `gamma` column.
 --dataset {river,cpazmal,both} restricts which dataset(s) to run (default both).
---gamma overrides gamma_values entirely with a single value, for one-off single-gamma runs
-(used by run_full_baseline_sweep.sh to run one (dataset, gamma) pair per OS process).
+--gamma overrides gamma_values entirely with a single value.
 
-Memory management (2026-07-09): STA's Sinkhorn calls accumulate RSS within a loky worker
-over the course of one method's batch (observed: ~5GB/worker growing over the ~60min it
-takes to run 4-5 seeds of STA on river, T=52 — not caused by JIT recompiles, since river's
-raw series are rectangular/uniform-shape after to_fixed_n; more likely XLA CPU allocator
-buffer accumulation across many small Sinkhorn dispatches in the same process). Two
-mitigations, both in this file:
-  (1) Method barrier: methods now run strictly sequentially (all seeds of method M finish
-      before method M+1 starts), each in its OWN joblib/loky worker pool — the pool is
-      explicitly torn down (get_reusable_executor().shutdown(kill_workers=True)) after
-      each method's batch so the next method's workers start with clean XLA allocators.
-      This is required because joblib's loky backend otherwise reuses a persistent global
-      executor across separate Parallel(...) calls, so jax.clear_caches() in the parent
-      process would NOT touch the workers' accumulated memory.
-  (2) A background psutil thread samples total RSS across the worker process tree once a
-      second during each method's batch, reporting the peak (and peak/n_jobs as an
-      average-per-job figure) to a dedicated `full_baseline_{name}_resource.csv`.
-n_jobs/n_seeds default to 4 (was 5) — user-chosen tradeoff after a repeated OOM/crash at
-n_jobs=5 (~26GB RSS for 5 STA workers, close to the 31GB machine's ceiling and still
-growing over a single batch).
+Memory management (2026-07-09/10): STA's Sinkhorn calls accumulate RSS within a loky
+worker over the course of one method's batch. Two mitigations:
+  (1) Method barrier: methods run strictly sequentially, each in its own joblib/loky
+      worker pool, torn down (get_reusable_executor().shutdown(kill_workers=True))
+      after each method's batch.
+  (2) A background psutil thread samples total RSS across the worker process tree once
+      a second during each method's batch, reporting peak/n_jobs (average-per-job RSS)
+      into the detail CSV's rss_mb column (one value per method/gamma/mode batch,
+      replicated across that batch's seed rows — batch-granular, not a true per-seed
+      figure; never compute a std from it).
+--sta-n-jobs caps STA's own concurrency (both the outer per-seed pool AND, in
+barycenter mode, the inner per-class fit_barycenters pool) separately from --n-jobs —
+cpazmal's STA has ~5.75x more (test,train) pairs than river's at equal per-class sample
+caps (7 vs 4 classes), OOM'd at n_jobs=4.
 
-Output per dataset: full_baseline_{river,cpazmal}.csv (f1_mean/f1_std/n_ok + gamma +
-train/test/total time means), full_baseline_{river,cpazmal}_detail.csv (one row per
-method × gamma × seed — individual F1, per-class F1 breakdown, timings), and
-full_baseline_{river,cpazmal}_resource.csv (one row per method × gamma — batch wall time,
-average per-job time, peak/average-per-job RSS, data-load time/RSS) — all written
-incrementally after each method's batch completes, so a crash mid-run only loses the
-in-progress method, not the whole gamma/dataset.
+Output per dataset: full_baseline_{river,cpazmal}_detail.csv (one row per method x
+gamma x mode x seed: F1, per-class F1 breakdown, timings, rss_mb) and
+full_baseline_{river,cpazmal}.log — summary means are derived from the detail CSV at
+table-extraction time (experiments/extract_latex_tables.py), not persisted separately.
 
 Usage:
-    python experiments/run_full_baseline.py --config configs/full_baseline.yaml --n-jobs 4
-    python experiments/run_full_baseline.py --config configs/full_baseline.yaml \\
-        --dataset cpazmal --n-jobs 4
-    python experiments/run_full_baseline.py --config configs/full_baseline.yaml \\
-        --dataset river --gamma 1e-2 --n-jobs 4
-
-    # Preferred: sequential per-(dataset,gamma) OS processes, full memory reclaim between
-    # them for free (process exit) — see run_full_baseline_sweep.sh
-    ./run_full_baseline_sweep.sh
+    python experiments/run_full_baseline.py --config configs/exp1_baseline.yaml \\
+        --modes knn,barycenter --n-jobs 4 --sta-n-jobs 2
+    python experiments/run_full_baseline.py --config configs/exp2_cpazmal_gamma.yaml \\
+        --dataset cpazmal --n-jobs 4 --sta-n-jobs 2
 """
 
 from __future__ import annotations
@@ -90,12 +81,11 @@ _HERE = Path(__file__).parent
 sys.path.insert(0, str(_HERE))
 
 from experiment_common import (
-    _log, _iterations, _eval_knn, _write_csv, _write_detail_csv, _time_summary, _detail_row,
+    _log, _iterations, _eval_knn, _eval_bary, _write_detail_csv, _detail_row,
 )
 
 # is_divergence=True for the base (divergence-on) methods; False for the _nodiv
-# variants and unused (but harmless) for 'sta', which has no divergence concept —
-# _eval_knn only forwards is_divergence to the non-STA (sdtw_knn) branch.
+# variants and unused (but harmless) for 'sta', which has no divergence concept.
 _IS_DIVERGENCE = {
     'wasps': True,        'wasps_nodiv': False,
     'eucl_params': True,  'eucl_params_nodiv': False,
@@ -105,38 +95,28 @@ _IS_DIVERGENCE = {
 
 _DEFAULT_METHODS = ['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv',
                     'eucl_raw', 'eucl_raw_nodiv', 'sta']
+# STA excluded by default from barycenter fitting — see module docstring.
+_DEFAULT_BARY_METHODS = ['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv',
+                         'eucl_raw', 'eucl_raw_nodiv']
 
-_SUMMARY_FIELDS = ["method", "gamma", "f1_mean", "f1_std", "n_ok",
-                   "train_time_mean", "test_time_mean", "total_time_mean"]
-_DETAIL_FIELDS = ["method", "gamma", "seed", "f1", "train_time", "test_time", "total_time"]
-_RESOURCE_FIELDS = ["method", "gamma", "n_jobs", "n_tasks", "batch_wall_time_s",
-                    "avg_task_time_s", "peak_total_rss_mb", "avg_rss_per_job_mb",
-                    "load_avg_time_s", "load_avg_rss_mb"]
+_DETAIL_FIELDS = ["method", "gamma", "mode", "seed", "f1",
+                  "train_time", "test_time", "total_time", "rss_mb"]
+
+_NUMERIC_FIELDS = ("gamma", "seed", "f1", "train_time", "test_time", "total_time", "rss_mb")
 
 
 def _gamma_key(g) -> str:
     return f"{float(g):.6g}"
 
 
-_NUMERIC_FIELDS = ("gamma", "f1_mean", "f1_std", "n_ok", "seed", "f1",
-                   "train_time_mean", "test_time_mean", "total_time_mean",
-                   "train_time", "test_time", "total_time",
-                   "n_jobs", "n_tasks", "batch_wall_time_s", "avg_task_time_s",
-                   "peak_total_rss_mb", "avg_rss_per_job_mb",
-                   "load_avg_time_s", "load_avg_rss_mb")
-
-
-def _read_existing_csv(path: Path) -> list:
+def _read_existing_detail(path: Path) -> list:
     if not path.exists():
         return []
     with open(path, newline="") as f:
         rows = list(csv.DictReader(f))
     for r in rows:
-        r.setdefault("gamma", "")
         for key in list(r.keys()):
             if r[key] in (None, ""):
-                if key == "gamma":
-                    r[key] = 1.0
                 continue
             if key in _NUMERIC_FIELDS or key.startswith("f1_class_"):
                 try:
@@ -149,8 +129,7 @@ def _read_existing_csv(path: Path) -> list:
 def _build_dataset_cfg(base_cfg: dict, name: str, estimator: str, n_seeds: int,
                        gamma: float = None) -> dict:
     """One dataset's {dataset, classification} sub-block, forced to holdout mode
-    (cross_validation.n_splits=1) regardless of any cross_validation block the
-    original dataset config would otherwise carry — this script never k-folds."""
+    (cross_validation.n_splits=1) — this script never k-folds."""
     ds_block = base_cfg[name]
     clf = {**ds_block["classification"], "estimator": estimator}
     if gamma is not None:
@@ -200,11 +179,52 @@ class _RssMonitor:
         return self._peak / (1024 ** 2)
 
 
-def run_full_baseline(base_cfg: dict, out_dir: Path, methods: list, n_seeds: int,
-                      estimator: str, seed: int, n_jobs: int = 4,
+def _one_method_seed(cfg, name, gamma, method, mode, family, sta_epsilon, k,
+                     estimator, bary_n_jobs, seed_i, fold, want_arrays):
+    from experiment_common import _load_and_cap
+    t0 = time.time()
+    data = _load_and_cap(cfg, fold, seed_i)
+    t_load = time.time() - t0
+    _log(f"  [{name}] gamma={gamma} method={method} mode={mode} seed={seed_i} "
+         f"data loaded in {t_load:.2f}s "
+         f"(n_train={len(data['X_train'])} n_test={len(data['X_test'])})")
+    t1 = time.time()
+    if mode == 'knn':
+        result = _eval_knn(method, family, sta_epsilon,
+                           data["X_train"], data["y_train"],
+                           data["X_test"], data["y_test"], gamma, k, estimator,
+                           is_divergence=_IS_DIVERGENCE.get(method, False))
+    else:
+        clf = cfg["classification"]
+        result = _eval_bary(method, family, sta_epsilon,
+                            data["X_train"], data["y_train"],
+                            data["X_test"], data["y_test"], gamma,
+                            lr=clf.get("lr", 1e-2), n_steps=clf.get("n_steps_bary", 100),
+                            optimizer=clf.get("optimizer", "sgd"),
+                            patience=clf.get("early_stop_patience", 15),
+                            min_rel_improve=clf.get("early_stop_tol", 1e-4),
+                            estimator=estimator, bary_n_jobs=bary_n_jobs,
+                            return_arrays=want_arrays)
+    t_method = time.time() - t1
+    _log(f"  [{name}] gamma={gamma} mode={mode} seed={seed_i} finished {method} in "
+         f"{t_method:.1f}s (f1={result['f1']:.3f})")
+    return {"seed": seed_i, "fold": fold, "result": result, "t_method": t_method}
+
+
+def run_full_baseline(base_cfg: dict, out_dir: Path, methods: list, bary_methods: list,
+                      modes: list, n_seeds: int, estimator: str, seed: int, n_jobs: int = 4,
                       datasets: tuple = ("river", "cpazmal"),
                       gamma_override: float = None, force: bool = False,
-                      sta_n_jobs: int = None) -> None:
+                      sta_n_jobs: int = None, bary_plot_dataset: str = None,
+                      bary_plot_methods: list = None, gamma_by_method: dict = None) -> None:
+    """gamma_by_method: optional {method: gamma} — when given, REPLACES the gamma_values
+    sweep entirely: each method uses its own fixed gamma instead of the dataset's
+    gamma_values/gamma_override/gamma scalar. `cfg["classification"]["gamma"]` (built once
+    per dataset below) is never read downstream — the gamma actually used for evaluation is
+    always the explicit loop variable — so this override is safe and doesn't need per-gamma
+    cfg rebuilding. When None (default), behavior is byte-identical to the sweep path."""
+    bary_plot_data: dict = {}
+
     for name in datasets:
         if name not in base_cfg:
             _log(f"[full_baseline] skipping {name}: no config block provided")
@@ -217,144 +237,134 @@ def run_full_baseline(base_cfg: dict, out_dir: Path, methods: list, n_seeds: int
         else:
             gamma_values = [ds_clf["gamma"]]
 
-        summary_path  = out_dir / f"full_baseline_{name}.csv"
-        detail_path   = out_dir / f"full_baseline_{name}_detail.csv"
-        resource_path = out_dir / f"full_baseline_{name}_resource.csv"
-        summary_by_key = {(r["method"], _gamma_key(r["gamma"])): r
-                          for r in _read_existing_csv(summary_path)}
-        detail_rows = _read_existing_csv(detail_path)
-        resource_by_key = {(r["method"], _gamma_key(r["gamma"])): r
-                           for r in _read_existing_csv(resource_path)}
+        detail_path = out_dir / f"full_baseline_{name}_detail.csv"
+        detail_rows = _read_existing_detail(detail_path)
+        existing_keys = {(r["method"], _gamma_key(r["gamma"]), r.get("mode", "knn"), r["seed"])
+                         for r in detail_rows}
 
-        for gamma in gamma_values:
-            gamma_key = _gamma_key(gamma)
-            methods_needed = methods if force else [
-                m for m in methods if (m, gamma_key) not in summary_by_key
-            ]
-            if not methods_needed:
-                _log(f"[full_baseline/{name}] gamma={gamma} already computed for all "
-                     f"methods — skip (use --force to recompute)")
-                continue
-            _log(f"[full_baseline/{name}] gamma={gamma} computing methods={methods_needed}")
+        want_plot = (name == bary_plot_dataset)
+        plot_methods = set(bary_plot_methods or [])
 
-            cfg = _build_dataset_cfg(base_cfg, name, estimator, n_seeds, gamma=gamma)
-            family      = cfg["dataset"]["family"]
-            sta_epsilon = cfg["classification"].get("sta_epsilon", 0.05)
-            k           = cfg["classification"].get("k", 1)
-            iterations  = _iterations(cfg, seed)  # holdout: [(seed_i, None), ...] — no fold axis
+        cfg = _build_dataset_cfg(base_cfg, name, estimator, n_seeds, gamma=gamma_values[0])
+        family      = cfg["dataset"]["family"]
+        sta_epsilon = cfg["classification"].get("sta_epsilon", 0.05)
+        k           = cfg["classification"].get("k", 1)
+        target_seeds = [s for s, _ in _iterations(cfg, seed)]
 
-            # Methods run strictly sequentially (barrier), each with its own fresh
-            # loky worker pool — required both to report clean per-method
-            # time/RAM stats and to actually release worker RSS between methods
-            # (see module docstring: "Memory management").
-            for method in methods_needed:
-                def _one_method_seed(seed_i, fold, _method=method, _cfg=cfg,
-                                     _family=family, _sta_epsilon=sta_epsilon,
-                                     _gamma=gamma, _k=k):
-                    from experiment_common import _load_and_cap
-                    t0 = time.time()
-                    data = _load_and_cap(_cfg, fold, seed_i)
-                    t_load = time.time() - t0
-                    rss_load_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 ** 2)
-                    _log(f"  [{name}] gamma={_gamma} method={_method} seed={seed_i} "
-                         f"data loaded in {t_load:.2f}s rss={rss_load_mb:.0f}MB "
-                         f"(n_train={len(data['X_train'])} n_test={len(data['X_test'])})")
-                    t1 = time.time()
-                    result = _eval_knn(_method, _family, _sta_epsilon,
-                                       data["X_train"], data["y_train"],
-                                       data["X_test"],  data["y_test"], _gamma, _k, estimator,
-                                       is_divergence=_IS_DIVERGENCE.get(_method, False))
-                    t_method = time.time() - t1
-                    _log(f"  [{name}] gamma={_gamma} seed={seed_i} finished {_method} in "
-                         f"{t_method:.1f}s (f1={result['f1']:.3f})")
-                    return {"seed": seed_i, "fold": fold, "result": result,
-                            "t_load": t_load, "rss_load_mb": rss_load_mb, "t_method": t_method}
+        for mode in modes:
+            mode_methods = methods if mode == 'knn' else \
+                [m for m in methods if m in bary_methods]
+            for method in mode_methods:
+                gammas_to_try = [gamma_by_method[method]] if gamma_by_method else gamma_values
+                for gamma in gammas_to_try:
+                    gamma_key = _gamma_key(gamma)
+                    seeds_needed = target_seeds if force else [
+                        s for s in target_seeds
+                        if (method, gamma_key, mode, s) not in existing_keys
+                    ]
+                    if not seeds_needed:
+                        _log(f"[full_baseline/{name}] gamma={gamma} mode={mode} "
+                             f"method={method} — all {len(target_seeds)} seeds already "
+                             f"present, skip (use --force to recompute)")
+                        continue
+                    _log(f"[full_baseline/{name}] gamma={gamma} mode={mode} method={method} "
+                         f"computing seeds={seeds_needed}")
 
-                job_n = sta_n_jobs if (method == 'sta' and sta_n_jobs is not None) else n_jobs
-                _log(f"[full_baseline/{name}] gamma={gamma} method={method} starting batch "
-                     f"({len(iterations)} seeds, n_jobs={job_n})")
-                t_batch0 = time.time()
-                with _RssMonitor() as mon:
-                    with Parallel(n_jobs=job_n, backend='loky', verbose=10) as parallel:
-                        task_results = parallel(
-                            delayed(_one_method_seed)(seed_i, fold) for seed_i, fold in iterations
-                        )
-                t_batch = time.time() - t_batch0
+                    is_sta = (method == 'sta')
+                    job_n = sta_n_jobs if (is_sta and sta_n_jobs is not None) else n_jobs
+                    bary_n_jobs = 1 if is_sta else 4
+                    want_arrays = (mode == 'barycenter' and want_plot and method in plot_methods
+                                  and seeds_needed[0] == target_seeds[0])
 
-                # Tear down the loky worker pool so the next method starts with
-                # fresh processes (clean XLA allocators) — Parallel(...) reuses a
-                # persistent global executor across calls by default, so without
-                # this explicit shutdown the accumulated RSS would carry over.
-                get_reusable_executor().shutdown(kill_workers=True)
-                gc.collect()
+                    t_batch0 = time.time()
+                    with _RssMonitor() as mon:
+                        with Parallel(n_jobs=job_n, backend='loky', verbose=10) as parallel:
+                            task_results = parallel(
+                                delayed(_one_method_seed)(
+                                    cfg, name, gamma, method, mode, family, sta_epsilon, k,
+                                    estimator, bary_n_jobs, seed_i, None,
+                                    want_arrays and (seed_i == seeds_needed[0]))
+                                for seed_i in seeds_needed
+                            )
+                    t_batch = time.time() - t_batch0
 
-                records = [tr["result"] for tr in task_results]
-                vals = np.array([r["f1"] for r in records])
-                n_ok = int(np.sum(~np.isnan(vals)))
-                summary_by_key[(method, gamma_key)] = {
-                    "method": method,
-                    "gamma": gamma,
-                    "f1_mean": float(np.nanmean(vals)) if n_ok > 0 else float('nan'),
-                    "f1_std":  float(np.nanstd(vals))  if n_ok > 0 else float('nan'),
-                    "n_ok": n_ok,
-                    **_time_summary(records),
-                }
-                detail_rows = [r for r in detail_rows
-                              if not (r["method"] == method and _gamma_key(r["gamma"]) == gamma_key)]
-                detail_rows.extend(_detail_row(r, method=method, gamma=gamma, seed=tr["seed"])
-                                   for tr, r in zip(task_results, records))
+                    get_reusable_executor().shutdown(kill_workers=True)
+                    gc.collect()
 
-                avg_task_time = float(np.mean([tr["t_method"] for tr in task_results]))
-                avg_load_time = float(np.mean([tr["t_load"] for tr in task_results]))
-                avg_load_rss  = float(np.mean([tr["rss_load_mb"] for tr in task_results]))
-                resource_by_key[(method, gamma_key)] = {
-                    "method": method, "gamma": gamma, "n_jobs": job_n, "n_tasks": len(iterations),
-                    "batch_wall_time_s": round(t_batch, 2),
-                    "avg_task_time_s": round(avg_task_time, 2),
-                    "peak_total_rss_mb": round(mon.peak_mb, 1),
-                    "avg_rss_per_job_mb": round(mon.peak_mb / max(job_n, 1), 1),
-                    "load_avg_time_s": round(avg_load_time, 3),
-                    "load_avg_rss_mb": round(avg_load_rss, 1),
-                }
-                _log(f"[full_baseline/{name}] gamma={gamma} method={method} batch done in "
-                     f"{t_batch:.1f}s peak_rss={mon.peak_mb:.0f}MB "
-                     f"(avg/job={mon.peak_mb / max(job_n, 1):.0f}MB)")
+                    rss_mb = round(mon.peak_mb / max(job_n, 1), 1)
+                    for tr in task_results:
+                        res = tr["result"]
+                        if want_arrays and "bary" in res:
+                            bary_plot_data.setdefault(method, {
+                                "bary": res.pop("bary"),
+                                "test_repr": np.asarray(res.pop("test_repr"), dtype=object),
+                                "test_labels": res.pop("test_labels"),
+                            })
+                            res.pop("train_repr", None)
+                            res.pop("train_labels", None)
+                        row = _detail_row(res, method=method, gamma=gamma, mode=mode, seed=tr["seed"])
+                        row["rss_mb"] = rss_mb
+                        detail_rows.append(row)
+                        existing_keys.add((method, gamma_key, mode, tr["seed"]))
 
-                # Write after every method's batch (not just every gamma) so a
-                # crash/kill mid-sweep loses at most the in-progress method.
-                summary_rows = sorted(summary_by_key.values(), key=lambda r: (r["gamma"], r["method"]))
-                _write_csv(summary_path, _SUMMARY_FIELDS, summary_rows)
-                _write_detail_csv(detail_path, _DETAIL_FIELDS, detail_rows)
-                resource_rows = sorted(resource_by_key.values(), key=lambda r: (r["gamma"], r["method"]))
-                _write_csv(resource_path, _RESOURCE_FIELDS, resource_rows)
+                    _log(f"[full_baseline/{name}] gamma={gamma} mode={mode} method={method} "
+                         f"batch done in {t_batch:.1f}s peak_rss={mon.peak_mb:.0f}MB "
+                         f"(avg/job={rss_mb:.0f}MB)")
 
-        summary_rows = sorted(summary_by_key.values(), key=lambda r: (r["gamma"], r["method"]))
+                    # Write after every method's batch so a crash/kill mid-sweep loses
+                    # at most the in-progress method.
+                    _write_detail_csv(detail_path, _DETAIL_FIELDS, detail_rows)
+
+        f1_by_key = {}
+        for r in detail_rows:
+            f1_by_key.setdefault((r["method"], _gamma_key(r["gamma"]), r.get("mode", "knn")), []).append(r["f1"])
         _log(f"[full_baseline/{name}] " +
-             "  ".join(f"{r['method']}@g={r['gamma']:g}={r['f1_mean']:.3f}±{r['f1_std']:.3f}"
-                       for r in summary_rows))
+             "  ".join(f"{m}@g={g}/{mo}=" +
+                       f"{np.nanmean(v):.3f}±{np.nanstd(v):.3f}(n={len(v)})"
+                       for (m, g, mo), v in sorted(f1_by_key.items()))[:4000])
+
+    if bary_plot_data:
+        out_path = out_dir / f"{bary_plot_dataset}_bary_data.npy"
+        np.save(out_path, bary_plot_data, allow_pickle=True)
+        _log(f"[full_baseline] saved barycenter+sample plot data to {out_path}")
 
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="WaSPS-DTW final baseline comparison (KNN-only)")
+    parser = argparse.ArgumentParser(description="WaSPS-DTW baseline comparison (KNN and/or barycenter)")
     parser.add_argument("--config", default="configs/full_baseline.yaml")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--n-jobs", type=int, default=4,
-                        help="capped at 4 by default — 5 caused repeated OOM crashes during "
-                             "STA (~5GB RSS/worker, growing over a single method's batch; see "
-                             "module docstring 'Memory management')")
+    parser.add_argument("--n-jobs", type=int, default=4)
     parser.add_argument("--sta-n-jobs", type=int, default=None,
-                        help="override n_jobs for the sta method's batch only (other "
-                             "methods keep --n-jobs). cpazmal's STA has ~5.75x more "
-                             "(test,train) pairs than river's at equal per-class sample "
-                             "caps (7 vs 4 classes) — its per-worker RSS climbs faster, "
-                             "OOM'd twice at n_jobs=4 (2026-07-10) even after reducing "
-                             "Sinkhorn max_iterations and before that too")
+                        help="override n_jobs for the sta method's batch only (both the "
+                             "outer per-seed pool in knn mode and the inner per-class "
+                             "fit_barycenters pool — capped at 1 regardless — in barycenter mode)")
     parser.add_argument("--dataset", choices=["river", "cpazmal", "both"], default="both")
     parser.add_argument("--gamma", type=float, default=None,
                         help="override gamma_values with a single value")
+    parser.add_argument("--modes", default="knn", help="comma-separated: knn,barycenter")
     parser.add_argument("--force", action="store_true",
-                        help="recompute (method, gamma) pairs already present in the CSV")
+                        help="recompute (method,gamma,mode,seed) rows already present")
+    parser.add_argument("--bary-plot-dataset", default=None, choices=[None, "river", "cpazmal"],
+                        help="save fitted barycenters + test samples for this dataset's "
+                             "first seed to <dataset>_bary_data.npy (barycenter mode only)")
+    parser.add_argument("--bary-plot-methods", default="wasps,eucl_params,eucl_raw",
+                        help="comma-separated method list to include in the plot npy")
+    parser.add_argument("--gamma-by-method-json", default=None,
+                        help="path to a best_params.json (e.g. from optimize_gamma.py) — "
+                             "when given, each method uses its own gamma from this file "
+                             "instead of sweeping gamma_values")
+    parser.add_argument("--gamma-by-method-key", default=None, choices=[None, "knn", "bary"],
+                        help="which section of --gamma-by-method-json to read "
+                             "({method: {'gamma':..}}) — required if --gamma-by-method-json is set")
+    parser.add_argument("--bary-methods-same-as-methods", action="store_true",
+                        help="use cfg['methods'] (not cfg['bary_methods']) as the barycenter "
+                             "method list too — Experiment 1bis's all-7-incl.-STA design, "
+                             "without touching the protected config's bary_methods key")
+    parser.add_argument("--output-dir", default=None,
+                        help="override --config's own output.dir — lets Experiment 1 (knn) "
+                             "and Experiment 1bis (barycenter) write to separate dirs despite "
+                             "sharing the same (protected) config file")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
@@ -363,9 +373,19 @@ def main():
         cfg = yaml.safe_load(f)
 
     methods = cfg.get("methods", _DEFAULT_METHODS)
+    bary_methods = methods if args.bary_methods_same_as_methods else cfg.get("bary_methods", _DEFAULT_BARY_METHODS)
+
+    gamma_by_method = None
+    if args.gamma_by_method_json:
+        import json
+        assert args.gamma_by_method_key, "--gamma-by-method-key is required with --gamma-by-method-json"
+        with open(args.gamma_by_method_json) as f:
+            best_params = json.load(f)
+        gamma_by_method = {m: p["gamma"] for m, p in best_params[args.gamma_by_method_key].items()}
+    modes = [m.strip() for m in args.modes.split(",")]
     n_seeds = cfg.get("n_seeds", 4)
     estimator = cfg.get("estimator", "mle")
-    out_dir = Path(cfg.get("output", {}).get("dir", "results/jax_full_baseline"))
+    out_dir = Path(args.output_dir or cfg.get("output", {}).get("dir", "results/jax_full_baseline"))
     out_dir.mkdir(parents=True, exist_ok=True)
 
     os.environ["EXPERIMENT_LOG_FILE"] = str(out_dir / "full_baseline.log")
@@ -376,12 +396,16 @@ def main():
     datasets = ("river", "cpazmal") if args.dataset == "both" else (args.dataset,)
     _log(f"===== full_baseline config={args.config} seed={args.seed} n_jobs={args.n_jobs} "
          f"sta_n_jobs={args.sta_n_jobs} dataset={args.dataset} gamma={args.gamma} "
-         f"force={args.force} debug={args.debug} verbose={args.verbose} =====")
-    _log(f"methods={methods} n_seeds={n_seeds} estimator={estimator}")
+         f"modes={modes} force={args.force} debug={args.debug} verbose={args.verbose} =====")
+    _log(f"methods={methods} bary_methods={bary_methods} n_seeds={n_seeds} estimator={estimator} "
+         f"gamma_by_method={gamma_by_method}")
 
-    run_full_baseline(cfg, out_dir, methods, n_seeds, estimator, seed=args.seed, n_jobs=args.n_jobs,
-                      datasets=datasets, gamma_override=args.gamma, force=args.force,
-                      sta_n_jobs=args.sta_n_jobs)
+    run_full_baseline(cfg, out_dir, methods, bary_methods, modes, n_seeds, estimator,
+                      seed=args.seed, n_jobs=args.n_jobs, datasets=datasets,
+                      gamma_override=args.gamma, force=args.force, sta_n_jobs=args.sta_n_jobs,
+                      bary_plot_dataset=args.bary_plot_dataset,
+                      bary_plot_methods=[m.strip() for m in args.bary_plot_methods.split(",")],
+                      gamma_by_method=gamma_by_method)
     _log("===== full_baseline done =====")
 
 

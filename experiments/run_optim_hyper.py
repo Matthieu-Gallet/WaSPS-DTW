@@ -157,10 +157,14 @@ def _grid_point_bary(base_cfg: dict, method: str, family: str, sta_epsilon: floa
         # tag only the first (fold,seed) per grid point — plotting/saving every
         # repetition across a 60+ point grid would be excessive (600+ files)
         tag = f"grid_bary_{method}_lr{lr:.4g}_g{gamma:.4g}" if i == 0 else None
+        # bary_n_jobs=1: this function already runs inside an outer Parallel (across grid
+        # points, see grid_bary) — the _eval_bary default of 4 would nest dangerously
+        # (outer_n_jobs x 4 processes), the pattern documented as having OOM'd this
+        # machine before (see run_full_baseline.py module docstring).
         res = _eval_bary(method, family, sta_epsilon,
                          data["X_train"], data["y_train"],
                          data["X_test"],  data["y_test"], gamma, lr, n_steps, optimizer,
-                         patience, min_rel_improve, estimator, tag)
+                         patience, min_rel_improve, estimator, tag, bary_n_jobs=1)
         records.append({"seed": seed, "fold": fold, **res})
     return records
 
