@@ -85,7 +85,7 @@ def dump_barycenters(cfg_block: dict, methods: list, gamma_by_method: dict,
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Dump train/test series+labels (+barycenters) to .npy")
-    parser.add_argument("--config", required=True, help="e.g. configs/exp1_baseline.yaml")
+    parser.add_argument("--config", required=True, help="e.g. configs/config_baseline.yaml")
     parser.add_argument("--dataset", choices=["river", "cpazmal"], required=True)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--out-series", required=True)

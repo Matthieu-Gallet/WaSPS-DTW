@@ -9,8 +9,8 @@ own samples_per_step (gamma_search.sta_samples_per_step, e.g. 48, vs the other m
 480) — this matches the main run's own STA/non-STA split (see run_full_baseline.py's
 --samples-per-step), not a separate reduced-scale calibration trick.
 
-grid_knn/grid_bary (formerly in the now-deleted experiments/run_optim_hyper.py) are
-self-contained here — only depend on utils/experiment_common.py.
+grid_knn/grid_bary (formerly in the now-deleted run_optim_hyper.py) are self-contained
+here — only depend on utils/experiment_common.py.
 
 Method list comes from configs/config_baseline.yaml's own top-level `methods:` key (7,
 includes STA) — not duplicated here or hardcoded, and that file itself is never written to.

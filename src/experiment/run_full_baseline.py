@@ -1,18 +1,17 @@
 """Method-comparison baseline — both datasets, divergence vs non-divergence, KNN and/or
-barycenter mode. Shared engine behind exp1_knn_baseline.sh and exp1bis_bary_baseline.sh
-(each: per-method gamma from experiments/optimize_gamma.py's best_params.json, both
-datasets, single mode).
+barycenter mode. Shared engine behind exp1_knn_baseline.sh and exp2_bary_baseline.sh
+(each: per-method gamma from optimize_gamma.py's best_params.json, both datasets, single
+mode).
 
 Per-method gamma (2026-07-14): `--gamma-by-method-json <path> --gamma-by-method-key
 {knn,bary}` loads `{method: {"gamma":..}}` from a best_params.json (the schema
-experiments/optimize_gamma.py / run_optim_hyper.py's grid_knn/grid_bary already write) and
-uses each method's own optimal gamma instead of sweeping `gamma_values`. See
-`run_full_baseline()`'s `gamma_by_method` param — when None (default), behavior is
-identical to the gamma-sweep path below.
+optimize_gamma.py's grid_knn/grid_bary already write) and uses each method's own optimal
+gamma instead of sweeping `gamma_values`. See `run_full_baseline()`'s `gamma_by_method`
+param — when None (default), behavior is identical to the gamma-sweep path below.
 
 Methods: wasps/eucl_params/eucl_raw + STA, plus a `_nodiv` variant of each of the 3
 non-STA methods (is_divergence=False, and for wasps also log_correction=False) — see
-experiments/method_defs.py for exactly which methods get is_divergence=True vs False.
+utils/method_defs.py for exactly which methods get is_divergence=True vs False.
 
 Modes: `--modes knn,barycenter` (default knn only, matching this script's original
 scope). STA is excluded from barycenter mode by default (`--bary-methods` controls the
@@ -52,7 +51,7 @@ caps (7 vs 4 classes), OOM'd at n_jobs=4.
 Output per dataset: full_baseline_{river,cpazmal}_detail.csv (one row per method x
 gamma x mode x seed: F1, per-class F1 breakdown, timings, rss_mb) and
 full_baseline_{river,cpazmal}.log — summary means are derived from the detail CSV at
-table-extraction time (experiments/extract_latex_tables.py), not persisted separately.
+table-extraction time (reporting/extract_latex_tables.py), not persisted separately.
 
 Usage:
     python src/experiment/run_full_baseline.py --config configs/config_baseline.yaml \\
