@@ -15,7 +15,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-sys.path.insert(0, str(Path(__file__).parent.parent / "experiments"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src" / "experiment" / "utils"))
 
 from data.cpazmal_loader import extract_time_series
 
@@ -125,10 +125,14 @@ def _write_fake_cache(cache_dir, n_per_class, n_groups_per_class, T=5, N=8, seed
             y.append(cls_idx)
             groups.append(cls_groups[i % n_groups_per_class])
     cache_dir.mkdir(parents=True, exist_ok=True)
-    np.save(cache_dir / "X_all.npy", np.array(X, dtype=object), allow_pickle=True)
-    np.save(cache_dir / "y_all.npy", np.array(y, dtype=np.int32))
-    np.save(cache_dir / "groups_all.npy", np.array(groups, dtype=np.int32))
-    (cache_dir / "meta_all.json").write_text(json.dumps({
+    # Suffix must match _load_cpazmal's own cache naming (data_utils.py):
+    # X_{mgpc_part}_w{window_size}{scale_suffix}.npy — "all_w12" here since _base_cfg
+    # leaves max_groups_per_class/window_size/scale_type at their defaults (None, 12,
+    # amplitude).
+    np.save(cache_dir / "X_all_w12.npy", np.array(X, dtype=object), allow_pickle=True)
+    np.save(cache_dir / "y_all_w12.npy", np.array(y, dtype=np.int32))
+    np.save(cache_dir / "groups_all_w12.npy", np.array(groups, dtype=np.int32))
+    (cache_dir / "meta_all_w12.json").write_text(json.dumps({
         "class_names": {str(k): v for k, v in class_names.items()},
         "group_names": {str(g): f"G{g}" for g in range(gi)},
     }))

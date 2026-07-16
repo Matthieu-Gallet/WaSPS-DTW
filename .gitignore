@@ -18,3 +18,4 @@ results/**/*.npy
 results/**/*.pdf
 
 *.md
+results/*

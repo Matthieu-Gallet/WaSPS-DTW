@@ -1,0 +1,82 @@
+# Baseline experiment — river + cpazmal method comparison, KNN and barycenter modes.
+# Per-method gamma comes from a calibration step (optimize_gamma.py, driven by the
+# gamma_search: block below) — not swept in the main run.
+#
+# All methods run at samples_per_step=480 (the value in each dataset's classification
+# block below) EXCEPT STA, which runs at 48 — each script (exp1_knn_baseline.sh,
+# exp2_bary_baseline.sh) invokes run_full_baseline.py twice: once for the non-STA
+# methods at this file's default samples_per_step, once for STA alone with
+# --samples-per-step 48 (gamma_search.sta_samples_per_step below, matching what STA has
+# always used).
+#
+# Sample caps are unchanged from the original baseline: river's max_train_samples/
+# max_test_samples are FLAT totals (105/175) — safe because river's 4 classes are
+# already perfectly balanced at source (200/class), so a stratified-proportional split
+# still comes out balanced; cpazmal's max_train_per_class/max_test_per_class are TRUE
+# per-class quotas (15/25 — fixed 2026-07-16, see utils/data_utils.py::subsample_per_class).
+#
+# cpazmal window_size=22 (was 9) — see src/dev/analysis/wasps_vs_euclraw_barycentre_findings.md
+# for why a bigger spatial window improves the per-timestep Weibull fit.
+#
+# Run: src/experiment/script/exp1_knn_baseline.sh and exp2_bary_baseline.sh (preferred)
+# or directly:
+#   python src/experiment/run_full_baseline.py --config configs/config_baseline.yaml \
+#       --modes knn,barycenter --n-jobs 4 --sta-n-jobs 2
+
+methods: [wasps, wasps_nodiv, eucl_params, eucl_params_nodiv, eucl_raw, eucl_raw_nodiv, sta]
+bary_methods: [wasps, wasps_nodiv, eucl_params, eucl_params_nodiv, eucl_raw, eucl_raw_nodiv]
+n_seeds: 5
+estimator: log_cumulant
+
+river:
+  dataset:
+    type: river
+    family: exponential
+    data_dir: data/river
+    mode: balanced
+    max_time_steps: null
+    aggregate_days: 7        # T=52
+  classification:
+    gamma: 1.0
+    k: 1
+    sta_epsilon: 0.05
+    samples_per_step: 480    # non-STA; STA sub-phase overrides to 48
+    max_train_samples: 105   # flat total, matches cpazmal's 15/class x 7 classes
+    max_test_samples: 175    # flat total, matches cpazmal's 25/class x 7 classes
+    lr: 0.001
+    n_steps_bary: 150
+    optimizer: sgd
+    early_stop_patience: 20
+    early_stop_tol: 1.0e-4
+
+cpazmal:
+  dataset:
+    type: cpazmal
+    family: weibull
+    hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
+    max_groups_per_class: null
+    window_size: 22
+  classification:
+    gamma: 1.0
+    k: 1
+    sta_epsilon: 0.05
+    samples_per_step: 480    # non-STA; STA sub-phase overrides to 48
+    max_train_per_class: 15
+    max_test_per_class: 25
+    lr: 0.05
+    n_steps_bary: 150
+    optimizer: sgd
+    early_stop_patience: 20
+    early_stop_tol: 1.0e-4
+
+# Gamma calibration (optimize_gamma.py) — replaces the old separate configs/gamma_search.yaml.
+# Sample caps for calibration are the SAME as the main run above (no separate reduced
+# scale) — only samples_per_step differs between STA and non-STA, both here and in the
+# main run.
+gamma_search:
+  gamma_grid: [1.0e-4, 1.0e-2, 1.0e-1, 1.0, 1.0e+1, 1.0e+2, 1.0e+4]
+  n_seeds: 3
+  sta_samples_per_step: 48   # STA's own samples_per_step, both for calibration and the main run
+
+output:
+  dir: results/jax_exp1_baseline
