@@ -45,17 +45,19 @@ class TestBarycentEuclidean:
         assert b.shape == (8, 3)
         assert np.all(np.isfinite(b))
 
-    def test_variable_length_series_are_padded_before_stacking(self):
+    def test_mismatched_length_series_raises(self):
+        # fit_barycenter requires equal-length (T) series — it stacks them into a
+        # single (N, T, n_params) array up front, so mismatched lengths must fail
+        # fast with a clear error rather than a raw jnp.stack ValueError.
         rng = np.random.default_rng(10)
         series = [
             rng.uniform(0, 1, (5, 1)).astype(np.float64),
             rng.uniform(0, 1, (7, 1)).astype(np.float64),
             rng.uniform(0, 1, (6, 1)).astype(np.float64),
         ]
-        b = fit_barycenter(series, self._make_sdtw(gamma=1.0), n_steps=20,
+        with pytest.raises(ValueError, match="equal-length"):
+            fit_barycenter(series, self._make_sdtw(gamma=1.0), n_steps=20,
                            dtype=jnp.float64)
-        assert b.shape == (7, 1)
-        assert np.all(np.isfinite(b))
 
     def test_loss_decreases(self):
         rng = np.random.default_rng(4)

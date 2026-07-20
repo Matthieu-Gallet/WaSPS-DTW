@@ -38,7 +38,7 @@ estimated. A handful of traces is enough to characterize where divergence happen
 For every run (NaN or not): records the resulting barycenter's min beta — informative
 either way, since it shows how close the iterate came even when it didn't fully NaN.
 
-Run: python analysis/tmp_mle_nan_investigation/barycenter_nan_sweep.py
+Run: python src/dev/notebook/tmp_mle_nan_investigation/barycenter_nan_sweep.py
 Writes: barycenter_nan_sweep.csv, nan_trace_log.txt (this directory).
 """
 
@@ -52,10 +52,10 @@ from pathlib import Path
 import numpy as np
 
 _HERE = Path(__file__).parent
-_SRC = _HERE.parent.parent / "src"
-_EXPERIMENTS = _HERE.parent.parent / "experiments"
+_SRC = _HERE.parent.parent.parent
+_EXPERIMENT_UTILS = _SRC / "experiment" / "utils"
 sys.path.insert(0, str(_SRC))
-sys.path.insert(0, str(_EXPERIMENTS))
+sys.path.insert(0, str(_EXPERIMENT_UTILS))
 
 import jax
 jax.config.update("jax_enable_x64", True)
@@ -70,7 +70,7 @@ from barycenter import fit_barycenter
 from classification.barycenter_clf import fit_barycenters
 from data_utils import subsample as _subsample
 
-DATA_DIR = str(_HERE.parent.parent / "data" / "river")
+DATA_DIR = str(_HERE.parent.parent.parent.parent / "data" / "river")
 N_SPLITS = 5
 SEEDS = [42, 43, 44, 45]
 SAMPLES_PER_STEP = 50    # river.yaml

@@ -63,21 +63,6 @@ def build_repr(
 # Raw downsampling helper (point 4)
 # ---------------------------------------------------------------------------
 
-def compute_raw_n_min(raw_series: list) -> int:
-    """Minimum count of finite, positive values across all series × timesteps.
-
-    Use this to choose the downsampling target N for the raw path when
-    samples_per_step is not set explicitly.  Computed on a single split
-    (train OR test) to avoid information leakage.
-    """
-    counts = [
-        int(np.sum(np.isfinite(s[t]) & (np.asarray(s[t]) > 0)))
-        for s in raw_series
-        for t in range(np.asarray(s).shape[0])
-    ]
-    return max(1, min(counts))
-
-
 # ---------------------------------------------------------------------------
 # Subsample helper
 # ---------------------------------------------------------------------------

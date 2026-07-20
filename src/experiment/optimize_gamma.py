@@ -47,6 +47,68 @@ from run_full_baseline import _build_dataset_cfg
 
 
 # ---------------------------------------------------------------------------
+# Shared grid-search driver — grid_knn/grid_bary differ only in the swept
+# parameter's name/values and which _grid_point_* they call; this factors out
+# the dispatch/aggregate/write-CSVs/pick-best/merge boilerplate both need.
+# ---------------------------------------------------------------------------
+
+def _grid_search(out_dir: Path, methods: list, kind: str, param_name: str,
+                 param_values: list, gamma_values: list, iterations: list,
+                 grid_point_fn, n_jobs: int) -> dict:
+    """(param_value × gamma) grid per method, parallelized over grid points.
+
+    grid_point_fn(method, param_value, gamma) -> list of per-iteration records
+    (already bound to base_cfg/family/sta_epsilon/... by the caller).
+
+    Writes both an aggregate CSV (f1_mean/f1_std/n_folds_ok/train_test_total
+    time means) and a `_detail.csv` (one row per grid point × fold × seed) per
+    method, to `sensitivity_grid_{kind}_{method}[_detail].csv`.
+
+    Returns {method: {param_name: best_value, "gamma": best_gamma, "f1": best_f1}}.
+    """
+    best_params = {}
+    for method in methods:
+        grid = [(p, g) for p in param_values for g in gamma_values]
+        results = Parallel(n_jobs=n_jobs, backend='loky', verbose=10)(
+            delayed(grid_point_fn)(method, p, g) for p, g in grid
+        )
+
+        summary_rows, detail_rows = [], []
+        for (p, g), records in zip(grid, results):
+            f1s = np.array([r["f1"] for r in records])
+            n_ok = int(np.sum(~np.isnan(f1s)))
+            summary_rows.append({
+                param_name: p, "gamma": g,
+                "f1_mean": float(np.nanmean(f1s)) if n_ok > 0 else float('nan'),
+                "f1_std":  float(np.nanstd(f1s))  if n_ok > 0 else float('nan'),
+                "n_folds_ok": n_ok,
+                **_time_summary(records),
+            })
+            detail_rows.extend(_detail_row(r, **{param_name: p}, gamma=g, seed=r["seed"], fold=r["fold"])
+                               for r in records)
+
+        _write_csv(out_dir / f"sensitivity_grid_{kind}_{method}.csv",
+                  [param_name, "gamma", "f1_mean", "f1_std", "n_folds_ok",
+                   "train_time_mean", "test_time_mean", "total_time_mean"], summary_rows)
+        _write_detail_csv(out_dir / f"sensitivity_grid_{kind}_{method}_detail.csv",
+                          [param_name, "gamma", "seed", "fold", "f1", "train_time", "test_time", "total_time"],
+                          detail_rows)
+
+        f1_means = [r["f1_mean"] for r in summary_rows]
+        valid_idx = [i for i, f in enumerate(f1_means) if not np.isnan(f)]
+        if not valid_idx:
+            raise RuntimeError(f"grid_{kind}: all grid points NaN for method={method} "
+                              "— check data availability / sample caps")
+        best_idx = max(valid_idx, key=lambda i: f1_means[i])
+        best_p, best_gamma = grid[best_idx]
+        best_params[method] = {param_name: best_p, "gamma": best_gamma, "f1": f1_means[best_idx]}
+        _log(f"[grid_{kind}] {method}: best {param_name}={best_p:.4g} gamma={best_gamma:.4g} "
+             f"f1={f1_means[best_idx]:.3f} ({summary_rows[best_idx]['n_folds_ok']}/{len(iterations)} runs)")
+        _merge_best_params(out_dir, kind, {method: best_params[method]})
+    return best_params
+
+
+# ---------------------------------------------------------------------------
 # grid_knn — k×gamma calibration grid, per method
 # ---------------------------------------------------------------------------
 
@@ -85,49 +147,13 @@ def grid_knn(base_cfg: dict, out_dir: Path, methods: list, k_values: list, gamma
     family      = base_cfg["dataset"]["family"]
     sta_epsilon = base_cfg["classification"].get("sta_epsilon", 0.05)
     iterations  = _iterations(base_cfg, seed)
-    best_params = {}
 
-    for method in methods:
-        grid = [(k, g) for k in k_values for g in gamma_values]
-        results = Parallel(n_jobs=n_jobs, backend='loky', verbose=10)(
-            delayed(_grid_point_knn)(base_cfg, method, family, sta_epsilon, k, g,
-                                     iterations, {}, classification_overrides)
-            for k, g in grid
-        )
+    def grid_point_fn(method, k, gamma):
+        return _grid_point_knn(base_cfg, method, family, sta_epsilon, k, gamma,
+                               iterations, {}, classification_overrides)
 
-        summary_rows, detail_rows = [], []
-        for (k, g), records in zip(grid, results):
-            f1s = np.array([r["f1"] for r in records])
-            n_ok = int(np.sum(~np.isnan(f1s)))
-            summary_rows.append({
-                "k": k, "gamma": g,
-                "f1_mean": float(np.nanmean(f1s)) if n_ok > 0 else float('nan'),
-                "f1_std":  float(np.nanstd(f1s))  if n_ok > 0 else float('nan'),
-                "n_folds_ok": n_ok,
-                **_time_summary(records),
-            })
-            detail_rows.extend(_detail_row(r, k=k, gamma=g, seed=r["seed"], fold=r["fold"])
-                               for r in records)
-
-        _write_csv(out_dir / f"sensitivity_grid_knn_{method}.csv",
-                  ["k", "gamma", "f1_mean", "f1_std", "n_folds_ok",
-                   "train_time_mean", "test_time_mean", "total_time_mean"], summary_rows)
-        _write_detail_csv(out_dir / f"sensitivity_grid_knn_{method}_detail.csv",
-                          ["k", "gamma", "seed", "fold", "f1", "train_time", "test_time", "total_time"],
-                          detail_rows)
-
-        f1_means = [r["f1_mean"] for r in summary_rows]
-        valid_idx = [i for i, f in enumerate(f1_means) if not np.isnan(f)]
-        if not valid_idx:
-            raise RuntimeError(f"grid_knn: all grid points NaN for method={method} "
-                              "— check data availability / sample caps")
-        best_idx = max(valid_idx, key=lambda i: f1_means[i])
-        best_k, best_gamma = grid[best_idx]
-        best_params[method] = {"k": best_k, "gamma": best_gamma, "f1": f1_means[best_idx]}
-        _log(f"[grid_knn] {method}: best k={best_k} gamma={best_gamma:.4g} "
-             f"f1={f1_means[best_idx]:.3f} ({summary_rows[best_idx]['n_folds_ok']}/{len(iterations)} runs)")
-        _merge_best_params(out_dir, "knn", {method: best_params[method]})
-    return best_params
+    return _grid_search(out_dir, methods, "knn", "k", k_values, gamma_values,
+                        iterations, grid_point_fn, n_jobs)
 
 
 # ---------------------------------------------------------------------------
@@ -171,49 +197,13 @@ def grid_bary(base_cfg: dict, out_dir: Path, methods: list, lr_values: list, gam
     family      = base_cfg["dataset"]["family"]
     sta_epsilon = base_cfg["classification"].get("sta_epsilon", 0.05)
     iterations  = _iterations(base_cfg, seed)
-    best_params = {}
 
-    for method in methods:
-        grid = [(lr, g) for lr in lr_values for g in gamma_values]
-        results = Parallel(n_jobs=n_jobs, backend='loky', verbose=10)(
-            delayed(_grid_point_bary)(base_cfg, method, family, sta_epsilon, lr, g,
-                                      iterations, n_steps, optimizer, {}, classification_overrides)
-            for lr, g in grid
-        )
+    def grid_point_fn(method, lr, gamma):
+        return _grid_point_bary(base_cfg, method, family, sta_epsilon, lr, gamma,
+                                iterations, n_steps, optimizer, {}, classification_overrides)
 
-        summary_rows, detail_rows = [], []
-        for (lr, g), records in zip(grid, results):
-            f1s = np.array([r["f1"] for r in records])
-            n_ok = int(np.sum(~np.isnan(f1s)))
-            summary_rows.append({
-                "lr": lr, "gamma": g,
-                "f1_mean": float(np.nanmean(f1s)) if n_ok > 0 else float('nan'),
-                "f1_std":  float(np.nanstd(f1s))  if n_ok > 0 else float('nan'),
-                "n_folds_ok": n_ok,
-                **_time_summary(records),
-            })
-            detail_rows.extend(_detail_row(r, lr=lr, gamma=g, seed=r["seed"], fold=r["fold"])
-                               for r in records)
-
-        _write_csv(out_dir / f"sensitivity_grid_bary_{method}.csv",
-                  ["lr", "gamma", "f1_mean", "f1_std", "n_folds_ok",
-                   "train_time_mean", "test_time_mean", "total_time_mean"], summary_rows)
-        _write_detail_csv(out_dir / f"sensitivity_grid_bary_{method}_detail.csv",
-                          ["lr", "gamma", "seed", "fold", "f1", "train_time", "test_time", "total_time"],
-                          detail_rows)
-
-        f1_means = [r["f1_mean"] for r in summary_rows]
-        valid_idx = [i for i, f in enumerate(f1_means) if not np.isnan(f)]
-        if not valid_idx:
-            raise RuntimeError(f"grid_bary: all grid points NaN for method={method} "
-                              "— check data availability / sample caps")
-        best_idx = max(valid_idx, key=lambda i: f1_means[i])
-        best_lr, best_gamma = grid[best_idx]
-        best_params[method] = {"lr": best_lr, "gamma": best_gamma, "f1": f1_means[best_idx]}
-        _log(f"[grid_bary] {method}: best lr={best_lr:.4g} gamma={best_gamma:.4g} "
-             f"f1={f1_means[best_idx]:.3f} ({summary_rows[best_idx]['n_folds_ok']}/{len(iterations)} runs)")
-        _merge_best_params(out_dir, "bary", {method: best_params[method]})
-    return best_params
+    return _grid_search(out_dir, methods, "bary", "lr", lr_values, gamma_values,
+                        iterations, grid_point_fn, n_jobs)
 
 
 # ---------------------------------------------------------------------------

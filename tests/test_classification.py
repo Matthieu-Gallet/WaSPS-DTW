@@ -124,3 +124,16 @@ class TestBarycentClf:
         preds = predict(test_s, barycenters, WaSPS('exponential'), gamma=1.0)
         # At least 1 test point classified correctly (weak sanity check)
         assert np.sum(preds == test_l) >= 1
+
+    def test_fit_barycenters_parallel_matches_sequential(self):
+        # n_jobs=-1 dispatches one class per joblib/loky worker (separate process,
+        # separate JAX state) — verify it produces the same result as n_jobs=1, not
+        # just that it doesn't crash.
+        train_s, train_l, _, _ = _make_two_class_data(seed=3)
+        sequential = fit_barycenters(train_s, train_l, _make_softdtw_bary(),
+                                     n_steps=30, lr=1e-2, n_jobs=1, verbose=False)
+        parallel = fit_barycenters(train_s, train_l, _make_softdtw_bary(),
+                                   n_steps=30, lr=1e-2, n_jobs=-1, verbose=False)
+        assert set(parallel.keys()) == set(sequential.keys())
+        for cls in sequential:
+            np.testing.assert_allclose(parallel[cls], sequential[cls], rtol=1e-6)

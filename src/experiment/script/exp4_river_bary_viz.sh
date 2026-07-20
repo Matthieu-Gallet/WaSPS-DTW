@@ -15,10 +15,10 @@ mkdir -p "$OUT_DIR"
 echo "===== $(date '+%Y-%m-%d %H:%M:%S') exp4_river_bary_viz starting =====" | tee -a "$LOG"
 
 python src/plot/plot_river_bary_viz.py --config "$CONFIG" --output-dir "$OUT_DIR" \
-    --classes NG,PN --gamma 10 \
-    --n-samples-per-class 75 --sta-n-samples-per-class 25 \
+    --classes NG,PN --gamma 100 \
+    --n-samples-per-class 30 --sta-n-samples-per-class 30 \
     --samples-per-step 480 --sta-samples-per-step 48 \
-    --n-steps-bary 150 --seed 45 \
+    --n-steps-bary 75 --seed 45 \
     2>&1 | tee -a "$LOG"
 
 echo "===== $(date '+%Y-%m-%d %H:%M:%S') exp4_river_bary_viz done =====" | tee -a "$LOG"

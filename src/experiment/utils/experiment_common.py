@@ -30,7 +30,7 @@ _SRC  = _HERE.parent.parent          # src/experiment/utils -> src/experiment ->
 sys.path.insert(0, str(_SRC))
 sys.path.insert(0, str(_HERE))
 
-from baselines.sta_wrapper import knn_predict as sta_knn
+from classification.sta_wrapper import knn_predict as sta_knn
 from classification.nn import knn_predict as sdtw_knn
 from classification.barycenter_clf import fit_barycenters, predict
 

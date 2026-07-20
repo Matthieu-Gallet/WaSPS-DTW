@@ -9,7 +9,7 @@ Loads river data at river.yaml's real hyperparameters (samples_per_step=50,
 max_train_samples=20 -> 5/class), across all 5 folds x 4 seeds, estimates both ways,
 and reports tail statistics. No src/ changes; read-only diagnostic.
 
-Run: python analysis/tmp_mle_nan_investigation/beta_distribution.py
+Run: python src/dev/notebook/tmp_mle_nan_investigation/beta_distribution.py
 Writes: beta_distribution_stats.json, beta_histograms.png (this directory).
 """
 
@@ -22,14 +22,14 @@ from pathlib import Path
 import numpy as np
 
 _HERE = Path(__file__).parent
-_SRC = _HERE.parent.parent / "src"
+_SRC = _HERE.parent.parent.parent
 sys.path.insert(0, str(_SRC))
 
 import distributions
 from data.preprocess import clean_time_series
 from data.river_loader import load_river_classification
 
-DATA_DIR = str(_HERE.parent.parent / "data" / "river")
+DATA_DIR = str(_HERE.parent.parent.parent.parent / "data" / "river")
 N_SPLITS = 5
 SEEDS = [42, 43, 44, 45]
 SAMPLES_PER_STEP = 50          # river.yaml

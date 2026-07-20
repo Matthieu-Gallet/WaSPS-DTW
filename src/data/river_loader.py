@@ -73,7 +73,7 @@ def load_river_classification(
     Args:
         data_dir:          Directory containing ``X_{mode}.npy``, ``Y_{mode}.npy``,
                            ``metadata_{mode}.npy`` and optionally ``groups_{mode}.npy``.
-        mode:              ``"balanced"`` (400 samples, T=365, 4 classes)
+        mode:              ``"balanced"`` (800 samples, T=365, 4 classes)
                            or ``"basic"`` (611 samples, T=52 weekly).
         n_splits:          Number of folds.  1 = stratified holdout (legacy).
         fold:              Fold index (0..n_splits-1).  Ignored when n_splits=1.

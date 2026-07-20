@@ -2,22 +2,15 @@ r"""Extract mean F1 ± std results into LaTeX tables (NiceTabular environment).
 
 Table families:
 
-1. `classif` — a gamma sweep in a classification/barycenter scores CSV: rows = method,
-   columns = gamma value. (Legacy — no current script produces this CSV shape; kept for
-   completeness, not exercised by the current pipeline.)
-2. `sensitivity` — a run_decimation.py sweep (decimation only, now — n_samples/n_train
+1. `sensitivity` — a run_decimation.py sweep (decimation only, now — n_samples/n_train
    sweeps were dropped along with the legacy sensitivity pipeline): one summary CSV per
    method (sensitivity_<scenario>_<method>_<mode>.csv), combined here into a single
    table: rows = method, columns = swept value (decimation fraction). F1 as %, 1
    decimal, best value per row in bold.
-3. `full_baseline` — a run_full_baseline.py gamma SWEEP (full_baseline_<name>_detail.csv):
-   two tables (F1 and total computation time, both mean +- std), rows = gamma, columns =
-   method. (Legacy format for when gamma is swept rather than fixed per method — the
-   current pipeline uses fixed per-method gamma from optimize_gamma.py, see `exp1` below.)
-4. `exp1` — the baseline experiment's fixed-gamma detail CSV (one dataset, one mode):
+2. `exp1` — the baseline experiment's fixed-gamma detail CSV (one dataset, one mode):
    rows = Metric (F1/Time/RAM), columns = method. F1 as %, 1 decimal; time 1 decimal;
    RAM integer; best value per row in bold.
-5. `exp1_combined` — wraps two `exp1` tables (river + cpazmal) into one `table*` with
+3. `exp1_combined` — wraps two `exp1` tables (river + cpazmal) into one `table*` with
    two `subtable` environments, matching the paper's two-dataset comparison layout.
 
 `nicematrix` is already a loaded LaTeX package in RESSOURCES/main.tex — the emitted
@@ -51,20 +44,6 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Formatting helpers
 # ---------------------------------------------------------------------------
-
-def _fmt(mean, std) -> str:
-    """Fraction, 3 decimals — legacy formatter, used only by the `classif`/
-    `full_baseline` table kinds (both effectively unused by the current pipeline)."""
-    try:
-        mean = float(mean)
-        std = float(std)
-    except (TypeError, ValueError):
-        return "--"
-    if math.isnan(mean):
-        return "--"
-    std_str = f"{std:.3f}" if not math.isnan(std) else "0.000"
-    return f"{mean:.3f} $\\pm$ {std_str}"
-
 
 def _fmt_pct(mean, std) -> str:
     """F1 as a percentage, 1 decimal — e.g. "59.6 $\\pm$ 4.1"."""
@@ -184,26 +163,6 @@ def render_nice_tabular(row_labels: list, col_labels: list, cells: dict,
     return "\n".join(lines)
 
 
-def table_from_classif_csv(csv_path: Path, mode: str = None, col: str = "gamma",
-                           caption: str = None, label: str = None) -> str:
-    """classification_scores.csv / barycenter_scores.csv → rows=method, columns=gamma.
-    Legacy — no current script produces this CSV shape."""
-    with open(csv_path, newline="") as f:
-        rows = list(csv.DictReader(f))
-    if mode is not None and "mode" in (rows[0].keys() if rows else []):
-        rows = [r for r in rows if r["mode"] == mode]
-
-    methods = _order_methods({r["method"] for r in rows})
-    col_values = sorted({r[col] for r in rows if r.get(col) not in (None, "")}, key=float)
-    cells = {}
-    for r in rows:
-        if r.get(col) in (None, ""):
-            continue
-        cells[(r["method"], r[col])] = (r["f1_mean"], r["f1_std"])
-    return render_nice_tabular(methods, col_values, cells,
-                               row_header="Method", caption=caption, label=label)
-
-
 def table_from_sensitivity_dir(sens_dir: Path, scenario: str, mode: str,
                                caption: str = None, label: str = None) -> str:
     """Combine sensitivity_<scenario>_<method>_<mode>.csv (one per method) into a
@@ -233,34 +192,6 @@ def table_from_sensitivity_dir(sens_dir: Path, scenario: str, mode: str,
     return render_nice_tabular(_order_methods(methods), col_values, cells,
                                row_header="Method", caption=caption, label=label,
                                fmt_fn=_fmt_pct, bold_best_per_row=True, higher_is_better=True)
-
-
-# ---------------------------------------------------------------------------
-# rows=gamma, columns=method table (full gamma sweep — legacy, see module docstring)
-# ---------------------------------------------------------------------------
-
-def render_gamma_by_method_table(gamma_values: list, methods: list, cells: dict,
-                                 caption: str = None, label: str = None) -> str:
-    """cells: {(gamma_str, method): (mean, std)} — rows=gamma, columns=method."""
-    lines = [
-        r"\begin{table}[htbp]",
-        r"\centering",
-        r"\begin{NiceTabular}{l" + "c" * len(methods) + "}",
-        r"\toprule",
-        r"$\gamma$ & " + " & ".join(_display(m) for m in methods) + r" \\",
-        r"\midrule",
-    ]
-    for g in gamma_values:
-        row_cells = [_fmt(*cells.get((g, m), (float('nan'), float('nan')))) for m in methods]
-        lines.append(f"{_fmt_col(g)} & " + " & ".join(row_cells) + r" \\")
-    lines.append(r"\bottomrule")
-    lines.append(r"\end{NiceTabular}")
-    if caption:
-        lines.append(f"\\caption{{{caption}}}")
-    if label:
-        lines.append(f"\\label{{{label}}}")
-    lines.append(r"\end{table}")
-    return "\n".join(lines)
 
 
 def _group_mean_std(rows: list, key_fn, value_key: str) -> dict:
@@ -410,47 +341,9 @@ def table_from_exp1_both_datasets(river_detail_csv: Path, cpazmal_detail_csv: Pa
     return "\n".join(lines)
 
 
-def tables_from_full_baseline_detail(detail_csv: Path, dataset_label: str = None,
-                                     label_prefix: str = None) -> str:
-    """run_full_baseline.py's full_baseline_<name>_detail.csv (one row per
-    method x gamma x seed) -> two NiceTabular tables (rows=gamma, columns=method):
-    F1 score mean+-std, and total computation time (s) mean+-std. Legacy — for a
-    full gamma SWEEP, not the fixed-per-method-gamma path (see `exp1` above)."""
-    with open(detail_csv, newline="") as f:
-        rows = list(csv.DictReader(f))
-    for r in rows:
-        if not r.get("gamma"):
-            r["gamma"] = "1.0"  # pre-gamma-sweep detail CSVs have no gamma column
-
-    gammas = sorted({r["gamma"] for r in rows}, key=float)
-    methods = _order_methods({r["method"] for r in rows})
-
-    f1_cells = _group_mean_std(rows, lambda r: (r["gamma"], r["method"]), "f1")
-    time_cells = _group_mean_std(rows, lambda r: (r["gamma"], r["method"]), "total_time")
-
-    prefix = f"{dataset_label} --- " if dataset_label else ""
-    f1_table = render_gamma_by_method_table(
-        gammas, methods, f1_cells,
-        caption=f"{prefix}F1 score (mean $\\pm$ std)",
-        label=f"{label_prefix}_f1" if label_prefix else None)
-    time_table = render_gamma_by_method_table(
-        gammas, methods, time_cells,
-        caption=f"{prefix}Computation time in seconds (mean $\\pm$ std)",
-        label=f"{label_prefix}_time" if label_prefix else None)
-    return f1_table + "\n\n" + time_table + "\n"
-
-
 def main():
     parser = argparse.ArgumentParser(description="Extract F1 mean±std results into LaTeX (NiceTabular) tables")
     sub = parser.add_subparsers(dest="kind", required=True)
-
-    p1 = sub.add_parser("classif", help="gamma sweep from classification/barycenter CSV (legacy)")
-    p1.add_argument("--csv", required=True)
-    p1.add_argument("--mode", default=None, help="filter to 'knn' or 'barycenter' (classification_scores.csv only)")
-    p1.add_argument("--col", default="gamma")
-    p1.add_argument("--out", required=True)
-    p1.add_argument("--caption", default=None)
-    p1.add_argument("--label", default=None)
 
     p2 = sub.add_parser("sensitivity", help="decimation sweep table combining per-method CSVs")
     p2.add_argument("--dir", required=True)
@@ -459,13 +352,6 @@ def main():
     p2.add_argument("--out", required=True)
     p2.add_argument("--caption", default=None)
     p2.add_argument("--label", default=None)
-
-    p3 = sub.add_parser("full_baseline",
-                        help="gamma x method tables (F1 + time) from a gamma-sweep detail CSV (legacy)")
-    p3.add_argument("--detail-csv", required=True)
-    p3.add_argument("--out", required=True)
-    p3.add_argument("--dataset-label", default=None)
-    p3.add_argument("--label-prefix", default=None)
 
     p4 = sub.add_parser("exp1",
                         help="per-method fixed-gamma summary table(s) (F1/time/RAM x method) "
@@ -489,14 +375,7 @@ def main():
 
     args = parser.parse_args()
 
-    if args.kind == "classif":
-        tex = table_from_classif_csv(Path(args.csv), mode=args.mode, col=args.col,
-                                     caption=args.caption, label=args.label)
-    elif args.kind == "full_baseline":
-        tex = tables_from_full_baseline_detail(Path(args.detail_csv),
-                                               dataset_label=args.dataset_label,
-                                               label_prefix=args.label_prefix)
-    elif args.kind == "exp1":
+    if args.kind == "exp1":
         if args.mode:
             tex = table_from_exp1_detail(Path(args.detail_csv), args.mode,
                                          dataset_label=args.dataset_label,

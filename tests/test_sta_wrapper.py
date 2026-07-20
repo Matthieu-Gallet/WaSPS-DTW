@@ -1,4 +1,4 @@
-"""Tests for baselines/sta_wrapper.py — Phase 8 validation."""
+"""Tests for classification/sta_wrapper.py — Phase 8 validation."""
 
 import sys
 from pathlib import Path
@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 import jax
 
-from baselines.sta_wrapper import sta_cost_matrix, sta_distance, knn_predict
+from classification.sta_wrapper import sta_cost_matrix, sta_distance, knn_predict, make_cost_fn
 
 
 # ---------------------------------------------------------------------------
@@ -131,3 +131,54 @@ class TestKnnPredictSTA:
         train_s, train_l, test_s, _ = self._make_two_class_data()
         preds = knn_predict(train_s, train_l, test_s, gamma=1.0, epsilon=0.1, k=3)
         assert preds.shape == (2,)
+
+
+# ---------------------------------------------------------------------------
+# make_cost_fn — used by fit_barycenter for STA barycenter estimation
+# (see src/plot/plot_river_bary_viz.py)
+# ---------------------------------------------------------------------------
+
+class TestMakeCostFn:
+    def test_returns_callable(self):
+        cost_fn = make_cost_fn(epsilon=0.1)
+        assert callable(cost_fn)
+
+    def test_output_is_scalar_jax_array(self):
+        cost_fn = make_cost_fn(epsilon=0.1)
+        rng = np.random.default_rng(0)
+        a = jax.numpy.asarray(np.abs(rng.normal(1.0, 0.1, 20)))
+        b = jax.numpy.asarray(np.abs(rng.normal(1.0, 0.1, 20)))
+        out = cost_fn(a, b)
+        assert out.shape == ()
+        assert jax.numpy.isfinite(out)
+
+    def test_near_zero_for_identical_inputs(self):
+        # entropic-regularized Sinkhorn cost, not exact OT: identical inputs give a
+        # small but nonzero cost (entropy term, epsilon-dependent) — compare against
+        # a clearly-different pair rather than asserting exact zero.
+        cost_fn = make_cost_fn(epsilon=0.1)
+        rng = np.random.default_rng(1)
+        a = jax.numpy.asarray(np.abs(rng.normal(1.0, 0.1, 20)))
+        b_far = jax.numpy.asarray(np.abs(rng.normal(10.0, 0.1, 20)))
+        assert float(cost_fn(a, a)) < float(cost_fn(a, b_far))
+
+    def test_increases_with_distribution_shift(self):
+        cost_fn = make_cost_fn(epsilon=0.1)
+        rng = np.random.default_rng(2)
+        a = jax.numpy.asarray(np.abs(rng.normal(1.0, 0.1, 30)))
+        b_near = jax.numpy.asarray(np.abs(rng.normal(1.2, 0.1, 30)))
+        b_far = jax.numpy.asarray(np.abs(rng.normal(10.0, 0.1, 30)))
+        assert float(cost_fn(a, b_far)) > float(cost_fn(a, b_near))
+
+    def test_grad_safe(self):
+        # value_and_grad through Sinkhorn — this is the property make_cost_fn's
+        # docstring claims ("pure JAX ... vmap- and grad-safe") that the STA
+        # barycenter path depends on.
+        cost_fn = make_cost_fn(epsilon=0.1)
+        rng = np.random.default_rng(3)
+        a = jax.numpy.asarray(np.abs(rng.normal(1.0, 0.1, 15)))
+        b = jax.numpy.asarray(np.abs(rng.normal(1.5, 0.1, 15)))
+        value, grad = jax.value_and_grad(cost_fn)(a, b)
+        assert jax.numpy.isfinite(value)
+        assert grad.shape == a.shape
+        assert jax.numpy.all(jax.numpy.isfinite(grad))

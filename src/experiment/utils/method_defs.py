@@ -11,7 +11,7 @@ sys.path.insert(0, str(_SRC))
 
 from costs import SqEuclidean, WaSPS
 from softdtw import SoftDTW
-from baselines.sta_wrapper import make_cost_fn as sta_cost_fn
+from classification.sta_wrapper import make_cost_fn as sta_cost_fn
 
 
 # repr:   'params' → estimate distribution parameters first

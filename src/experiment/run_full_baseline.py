@@ -331,7 +331,7 @@ def run_full_baseline(base_cfg: dict, out_dir: Path, methods: list, bary_methods
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="WaSPS-DTW baseline comparison (KNN and/or barycenter)")
-    parser.add_argument("--config", default="configs/full_baseline.yaml")
+    parser.add_argument("--config", default="configs/config_baseline.yaml")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-jobs", type=int, default=4)
     parser.add_argument("--sta-n-jobs", type=int, default=None,

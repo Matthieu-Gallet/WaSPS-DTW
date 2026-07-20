@@ -35,7 +35,7 @@ river:
     data_dir: data/river
     mode: balanced
     max_time_steps: null
-    aggregate_days: 7        # T=52
+    aggregate_days: 3        # T=52
   classification:
     gamma: 1.0
     k: 1

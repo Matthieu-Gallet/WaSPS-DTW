@@ -41,7 +41,7 @@ from data_utils import load_dataset, build_repr, subsample_per_class
 from method_defs import make_softdtw_bary
 from classification.barycenter_clf import fit_barycenters
 from softdtw import SoftDTW
-from baselines.sta_wrapper import make_cost_fn as sta_cost_fn
+from classification.sta_wrapper import make_cost_fn as sta_cost_fn
 
 from classification_plots import plot_class_pair_barycenters
 

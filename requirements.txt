@@ -4,8 +4,6 @@ pandas
 joblib
 scikit-learn
 matplotlib
-xarray
-netcdf4
 h5py
 tqdm
 psutil

@@ -102,6 +102,9 @@ def fit_barycenter(
     N = len(series)
     if N == 0:
         raise ValueError("series must be non-empty")
+    lengths = {np.asarray(s).shape[0] for s in series}
+    if len(lengths) > 1:
+        raise ValueError(f"fit_barycenter requires equal-length series (T); got lengths {sorted(lengths)}")
     if verbose:
         print(f"Fitting barycenter of {N} series with {n_steps} steps, lr={lr}, patience={patience}, min_rel_improve={min_rel_improve}")
     # NaN-fill before converting to JAX: some timesteps may have no valid samples for MLE
