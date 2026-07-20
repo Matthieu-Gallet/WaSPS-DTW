@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 # Baseline experiment — barycenter mode, both datasets, per-method optimal gamma.
-# STA is excluded from barycenter mode entirely (not tractable at this scale — see
-# run_full_baseline.py module docstring); STA's barycenter only appears in the
-# dedicated river illustration figure (exp4_river_bary_viz.sh).
+# Both divergence methods (6 total: wasps/eucl/raw ± _nodiv) and STA.
 #
 # Phase 1 (run): calibrate gamma if results/gamma_search/{dataset}/best_params.json is
 # missing (shared with exp1_knn_baseline.sh — skipped here if that script already ran),
-# then run all 6 non-STA methods at samples_per_step=480.
+# then run 6 non-STA methods at samples_per_step=480, then STA alone at 48.
 #
-# Phase 2 (extract): per-dataset + combined F1/Time/RAM x method LaTeX table, plus a
-# train/test series+labels + fitted-barycenters .npy dump per dataset.
+# Phase 2 (extract): per-dataset + combined F1/Time/RAM x method LaTeX table. The
+# train/test series+labels + fitted-barycenters .npy dump (all 7 methods) is OPTIONAL —
+# it refits every barycenter from scratch (nothing from Phase 1 is kept in memory across
+# these separate script invocations), so for STA this re-runs the same O(T^2)-per-step
+# fit that Phase 1 already paid for, at reduced (bary_n_jobs=1) parallelism — river/STA
+# alone took 3h50+ standalone. exp4_river_bary_viz.sh now covers the river barycenter
+# visualization independently (its own gamma/sample settings), so this dump is normally
+# unneeded — set DUMP_ARRAYS=true to re-enable it (e.g. for cpazmal-specific plots).
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../../.."
 source .venv/bin/activate
@@ -19,6 +23,7 @@ GAMMA_DIR="results/gamma_search"
 OUT_DIR="results/jax_exp2_bary_baseline"
 RESULTS_DIR="$OUT_DIR/results"
 LOG="$OUT_DIR/exp2_bary_baseline.sh.log"
+DUMP_ARRAYS="${DUMP_ARRAYS:-false}"
 mkdir -p "$RESULTS_DIR"
 cp "$CONFIG" "$OUT_DIR/"
 
@@ -33,10 +38,19 @@ for DATASET in river cpazmal; do
         2>&1 | tee -a "$LOG"
   fi
 
-  echo "----- $DATASET: barycenter, 6 methods, no STA (samples_per_step=480) -----" | tee -a "$LOG"
+  echo "----- $DATASET: barycenter, 6 non-STA methods (samples_per_step=480) -----" | tee -a "$LOG"
   python src/experiment/run_full_baseline.py --config "$CONFIG" --output-dir "$OUT_DIR" \
       --dataset "$DATASET" --modes barycenter --n-jobs 4 \
       --methods wasps,wasps_nodiv,eucl_params,eucl_params_nodiv,eucl_raw,eucl_raw_nodiv \
+      --bary-methods-same-as-methods \
+      --gamma-by-method-json "$GAMMA_DIR/$DATASET/best_params.json" --gamma-by-method-key bary \
+      --debug --verbose \
+      2>&1 | tee -a "$LOG"
+
+  echo "----- $DATASET: barycenter, STA (samples_per_step=48) -----" | tee -a "$LOG"
+  python src/experiment/run_full_baseline.py --config "$CONFIG" --output-dir "$OUT_DIR" \
+      --dataset "$DATASET" --modes barycenter --n-jobs 4 --sta-n-jobs 2 \
+      --methods sta --samples-per-step 48 \
       --bary-methods-same-as-methods \
       --gamma-by-method-json "$GAMMA_DIR/$DATASET/best_params.json" --gamma-by-method-key bary \
       --debug --verbose \
@@ -51,12 +65,14 @@ for DATASET in river cpazmal; do
       --dataset-label "$DATASET" --label-prefix "tab:exp2_${DATASET}" \
       2>&1 | tee -a "$LOG"
 
-  python src/experiment/reporting/dump_arrays.py --config "$CONFIG" --dataset "$DATASET" --seed 42 \
-      --out-series "$OUT_DIR/${DATASET}_series.npy" \
-      --out-barycenters "$OUT_DIR/${DATASET}_barycenters.npy" \
-      --methods wasps,wasps_nodiv,eucl_params,eucl_params_nodiv,eucl_raw,eucl_raw_nodiv \
-      --gamma-by-method-json "$GAMMA_DIR/$DATASET/best_params.json" \
-      2>&1 | tee -a "$LOG"
+  if [[ "$DUMP_ARRAYS" == "true" ]]; then
+    python src/experiment/reporting/dump_arrays.py --config "$CONFIG" --dataset "$DATASET" --seed 42 \
+        --out-series "$OUT_DIR/${DATASET}_series.npy" \
+        --out-barycenters "$OUT_DIR/${DATASET}_barycenters.npy" \
+        --methods wasps,wasps_nodiv,eucl_params,eucl_params_nodiv,eucl_raw,eucl_raw_nodiv,sta \
+        --gamma-by-method-json "$GAMMA_DIR/$DATASET/best_params.json" \
+        2>&1 | tee -a "$LOG"
+  fi
 done
 
 python src/experiment/reporting/extract_latex_tables.py exp1_combined \

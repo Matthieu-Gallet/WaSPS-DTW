@@ -4,10 +4,14 @@ once up front, reused by both.
 
 For each dataset (river, cpazmal) and mode (knn, barycenter): 3-seed holdout evaluation of
 every method across configs/config_baseline.yaml's gamma_search.gamma_grid, picking the
-best gamma per method by mean F1. STA gets its own pair of calls (knn + barycenter) at its
-own samples_per_step (gamma_search.sta_samples_per_step, e.g. 48, vs the other methods'
-480) — this matches the main run's own STA/non-STA split (see run_full_baseline.py's
---samples-per-step), not a separate reduced-scale calibration trick.
+best gamma per method by mean F1. STA gets its own pair of calls (knn + barycenter) at a
+MUCH-REDUCED scale (gamma_search.sta_reduced, e.g. samples_per_step=8, max_train_per_class
+=3) — a full 7-gamma x 3-seed grid at STA's normal scale (O(T^2) per pair) is impractically
+slow; this reduced scale is used ONLY here, giving a coarse but usable gamma estimate. The
+MAIN run (run_full_baseline.py / run_decimation.py) uses a different, unrelated split —
+its own STA sub-phase runs at samples_per_step=48 with the SAME sample caps as every other
+method (see gamma_search.sta_samples_per_step and --samples-per-step) — do not confuse the
+two: one is a calibration-speed hack, the other is STA's actual operating scale.
 
 grid_knn/grid_bary (formerly in the now-deleted run_optim_hyper.py) are self-contained
 here — only depend on utils/experiment_common.py.
@@ -221,7 +225,11 @@ def run_for_dataset(cfg: dict, name: str, out_dir: Path,
     gs_cfg = cfg["gamma_search"]
     grid = gs_cfg["gamma_grid"]
     n_seeds = gs_cfg["n_seeds"]
-    sta_samples_per_step = gs_cfg["sta_samples_per_step"]
+    # STA calibration uses a much-reduced scale (sta_reduced) — a full 7-gamma x 3-seed
+    # grid at STA's normal scale (O(T^2) per pair) is impractically slow. This is
+    # calibration-only; the main run's own STA sample cap is untouched (see
+    # run_for_dataset's caller / run_full_baseline.py's --samples-per-step).
+    sta_overrides = gs_cfg["sta_reduced"][name]
     methods = cfg["methods"]
     non_sta = [m for m in methods if m != "sta"]
     has_sta = "sta" in methods
@@ -240,8 +248,7 @@ def run_for_dataset(cfg: dict, name: str, out_dir: Path,
     grid_knn(base, dataset_out, non_sta, [k], grid, {}, seed, n_jobs=n_jobs)
 
     if has_sta:
-        sta_overrides = {"samples_per_step": sta_samples_per_step}
-        _log(f"[optimize_gamma/{name}] knn: sta @ {sta_overrides}, n_jobs={sta_n_jobs}")
+        _log(f"[optimize_gamma/{name}] knn: sta @ reduced scale {sta_overrides}, n_jobs={sta_n_jobs}")
         grid_knn(base, dataset_out, ["sta"], [k], grid, sta_overrides, seed, n_jobs=sta_n_jobs)
     else:
         _log(f"[optimize_gamma/{name}] knn: 'sta' not in methods, skipping")
@@ -251,8 +258,7 @@ def run_for_dataset(cfg: dict, name: str, out_dir: Path,
     grid_bary(base, dataset_out, non_sta, [lr], grid, {}, seed, n_steps, optimizer, n_jobs=n_jobs)
 
     if has_sta:
-        sta_overrides = {"samples_per_step": sta_samples_per_step}
-        _log(f"[optimize_gamma/{name}] barycenter: sta @ {sta_overrides}, n_jobs={sta_n_jobs}")
+        _log(f"[optimize_gamma/{name}] barycenter: sta @ reduced scale {sta_overrides}, n_jobs={sta_n_jobs}")
         grid_bary(base, dataset_out, ["sta"], [lr], grid, sta_overrides, seed, n_steps, optimizer,
                  n_jobs=sta_n_jobs)
     else:

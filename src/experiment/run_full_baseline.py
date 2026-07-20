@@ -252,7 +252,9 @@ def run_full_baseline(base_cfg: dict, out_dir: Path, methods: list, bary_methods
             mode_methods = methods if mode == 'knn' else \
                 [m for m in methods if m in bary_methods]
             for method in mode_methods:
-                gammas_to_try = [gamma_by_method[method]] if gamma_by_method else gamma_values
+                # _nodiv variants reuse base method's gamma (differ only in is_divergence, not cost)
+                lookup_method = method.replace("_nodiv", "") if "_nodiv" in method else method
+                gammas_to_try = [gamma_by_method[lookup_method]] if gamma_by_method else gamma_values
                 for gamma in gammas_to_try:
                     gamma_key = _gamma_key(gamma)
                     seeds_needed = target_seeds if force else [

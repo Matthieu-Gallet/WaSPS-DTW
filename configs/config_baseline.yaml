@@ -24,7 +24,7 @@
 #       --modes knn,barycenter --n-jobs 4 --sta-n-jobs 2
 
 methods: [wasps, wasps_nodiv, eucl_params, eucl_params_nodiv, eucl_raw, eucl_raw_nodiv, sta]
-bary_methods: [wasps, wasps_nodiv, eucl_params, eucl_params_nodiv, eucl_raw, eucl_raw_nodiv]
+bary_methods: [wasps, wasps_nodiv, eucl_params, eucl_params_nodiv, eucl_raw, eucl_raw_nodiv, sta]
 n_seeds: 5
 estimator: log_cumulant
 
@@ -44,7 +44,7 @@ river:
     max_train_samples: 105   # flat total, matches cpazmal's 15/class x 7 classes
     max_test_samples: 175    # flat total, matches cpazmal's 25/class x 7 classes
     lr: 0.001
-    n_steps_bary: 150
+    n_steps_bary: 75
     optimizer: sgd
     early_stop_patience: 20
     early_stop_tol: 1.0e-4
@@ -64,19 +64,25 @@ cpazmal:
     max_train_per_class: 15
     max_test_per_class: 25
     lr: 0.05
-    n_steps_bary: 150
+    n_steps_bary: 75
     optimizer: sgd
     early_stop_patience: 20
     early_stop_tol: 1.0e-4
 
 # Gamma calibration (optimize_gamma.py) — replaces the old separate configs/gamma_search.yaml.
-# Sample caps for calibration are the SAME as the main run above (no separate reduced
-# scale) — only samples_per_step differs between STA and non-STA, both here and in the
-# main run.
+# Non-STA methods calibrate at full scale (this file's own samples_per_step/sample caps).
+# STA calibrates at a SEPARATE, much-reduced scale (sta_reduced below) — a full 7-gamma x
+# 3-seed grid search at STA's normal scale (O(T^2) per pair) is impractically slow; this
+# reduced scale gives a coarse but usable gamma estimate. This is ONLY for calibration —
+# the main run's own STA sample cap (sta_samples_per_step, same max_train_per_class/
+# max_train_samples as every other method) is unaffected and unchanged.
 gamma_search:
   gamma_grid: [1.0e-4, 1.0e-2, 1.0e-1, 1.0, 1.0e+1, 1.0e+2, 1.0e+4]
   n_seeds: 3
-  sta_samples_per_step: 48   # STA's own samples_per_step, both for calibration and the main run
+  sta_samples_per_step: 48   # STA's own samples_per_step for the MAIN run (not calibration)
+  sta_reduced:
+    cpazmal: {samples_per_step: 8, max_train_per_class: 3, max_test_per_class: 1}
+    river:   {samples_per_step: 8, max_train_samples: 12, max_test_samples: 8}
 
 output:
   dir: results/jax_exp1_baseline

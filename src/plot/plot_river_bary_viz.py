@@ -18,7 +18,7 @@ before plotting, so all 4 methods end up in the same parameter (β) space for th
 overlay plot (src/plot/classification_plots.py::plot_class_pair_barycenters).
 
 Usage:
-    python src/experiment/plot_river_bary_viz.py --config configs/config_baseline.yaml \\
+    python src/plot/plot_river_bary_viz.py --config configs/config_baseline.yaml \\
         --output-dir results/jax_exp4_river_bary_viz --gamma 10 --classes NG,PN
 """
 
@@ -32,7 +32,7 @@ import numpy as np
 import yaml
 
 _HERE = Path(__file__).parent
-sys.path.insert(0, str(_HERE / "utils"))
+sys.path.insert(0, str(_HERE.parent / "experiment" / "utils"))
 sys.path.insert(0, str(_HERE.parent))
 
 import distributions
@@ -43,7 +43,6 @@ from classification.barycenter_clf import fit_barycenters
 from softdtw import SoftDTW
 from baselines.sta_wrapper import make_cost_fn as sta_cost_fn
 
-sys.path.insert(0, str(_HERE.parent / "plot"))
 from classification_plots import plot_class_pair_barycenters
 
 _FAMILY = "exponential"
@@ -146,10 +145,14 @@ def main():
         cls: _fit_params_on_raw_barycenter(b, estimator) for cls, b in bary_sta.items()
     }
     print(f"[exp4] sta: fit {len(bary_sta)} class barycenters (raw -> params fit post-hoc, no divergence)")
+    # dump all time-series and barycenters to disk for later inspection
+    np.savez(out_dir / "barycenters.npz", **barycenters_by_method)
+    np.savez(out_dir / "X_params.npz", X_params=X_params, y_params=y_params)
+    np.savez(out_dir / "X_train_sta.npz", X_train_sta=X_train_sta, y_train_sta=y_train_sta)
 
     plot_class_pair_barycenters(
         barycenters_by_method, X_params, y_params, class_names,
-        output_dir=str(out_dir), save_pdf=True, n_samples=10, show_legend=True,
+        output_dir=str(out_dir), save_pdf=True, n_samples=200, show_legend=False,
     )
     print(f"[exp4] wrote PDFs to {out_dir / 'class_pairs'}")
 
