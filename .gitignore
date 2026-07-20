@@ -13,10 +13,8 @@ RESSOURCES/*
 notebooks/*
 results/regime_classification/seed_sweep/*
 *.md
-data/**/*.npy
+data/**/*.*
 results/**/*.npy
 results/**/*.pdf
-
-*.md
-results/*
-CLAUDE.md
+results/**/*.png
+results/**/*.npz

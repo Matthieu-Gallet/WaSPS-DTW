@@ -1,0 +1,1434 @@
+===== 2026-07-17 22:40:45 exp2_bary_baseline starting =====
+----- river: barycenter, 6 methods, no STA (samples_per_step=480) -----
+[22:40:47] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[22:40:47] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[22:40:47] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[22:40:49] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:40:49]   [river] gamma=10000.0 method=wasps mode=barycenter seed=42 data loaded in 0.72s (n_train=105 n_test=160)
+[22:40:49] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:40:49]   [river] gamma=10000.0 method=wasps mode=barycenter seed=44 data loaded in 0.73s (n_train=105 n_test=160)
+[22:40:49] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:40:49]   [river] gamma=10000.0 method=wasps mode=barycenter seed=45 data loaded in 0.74s (n_train=105 n_test=160)
+[22:40:49] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:40:49]   [river] gamma=10000.0 method=wasps mode=barycenter seed=43 data loaded in 0.73s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:40:57]   [river] gamma=10000.0 mode=barycenter seed=44 finished wasps in 8.2s (f1=0.472)
+[22:40:57]   [river] gamma=10000.0 mode=barycenter seed=42 finished wasps in 8.3s (f1=0.490)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   10.6s remaining:   15.8s
+[22:40:58]   [river] gamma=10000.0 mode=barycenter seed=43 finished wasps in 8.4s (f1=0.438)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   10.7s remaining:    7.2s
+[22:40:58]   [river] gamma=10000.0 mode=barycenter seed=45 finished wasps in 8.5s (f1=0.528)
+[22:40:58] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:40:58]   [river] gamma=10000.0 method=wasps mode=barycenter seed=46 data loaded in 0.65s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[22:41:01]   [river] gamma=10000.0 mode=barycenter seed=46 finished wasps in 2.9s (f1=0.490)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   14.1s finished
+[22:41:03] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps batch done in 14.1s peak_rss=9796MB (avg/job=2449MB)
+[22:41:03] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[22:41:05] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:05]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=42 data loaded in 0.76s (n_train=105 n_test=160)
+[22:41:05] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:05]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=44 data loaded in 0.79s (n_train=105 n_test=160)
+[22:41:05] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:05]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=43 data loaded in 0.79s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[22:41:05] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:05]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=45 data loaded in 0.81s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:41:10]   [river] gamma=10000.0 mode=barycenter seed=42 finished wasps_nodiv in 5.3s (f1=0.479)
+[22:41:10]   [river] gamma=10000.0 mode=barycenter seed=43 finished wasps_nodiv in 5.3s (f1=0.441)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    7.9s remaining:   11.8s
+[22:41:10]   [river] gamma=10000.0 mode=barycenter seed=44 finished wasps_nodiv in 5.4s (f1=0.428)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    7.9s remaining:    5.3s
+[22:41:10]   [river] gamma=10000.0 mode=barycenter seed=45 finished wasps_nodiv in 5.4s (f1=0.527)
+[22:41:11] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:11]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=46 data loaded in 0.62s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[22:41:12]   [river] gamma=10000.0 mode=barycenter seed=46 finished wasps_nodiv in 1.0s (f1=0.490)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:    9.4s finished
+[22:41:13] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv batch done in 9.5s peak_rss=9677MB (avg/job=2419MB)
+[22:41:13] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[22:41:16] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:16]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=43 data loaded in 0.81s (n_train=105 n_test=160)
+[22:41:16] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:16]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=42 data loaded in 0.81s (n_train=105 n_test=160)
+[22:41:16] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:16]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=45 data loaded in 0.83s (n_train=105 n_test=160)
+[22:41:16] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:16]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=44 data loaded in 0.81s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:41:25]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_params in 8.6s (f1=0.268)
+[22:41:25]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_params in 8.6s (f1=0.285)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   11.2s remaining:   16.8s
+[22:41:25]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_params in 8.8s (f1=0.369)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   11.3s remaining:    7.5s
+[22:41:25]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_params in 8.8s (f1=0.297)
+[22:41:25] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:25]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=46 data loaded in 0.61s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[22:41:28]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_params in 2.9s (f1=0.272)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   14.7s finished
+[22:41:30] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params batch done in 14.7s peak_rss=9739MB (avg/job=2435MB)
+[22:41:30] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[22:41:32] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:32]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 0.84s (n_train=105 n_test=160)
+[22:41:32] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:32]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 0.84s (n_train=105 n_test=160)
+[22:41:32] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:32]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 0.84s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[22:41:33] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:33]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 1.03s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:41:39]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_params_nodiv in 6.9s (f1=0.360)
+[22:41:39]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_params_nodiv in 7.0s (f1=0.293)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:    9.6s remaining:   14.4s
+[22:41:39]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_params_nodiv in 7.0s (f1=0.285)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:    9.6s remaining:    6.4s
+[22:41:40]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_params_nodiv in 6.8s (f1=0.272)
+[22:41:40] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:40]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 0.62s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[22:41:42]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_params_nodiv in 1.9s (f1=0.272)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   12.1s finished
+[22:41:43] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv batch done in 12.1s peak_rss=9619MB (avg/job=2405MB)
+[22:41:43] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[22:41:46] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:46]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=42 data loaded in 0.80s (n_train=105 n_test=160)
+[22:41:46] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:46]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=45 data loaded in 0.81s (n_train=105 n_test=160)
+[22:41:46] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:46]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=44 data loaded in 0.81s (n_train=105 n_test=160)
+[22:41:46] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:46]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=43 data loaded in 0.81s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:41:59]   [river] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw in 12.6s (f1=0.358)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:41:59]   [river] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw in 12.9s (f1=0.329)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   15.5s remaining:   23.2s
+[22:41:59]   [river] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw in 13.0s (f1=0.256)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   15.6s remaining:   10.4s
+[22:41:59]   [river] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw in 13.2s (f1=0.270)
+[22:41:59] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:41:59]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=46 data loaded in 0.72s (n_train=105 n_test=160)
+[22:42:04]   [river] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw in 4.9s (f1=0.338)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   20.8s finished
+[22:42:06] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw batch done in 20.8s peak_rss=10402MB (avg/job=2601MB)
+[22:42:06] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[22:42:08] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:42:08]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 0.80s (n_train=105 n_test=160)
+[22:42:08] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:42:08]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 0.81s (n_train=105 n_test=160)
+[22:42:08] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:42:08]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 0.82s (n_train=105 n_test=160)
+[22:42:09] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:42:09]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 0.92s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:42:25]   [river] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw_nodiv in 16.5s (f1=0.256)
+[22:42:25]   [river] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw_nodiv in 16.7s (f1=0.358)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   19.3s remaining:   28.9s
+[22:42:26]   [river] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw_nodiv in 17.1s (f1=0.270)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   19.7s remaining:   13.2s
+[22:42:26]   [river] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw_nodiv in 17.2s (f1=0.329)
+[22:42:26] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:42:26]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 1.11s (n_train=105 n_test=160)
+[22:42:33]   [river] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw_nodiv in 6.5s (f1=0.338)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   26.9s finished
+[22:42:36] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv batch done in 26.9s peak_rss=10218MB (avg/job=2554MB)
+[22:42:36] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.037(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.033(n=5)  eucl_raw@g=0.0001/barycenter=0.310±0.040(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.310±0.040(n=5)  wasps@g=10000/barycenter=0.483±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[22:42:36] ===== full_baseline done =====
+----- cpazmal: barycenter, 6 methods, no STA (samples_per_step=480) -----
+[22:42:38] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[22:42:38] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 0.0001}
+[22:42:38] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:42:48] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:42:48]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=45 data loaded in 6.79s (n_train=104 n_test=135)
+[22:42:48] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:42:48]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=44 data loaded in 6.89s (n_train=104 n_test=135)
+[22:42:48] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:42:48]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=42 data loaded in 6.88s (n_train=104 n_test=135)
+[22:42:48] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:42:48]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=43 data loaded in 6.98s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:43:15]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps in 27.2s (f1=0.590)
+[22:43:15]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps in 27.1s (f1=0.627)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   37.1s remaining:   55.7s
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:43:15]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps in 27.1s (f1=0.646)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   37.3s remaining:   24.8s
+[22:43:15]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps in 27.3s (f1=0.557)
+[22:43:18] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:18]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=46 data loaded in 2.65s (n_train=104 n_test=135)
+[22:43:21]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps in 3.6s (f1=0.617)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   43.5s finished
+[22:43:23] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps batch done in 43.5s peak_rss=11351MB (avg/job=2838MB)
+[22:43:23] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:43:28] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:28]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=42 data loaded in 3.57s (n_train=104 n_test=135)
+[22:43:28] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:28]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=44 data loaded in 3.61s (n_train=104 n_test=135)
+[22:43:28] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:28]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=45 data loaded in 3.62s (n_train=104 n_test=135)
+[22:43:28] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:28]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=43 data loaded in 3.62s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:43:37]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps_nodiv in 9.1s (f1=0.506)
+[22:43:37]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps_nodiv in 9.2s (f1=0.590)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   14.3s remaining:   21.5s
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:43:37]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps_nodiv in 9.3s (f1=0.640)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   14.4s remaining:    9.6s
+[22:43:38]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps_nodiv in 9.2s (f1=0.668)
+[22:43:40] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:40]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=46 data loaded in 2.76s (n_train=104 n_test=135)
+[22:43:43]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps_nodiv in 2.3s (f1=0.626)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   19.4s finished
+[22:43:44] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv batch done in 19.4s peak_rss=11248MB (avg/job=2812MB)
+[22:43:44] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:43:49] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:49]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=42 data loaded in 3.71s (n_train=104 n_test=135)
+[22:43:49] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:49] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:49]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=43 data loaded in 3.70s (n_train=104 n_test=135)
+[22:43:49]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=44 data loaded in 3.70s (n_train=104 n_test=135)
+[22:43:50] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:43:50]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=45 data loaded in 3.67s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:43:57]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished eucl_params in 7.3s (f1=0.449)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:43:57]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished eucl_params in 7.5s (f1=0.459)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   12.9s remaining:   19.3s
+[22:43:57]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished eucl_params in 7.5s (f1=0.436)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   12.9s remaining:    8.6s
+[22:43:57]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished eucl_params in 7.5s (f1=0.403)
+[22:44:00] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:00]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=46 data loaded in 2.72s (n_train=104 n_test=135)
+[22:44:02]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished eucl_params in 2.0s (f1=0.415)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   17.5s finished
+[22:44:03] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params batch done in 17.5s peak_rss=10740MB (avg/job=2685MB)
+[22:44:03] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:44:09] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:09]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 3.86s (n_train=104 n_test=135)
+[22:44:09] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:09] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:09]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 3.87s (n_train=104 n_test=135)
+[22:44:09]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 3.87s (n_train=104 n_test=135)
+[22:44:09] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:09]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 3.84s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:44:15]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished eucl_params_nodiv in 6.0s (f1=0.403)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[cpazmal] loading from cache (max_groups_per_class=None)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:44:15]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished eucl_params_nodiv in 6.2s (f1=0.428)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   11.7s remaining:   17.5s
+[22:44:15]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished eucl_params_nodiv in 6.4s (f1=0.428)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   11.8s remaining:    7.9s
+[22:44:15]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished eucl_params_nodiv in 6.4s (f1=0.494)
+[22:44:18] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:18]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 2.95s (n_train=104 n_test=135)
+[22:44:19]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished eucl_params_nodiv in 1.4s (f1=0.387)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   15.9s finished
+[22:44:21] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv batch done in 15.9s peak_rss=10618MB (avg/job=2654MB)
+[22:44:21] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:44:26] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:26]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=45 data loaded in 3.91s (n_train=104 n_test=135)
+[22:44:26] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:26]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=43 data loaded in 3.91s (n_train=104 n_test=135)
+[22:44:26] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:26]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=42 data loaded in 3.92s (n_train=104 n_test=135)
+[22:44:27] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:27]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=44 data loaded in 4.16s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[22:44:36]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw in 9.6s (f1=0.431)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[22:44:36]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw in 9.8s (f1=0.726)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   15.4s remaining:   23.2s
+[22:44:36]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw in 9.8s (f1=0.628)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   15.7s remaining:   10.5s
+[22:44:37]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw in 10.1s (f1=0.713)
+[22:44:39] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[22:44:39]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=46 data loaded in 2.89s (n_train=104 n_test=135)
+===== 2026-07-17 22:45:26 exp2_bary_baseline starting =====
+----- river: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[22:45:28] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[22:45:28] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[22:45:28] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[22:45:28] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[22:45:28] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[22:45:28] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[22:45:28] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[22:45:28] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[22:45:28] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.037(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.033(n=5)  eucl_raw@g=0.0001/barycenter=0.310±0.040(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.310±0.040(n=5)  wasps@g=10000/barycenter=0.483±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[22:45:28] ===== full_baseline done =====
+----- river: barycenter, STA (samples_per_step=48) -----
+[22:45:29] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[22:45:29] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[22:45:29] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=2)]: Using backend LokyBackend with 2 concurrent workers.
+[22:45:31] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:45:31]   [river] gamma=0.0001 method=sta mode=barycenter seed=43 data loaded in 0.49s (n_train=105 n_test=160)
+[22:45:31] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[22:45:31]   [river] gamma=0.0001 method=sta mode=barycenter seed=42 data loaded in 0.49s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[04:55:07]   [river] gamma=0.0001 mode=barycenter seed=42 finished sta in 22175.4s (f1=0.245)
+[Parallel(n_jobs=2)]: Done   1 tasks      | elapsed: 369.6min
+[04:55:07] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[04:55:07]   [river] gamma=0.0001 method=sta mode=barycenter seed=44 data loaded in 0.53s (n_train=105 n_test=160)
+[04:55:11]   [river] gamma=0.0001 mode=barycenter seed=43 finished sta in 22179.5s (f1=0.298)
+[04:55:11] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[04:55:11]   [river] gamma=0.0001 method=sta mode=barycenter seed=45 data loaded in 0.50s (n_train=105 n_test=160)
+===== 2026-07-18 10:17:38 exp2_bary_baseline starting =====
+----- river: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[10:17:39] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[10:17:39] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[10:17:39] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[10:17:39] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[10:17:39] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[10:17:39] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[10:17:39] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[10:17:39] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[10:17:39] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.037(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.033(n=5)  eucl_raw@g=0.0001/barycenter=0.310±0.040(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.310±0.040(n=5)  wasps@g=10000/barycenter=0.483±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[10:17:39] ===== full_baseline done =====
+----- river: barycenter, STA (samples_per_step=48) -----
+[10:17:41] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=5 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[10:17:41] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[10:17:41] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=5)]: Using backend LokyBackend with 5 concurrent workers.
+[10:17:43] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[10:17:43]   [river] gamma=0.0001 method=sta mode=barycenter seed=42 data loaded in 0.51s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[10:17:43] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[10:17:43]   [river] gamma=0.0001 method=sta mode=barycenter seed=43 data loaded in 0.51s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[10:17:43] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[10:17:43]   [river] gamma=0.0001 method=sta mode=barycenter seed=44 data loaded in 0.52s (n_train=105 n_test=160)
+[10:17:43] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[10:17:43]   [river] gamma=0.0001 method=sta mode=barycenter seed=46 data loaded in 0.51s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[10:17:43] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[10:17:43]   [river] gamma=0.0001 method=sta mode=barycenter seed=45 data loaded in 0.54s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+===== 2026-07-18 14:39:55 exp2_bary_baseline starting =====
+----- river: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[14:39:57] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[14:39:57] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[14:39:57] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[14:39:57] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[14:39:57] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[14:39:57] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[14:39:57] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[14:39:57] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[14:39:57] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.037(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.033(n=5)  eucl_raw@g=0.0001/barycenter=0.310±0.040(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.310±0.040(n=5)  wasps@g=10000/barycenter=0.483±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[14:39:57] ===== full_baseline done =====
+----- river: barycenter, STA (samples_per_step=48) -----
+[14:39:58] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=5 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[14:39:58] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[14:39:58] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=5)]: Using backend LokyBackend with 5 concurrent workers.
+[14:40:01] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[14:40:01] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[14:40:01] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[14:40:01]   [river] gamma=0.0001 method=sta mode=barycenter seed=46 data loaded in 0.58s (n_train=105 n_test=160)
+[14:40:01]   [river] gamma=0.0001 method=sta mode=barycenter seed=43 data loaded in 0.60s (n_train=105 n_test=160)
+[14:40:01]   [river] gamma=0.0001 method=sta mode=barycenter seed=44 data loaded in 0.61s (n_train=105 n_test=160)
+[14:40:01] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[14:40:01]   [river] gamma=0.0001 method=sta mode=barycenter seed=42 data loaded in 0.64s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[14:40:01] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[14:40:01]   [river] gamma=0.0001 method=sta mode=barycenter seed=45 data loaded in 0.53s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+===== 2026-07-19 01:30:01 exp2_bary_baseline starting =====
+----- river: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[01:30:03] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[01:30:03] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[01:30:03] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[01:30:08] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=43 data loaded in 1.56s (n_train=105 n_test=160)
+[01:30:08] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=44 data loaded in 1.58s (n_train=105 n_test=160)
+[01:30:08] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=45 data loaded in 1.62s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[01:30:08] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=42 data loaded in 1.61s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:30:19]   [river] gamma=10000.0 mode=barycenter seed=42 finished wasps in 11.1s (f1=0.481)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:30:19]   [river] gamma=10000.0 mode=barycenter seed=44 finished wasps in 11.7s (f1=0.466)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   16.1s remaining:   24.1s
+[01:30:20]   [river] gamma=10000.0 mode=barycenter seed=45 finished wasps in 12.2s (f1=0.522)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   16.7s remaining:   11.1s
+[01:30:20]   [river] gamma=10000.0 mode=barycenter seed=43 finished wasps in 12.4s (f1=0.434)
+[01:30:21] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:21]   [river] gamma=10000.0 method=wasps mode=barycenter seed=46 data loaded in 1.19s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[01:30:24]   [river] gamma=10000.0 mode=barycenter seed=46 finished wasps in 3.7s (f1=0.490)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   20.8s finished
+[01:30:27] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps batch done in 20.8s peak_rss=9862MB (avg/job=2466MB)
+[01:30:27] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[01:30:31] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=43 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:31] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=42 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:31] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=44 data loaded in 1.43s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[01:30:31] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=45 data loaded in 1.37s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:30:42]   [river] gamma=10000.0 mode=barycenter seed=43 finished wasps_nodiv in 11.0s (f1=0.441)
+[01:30:42]   [river] gamma=10000.0 mode=barycenter seed=42 finished wasps_nodiv in 11.1s (f1=0.479)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   15.3s remaining:   22.9s
+[01:30:42]   [river] gamma=10000.0 mode=barycenter seed=44 finished wasps_nodiv in 11.2s (f1=0.428)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   15.4s remaining:   10.2s
+[01:30:43]   [river] gamma=10000.0 mode=barycenter seed=45 finished wasps_nodiv in 11.5s (f1=0.527)
+[01:30:43] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:43]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=46 data loaded in 1.17s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[01:30:45]   [river] gamma=10000.0 mode=barycenter seed=46 finished wasps_nodiv in 2.1s (f1=0.490)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   18.3s finished
+[01:30:48] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv batch done in 18.3s peak_rss=9645MB (avg/job=2411MB)
+[01:30:48] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[01:30:52] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=42 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:52] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=43 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:52] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=44 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:52] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=45 data loaded in 1.35s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:31:04]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_params in 12.5s (f1=0.345)
+[01:31:04]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_params in 12.7s (f1=0.271)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   16.6s remaining:   24.9s
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:31:04]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_params in 12.7s (f1=0.307)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   16.8s remaining:   11.2s
+[01:31:05]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_params in 13.2s (f1=0.291)
+[01:31:05] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:05]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=46 data loaded in 1.17s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[01:31:08]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_params in 3.0s (f1=0.279)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   20.8s finished
+[01:31:11] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params batch done in 20.8s peak_rss=9720MB (avg/job=2430MB)
+[01:31:11] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[01:31:14] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 1.06s (n_train=105 n_test=160)
+[01:31:14] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 1.13s (n_train=105 n_test=160)
+[01:31:14] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 1.14s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[01:31:14] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 1.15s (n_train=105 n_test=160)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 3/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_params_nodiv in 9.6s (f1=0.345)
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_params_nodiv in 9.5s (f1=0.282)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   13.3s remaining:   19.9s
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_params_nodiv in 9.8s (f1=0.307)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   13.5s remaining:    9.0s
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_params_nodiv in 9.8s (f1=0.271)
+[01:31:25] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:25]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 0.95s (n_train=105 n_test=160)
+[warn] build_repr: dropped 2/105 series with NaN params (timesteps where log_cumulant failed)
+[01:31:27]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_params_nodiv in 2.3s (f1=0.279)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   16.5s finished
+[01:31:30] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv batch done in 16.5s peak_rss=9589MB (avg/job=2397MB)
+[01:31:30] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[01:31:34] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:34]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=45 data loaded in 1.57s (n_train=105 n_test=160)
+[01:31:34] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:34]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=43 data loaded in 1.76s (n_train=105 n_test=160)
+[01:31:34] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:34]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=42 data loaded in 1.89s (n_train=105 n_test=160)
+[01:31:35] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:35]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=44 data loaded in 2.28s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw in 16.6s (f1=0.253)
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw in 16.9s (f1=0.375)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   21.5s remaining:   32.2s
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw in 16.4s (f1=0.344)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   21.6s remaining:   14.4s
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw in 17.2s (f1=0.270)
+[01:31:52] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:52]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=46 data loaded in 1.00s (n_train=105 n_test=160)
+[01:31:57]   [river] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw in 4.8s (f1=0.352)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   27.0s finished
+[01:31:59] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw batch done in 27.1s peak_rss=10495MB (avg/job=2624MB)
+[01:31:59] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[01:32:04] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 1.41s (n_train=105 n_test=160)
+[01:32:04] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 1.51s (n_train=105 n_test=160)
+[01:32:04] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 1.53s (n_train=105 n_test=160)
+[01:32:04] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 1.70s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw_nodiv in 12.8s (f1=0.344)
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw_nodiv in 12.9s (f1=0.270)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   17.6s remaining:   26.5s
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw_nodiv in 12.4s (f1=0.253)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   17.7s remaining:   11.8s
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw_nodiv in 12.9s (f1=0.375)
+[01:32:18] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:18]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 0.98s (n_train=105 n_test=160)
+[01:32:22]   [river] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw_nodiv in 4.6s (f1=0.352)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   23.2s finished
+[01:32:25] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv batch done in 23.2s peak_rss=10340MB (avg/job=2585MB)
+[01:32:25] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[01:32:25] ===== full_baseline done =====
+----- river: barycenter, STA (samples_per_step=48) -----
+[01:32:28] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[01:32:28] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[01:32:28] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=2)]: Using backend LokyBackend with 2 concurrent workers.
+[01:32:32] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:32]   [river] gamma=0.0001 method=sta mode=barycenter seed=43 data loaded in 1.08s (n_train=105 n_test=160)
+[01:32:32] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:32]   [river] gamma=0.0001 method=sta mode=barycenter seed=42 data loaded in 1.12s (n_train=105 n_test=160)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[06:53:00]   [river] gamma=0.0001 mode=barycenter seed=42 finished sta in 19228.6s (f1=0.245)
+[Parallel(n_jobs=2)]: Done   1 tasks      | elapsed: 320.5min
+[06:53:02] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[06:53:02]   [river] gamma=0.0001 method=sta mode=barycenter seed=44 data loaded in 1.06s (n_train=105 n_test=160)
+[06:53:06]   [river] gamma=0.0001 mode=barycenter seed=43 finished sta in 19233.9s (f1=0.298)
+[06:53:07] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[06:53:07]   [river] gamma=0.0001 method=sta mode=barycenter seed=45 data loaded in 1.03s (n_train=105 n_test=160)
+[10:07:51]   [river] gamma=0.0001 mode=barycenter seed=44 finished sta in 11689.4s (f1=0.307)
+[Parallel(n_jobs=2)]: Done   3 out of   5 | elapsed: 515.4min remaining: 343.6min
+[10:07:52] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[10:07:52]   [river] gamma=0.0001 method=sta mode=barycenter seed=46 data loaded in 0.55s (n_train=105 n_test=160)
+[10:07:54]   [river] gamma=0.0001 mode=barycenter seed=45 finished sta in 11687.5s (f1=0.284)
+[11:35:50]   [river] gamma=0.0001 mode=barycenter seed=46 finished sta in 5278.1s (f1=0.391)
+[Parallel(n_jobs=2)]: Done   5 out of   5 | elapsed: 603.4min finished
+[11:35:51] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta batch done in 36202.1s peak_rss=3142MB (avg/job=1571MB)
+[11:35:51] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[11:35:51] ===== full_baseline done =====
+----- cpazmal: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[11:35:52] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:35:52] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 0.0001}
+[11:35:52] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:35:57] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=43 data loaded in 3.37s (n_train=104 n_test=135)
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=42 data loaded in 3.39s (n_train=104 n_test=135)
+[11:35:57] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=44 data loaded in 3.38s (n_train=104 n_test=135)
+[11:35:57] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=45 data loaded in 3.38s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps in 8.6s (f1=0.527)
+[cpazmal] loading from cache (max_groups_per_class=None)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps in 9.1s (f1=0.598)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   13.9s remaining:   20.9s
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps in 9.1s (f1=0.635)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   13.9s remaining:    9.3s
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps in 9.2s (f1=0.594)
+[11:36:08] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:08]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=46 data loaded in 2.61s (n_train=104 n_test=135)
+[11:36:11]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps in 2.7s (f1=0.622)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   18.9s finished
+[11:36:13] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps batch done in 18.9s peak_rss=11386MB (avg/job=2846MB)
+[11:36:13] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:36:17] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=44 data loaded in 3.33s (n_train=104 n_test=135)
+[11:36:17] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=42 data loaded in 3.34s (n_train=104 n_test=135)
+[11:36:17] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=45 data loaded in 3.35s (n_train=104 n_test=135)
+[11:36:17] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=43 data loaded in 3.38s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps_nodiv in 7.1s (f1=0.635)
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps_nodiv in 7.1s (f1=0.493)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   11.9s remaining:   17.9s
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps_nodiv in 7.1s (f1=0.686)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   12.0s remaining:    8.0s
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps_nodiv in 7.2s (f1=0.609)
+[11:36:27] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:27]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=46 data loaded in 2.54s (n_train=104 n_test=135)
+[11:36:29]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps_nodiv in 1.7s (f1=0.611)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   16.3s finished
+[11:36:30] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv batch done in 16.3s peak_rss=11007MB (avg/job=2752MB)
+[11:36:30] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:36:35] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=45 data loaded in 3.41s (n_train=104 n_test=135)
+[11:36:35] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=43 data loaded in 3.44s (n_train=104 n_test=135)
+[11:36:35] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=44 data loaded in 3.44s (n_train=104 n_test=135)
+[11:36:35] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=42 data loaded in 3.45s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished eucl_params in 6.3s (f1=0.446)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished eucl_params in 6.3s (f1=0.505)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   11.3s remaining:   17.0s
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished eucl_params in 6.4s (f1=0.396)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   11.4s remaining:    7.6s
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished eucl_params in 6.4s (f1=0.440)
+[11:36:44] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:44]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:36:46]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished eucl_params in 1.5s (f1=0.457)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   15.3s finished
+[11:36:47] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params batch done in 15.3s peak_rss=10816MB (avg/job=2704MB)
+[11:36:47] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:36:52] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 3.39s (n_train=104 n_test=135)
+[11:36:52] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 3.41s (n_train=104 n_test=135)
+[11:36:52] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 3.39s (n_train=104 n_test=135)
+[11:36:52] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 3.42s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:36:57]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished eucl_params_nodiv in 5.3s (f1=0.429)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:36:58]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished eucl_params_nodiv in 5.5s (f1=0.405)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   10.5s remaining:   15.7s
+[11:36:58]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished eucl_params_nodiv in 5.5s (f1=0.493)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   10.5s remaining:    7.0s
+[11:36:58]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished eucl_params_nodiv in 5.5s (f1=0.387)
+[11:37:00] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:00]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:37:01]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished eucl_params_nodiv in 1.0s (f1=0.369)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   14.0s finished
+[11:37:03] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv batch done in 14.0s peak_rss=10596MB (avg/job=2649MB)
+[11:37:03] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:37:08] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=44 data loaded in 3.51s (n_train=104 n_test=135)
+[11:37:08] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=43 data loaded in 3.49s (n_train=104 n_test=135)
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=42 data loaded in 3.49s (n_train=104 n_test=135)
+[11:37:08] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=45 data loaded in 3.51s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw in 7.5s (f1=0.726)
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw in 7.6s (f1=0.413)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   12.6s remaining:   18.9s
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw in 7.6s (f1=0.705)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   12.6s remaining:    8.4s
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw in 7.6s (f1=0.628)
+[11:37:18] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:18]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:37:20]   [cpazmal] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw in 2.2s (f1=0.655)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   17.3s finished
+[11:37:22] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw batch done in 17.3s peak_rss=11020MB (avg/job=2755MB)
+[11:37:22] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:37:26] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 3.36s (n_train=104 n_test=135)
+[11:37:26] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 3.39s (n_train=104 n_test=135)
+[11:37:26] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 3.44s (n_train=104 n_test=135)
+[11:37:26] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 3.43s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw_nodiv in 6.4s (f1=0.628)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw_nodiv in 6.6s (f1=0.705)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   11.4s remaining:   17.1s
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw_nodiv in 6.5s (f1=0.726)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   11.4s remaining:    7.6s
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw_nodiv in 6.6s (f1=0.413)
+[11:37:35] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:35]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 2.58s (n_train=104 n_test=135)
+[11:37:37]   [cpazmal] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw_nodiv in 1.4s (f1=0.655)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   15.4s finished
+[11:37:38] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv batch done in 15.4s peak_rss=10881MB (avg/job=2720MB)
+[11:37:38] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[11:37:38] ===== full_baseline done =====
+----- cpazmal: barycenter, STA (samples_per_step=48) -----
+[11:37:40] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:37:40] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 0.0001}
+Traceback (most recent call last):
+  File "/home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/src/experiment/run_full_baseline.py", line 427, in <module>
+    main()
+    ~~~~^^
+  File "/home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/src/experiment/run_full_baseline.py", line 417, in main
+    run_full_baseline(cfg, out_dir, methods, bary_methods, modes, n_seeds, estimator,
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      seed=args.seed, n_jobs=args.n_jobs, datasets=datasets,
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+                      bary_plot_methods=[m.strip() for m in args.bary_plot_methods.split(",")],
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      gamma_by_method=gamma_by_method)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mgallet/Documents/Codes/Python/3_DEVELOPPEMENT/WaSPS-DTW/WaSPS-DTW/src/experiment/run_full_baseline.py", line 257, in run_full_baseline
+    gammas_to_try = [gamma_by_method[lookup_method]] if gamma_by_method else gamma_values
+                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'sta'
+===== 2026-07-19 11:56:03 exp2_bary_baseline starting =====
+----- river: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[11:56:05] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:05] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[11:56:05] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[11:56:05] ===== full_baseline done =====
+----- river: barycenter, STA (samples_per_step=48) -----
+[11:56:06] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:06] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[11:56:06] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta — all 5 seeds already present, skip (use --force to recompute)
+[11:56:06] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[11:56:06] ===== full_baseline done =====
+----- cpazmal: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[11:56:08] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:08] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:56:13] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=44 data loaded in 3.37s (n_train=104 n_test=135)
+[11:56:13] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=43 data loaded in 3.34s (n_train=104 n_test=135)
+[11:56:13] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=45 data loaded in 3.39s (n_train=104 n_test=135)
+[11:56:13] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=42 data loaded in 3.42s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=42 finished eucl_raw in 7.6s (f1=0.416)
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=43 finished eucl_raw in 7.7s (f1=0.726)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   12.6s remaining:   18.9s
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=44 finished eucl_raw in 7.7s (f1=0.628)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   12.6s remaining:    8.4s
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=45 finished eucl_raw in 7.7s (f1=0.693)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:56:23] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:23]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:56:25]   [cpazmal] gamma=1.0 mode=barycenter seed=46 finished eucl_raw in 2.2s (f1=0.648)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   17.4s finished
+[11:56:27] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw batch done in 17.4s peak_rss=11043MB (avg/job=2761MB)
+[11:56:27] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:56:32] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 3.38s (n_train=104 n_test=135)
+[11:56:32] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 3.44s (n_train=104 n_test=135)
+[11:56:32] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 3.60s (n_train=104 n_test=135)
+[11:56:32] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 3.61s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[11:56:38]   [cpazmal] gamma=1.0 mode=barycenter seed=43 finished eucl_raw_nodiv in 6.5s (f1=0.719)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:56:38]   [cpazmal] gamma=1.0 mode=barycenter seed=42 finished eucl_raw_nodiv in 6.5s (f1=0.416)
+[Parallel(n_jobs=4)]: Done   2 out of   5 | elapsed:   11.5s remaining:   17.3s
+[11:56:39]   [cpazmal] gamma=1.0 mode=barycenter seed=44 finished eucl_raw_nodiv in 6.5s (f1=0.628)
+[Parallel(n_jobs=4)]: Done   3 out of   5 | elapsed:   11.6s remaining:    7.8s
+[11:56:39]   [cpazmal] gamma=1.0 mode=barycenter seed=45 finished eucl_raw_nodiv in 6.5s (f1=0.690)
+[11:56:41] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:41]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 2.58s (n_train=104 n_test=135)
+[11:56:43]   [cpazmal] gamma=1.0 mode=barycenter seed=46 finished eucl_raw_nodiv in 1.6s (f1=0.648)
+[Parallel(n_jobs=4)]: Done   5 out of   5 | elapsed:   15.7s finished
+[11:56:44] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw_nodiv batch done in 15.7s peak_rss=10885MB (avg/job=2721MB)
+[11:56:44] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[11:56:44] ===== full_baseline done =====
+----- cpazmal: barycenter, STA (samples_per_step=48) -----
+[11:56:46] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:46] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[11:56:46] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[Parallel(n_jobs=2)]: Using backend LokyBackend with 2 concurrent workers.
+[cpazmal] loading from cache (max_groups_per_class=None)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[11:56:50] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:50]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=43 data loaded in 2.48s (n_train=104 n_test=135)
+[11:56:50] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:50]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=42 data loaded in 2.51s (n_train=104 n_test=135)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[12:53:48]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished sta in 3418.0s (f1=0.688)
+[Parallel(n_jobs=2)]: Done   1 tasks      | elapsed: 57.0min
+[cpazmal] loading from cache (max_groups_per_class=None)
+[12:53:48]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished sta in 3418.4s (f1=0.431)
+[cpazmal] loading from cache (max_groups_per_class=None)
+[12:53:50] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[12:53:50]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=44 data loaded in 2.31s (n_train=104 n_test=135)
+[12:53:51] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[12:53:51]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=45 data loaded in 2.29s (n_train=104 n_test=135)
+[13:46:16]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished sta in 3145.7s (f1=0.600)
+[Parallel(n_jobs=2)]: Done   3 out of   5 | elapsed: 109.5min remaining: 73.0min
+[cpazmal] loading from cache (max_groups_per_class=None)
+[13:46:18]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished sta in 3147.3s (f1=0.597)
+[13:46:19] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[13:46:19]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=46 data loaded in 2.62s (n_train=104 n_test=135)
+[14:06:12]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished sta in 1192.9s (f1=0.657)
+[Parallel(n_jobs=2)]: Done   5 out of   5 | elapsed: 129.4min finished
+[14:06:12] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=sta batch done in 7765.9s peak_rss=3869MB (avg/job=1934MB)
+[14:06:12] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  sta@g=0.01/barycenter=0.595±0.089(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[14:06:12] ===== full_baseline done =====
+[done] wrote results/jax_exp2_bary_baseline/results/exp2_river_barycenter.tex
+[14:06:15] [dump_arrays] saved series+labels (n_train=105 n_test=160) to results/jax_exp2_bary_baseline/river_series.npy
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[14:06:19] [dump_arrays] barycenters fitted for wasps (gamma=1e+04)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[14:06:20] [dump_arrays] barycenters fitted for wasps_nodiv (gamma=100)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[14:06:21] [dump_arrays] barycenters fitted for eucl_params (gamma=100)
+[warn] build_repr: dropped 1/105 series with NaN params (timesteps where log_cumulant failed)
+[warn] build_repr: dropped 2/160 series with NaN params (timesteps where log_cumulant failed)
+[14:06:23] [dump_arrays] barycenters fitted for eucl_params_nodiv (gamma=100)
+[14:06:26] [dump_arrays] barycenters fitted for eucl_raw (gamma=0.0001)
+[14:06:28] [dump_arrays] barycenters fitted for eucl_raw_nodiv (gamma=0.0001)
+===== 2026-07-19 18:14:45 exp2_bary_baseline starting =====
+----- river: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[18:14:47] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:47] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[18:14:47] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[18:14:47] ===== full_baseline done =====
+----- river: barycenter, STA (samples_per_step=48) -----
+[18:14:49] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:49] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[18:14:49] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta — all 5 seeds already present, skip (use --force to recompute)
+[18:14:49] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[18:14:49] ===== full_baseline done =====
+----- cpazmal: barycenter, 6 non-STA methods (samples_per_step=480) -----
+[18:14:50] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:50] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  sta@g=0.01/barycenter=0.595±0.089(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[18:14:50] ===== full_baseline done =====
+----- cpazmal: barycenter, STA (samples_per_step=48) -----
+[18:14:52] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:52] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[18:14:52] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=sta — all 5 seeds already present, skip (use --force to recompute)
+[18:14:52] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  sta@g=0.01/barycenter=0.595±0.089(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[18:14:52] ===== full_baseline done =====
+[done] wrote results/jax_exp2_bary_baseline/results/exp2_river_barycenter.tex
+[done] wrote results/jax_exp2_bary_baseline/results/exp2_cpazmal_barycenter.tex
+[done] wrote results/jax_exp2_bary_baseline/results/exp2_barycenter.tex
+===== 2026-07-19 18:14:52 exp2_bary_baseline done =====

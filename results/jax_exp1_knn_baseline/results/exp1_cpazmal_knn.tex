@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\centering
+\begin{NiceTabular}{lccccccc}
+\toprule
+Metric & $\mathcal{D}$-WASPS (ours) & WASPS (ours) & $\mathcal{D}$-SoftDTW (params) & SoftDTW (params) & $\mathcal{D}$-SoftDTW (raw) & SoftDTW (raw) & STA~\cite{janati2020spatio} \\
+\midrule
+F1 & 74.1 $\pm$ 2.9 & 74.0 $\pm$ 2.9 & 42.5 $\pm$ 3.5 & 41.8 $\pm$ 3.2 & 56.0 $\pm$ 6.8 & 56.0 $\pm$ 6.8 & \textbf{74.4 $\pm$ 5.3} \\
+Time (s) & 1.4 $\pm$ 0.3 & 1.0 $\pm$ 0.2 & 1.1 $\pm$ 0.3 & 0.9 $\pm$ 0.3 & 2.1 $\pm$ 0.4 & \textbf{0.8 $\pm$ 0.1} & 2965.3 $\pm$ 176.0 \\
+RAM (MB) & 1856 & 1856 & 1856 & 1855 & 1856 & \textbf{1855} & 7906 \\
+\bottomrule
+\end{NiceTabular}
+\caption{cpazmal --- KNN}
+\label{tab:exp1_cpazmal_knn}
+\end{table}

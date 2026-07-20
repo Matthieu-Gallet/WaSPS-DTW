@@ -1,0 +1,18 @@
+===== 2026-07-19 23:14:23 exp4_river_bary_viz starting =====
+[warn] build_repr: dropped 3/150 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[exp4] wasps: fit 2 class barycenters (param space)
+[exp4] eucl_params: fit 2 class barycenters (param space)
+[exp4] eucl_raw: fit 2 class barycenters (raw -> params fit post-hoc)
+[exp4] sta: fit 2 class barycenters (raw -> params fit post-hoc, no divergence)
+[exp4] wrote PDFs to results/jax_exp4_river_bary_viz/class_pairs
+===== 2026-07-19 23:34:39 exp4_river_bary_viz done =====
+===== 2026-07-19 23:56:10 exp4_river_bary_viz starting =====
+[warn] build_repr: dropped 1/150 series with NaN params (timesteps where log_cumulant failed)
+An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+[exp4] wasps: fit 2 class barycenters (param space)
+[exp4] eucl_params: fit 2 class barycenters (param space)
+[exp4] eucl_raw: fit 2 class barycenters (raw -> params fit post-hoc)
+[exp4] sta: fit 2 class barycenters (raw -> params fit post-hoc, no divergence)
+[exp4] wrote PDFs to results/jax_exp4_river_bary_viz/class_pairs
+===== 2026-07-20 00:44:06 exp4_river_bary_viz done =====

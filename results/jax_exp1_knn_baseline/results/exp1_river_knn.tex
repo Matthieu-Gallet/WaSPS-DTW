@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\centering
+\begin{NiceTabular}{lccccccc}
+\toprule
+Metric & $\mathcal{D}$-WASPS (ours) & WASPS (ours) & $\mathcal{D}$-SoftDTW (params) & SoftDTW (params) & $\mathcal{D}$-SoftDTW (raw) & SoftDTW (raw) & STA~\cite{janati2020spatio} \\
+\midrule
+F1 & 62.1 $\pm$ 2.6 & 61.6 $\pm$ 3.0 & 56.0 $\pm$ 3.0 & 55.7 $\pm$ 2.8 & 50.8 $\pm$ 3.7 & 50.4 $\pm$ 3.4 & \textbf{66.6 $\pm$ 3.3} \\
+Time (s) & 1.8 $\pm$ 0.1 & \textbf{1.2 $\pm$ 0.1} & 1.8 $\pm$ 0.2 & 1.2 $\pm$ 0.1 & 5.2 $\pm$ 1.2 & 1.6 $\pm$ 0.2 & 8482.3 $\pm$ 1320.2 \\
+RAM (MB) & 802 & 770 & 788 & \textbf{762} & 851 & 836 & 6876 \\
+\bottomrule
+\end{NiceTabular}
+\caption{river --- KNN}
+\label{tab:exp1_river_knn}
+\end{table}

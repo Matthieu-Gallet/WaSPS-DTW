@@ -1,0 +1,37 @@
+\begin{table*}[htbp]
+\centering
+% \scalebox{\textwidth}
+{
+\caption{Comparative results (KNN, $K=1$) on River and CPAZMaL. F1 in \%, best value per row in bold. The $\mathcal{D}$- prefix denotes the divergence mode.}
+\label{tab:exp1_knn}
+\begin{subtable}{\textwidth}
+\centering
+\begin{NiceTabular}{lccccccc}
+\toprule
+Metric & $\mathcal{D}$-WASPS (ours) & WASPS (ours) & $\mathcal{D}$-SoftDTW (params) & SoftDTW (params) & $\mathcal{D}$-SoftDTW (raw) & SoftDTW (raw) & STA~\cite{janati2020spatio} \\
+\midrule
+F1 & 62.1 $\pm$ 2.6 & 61.6 $\pm$ 3.0 & 56.0 $\pm$ 3.0 & 55.7 $\pm$ 2.8 & 50.8 $\pm$ 3.7 & 50.4 $\pm$ 3.4 & \textbf{66.6 $\pm$ 3.3} \\
+Time (s) & 1.8 $\pm$ 0.1 & \textbf{1.2 $\pm$ 0.1} & 1.8 $\pm$ 0.2 & 1.2 $\pm$ 0.1 & 5.2 $\pm$ 1.2 & 1.6 $\pm$ 0.2 & 8482.3 $\pm$ 1320.2 \\
+RAM (MB) & 802 & 770 & 788 & \textbf{762} & 851 & 836 & 6876 \\
+\bottomrule
+\end{NiceTabular}
+\caption{River}
+\label{tab:exp1_knn_river}
+\vspace{0.75em}
+\end{subtable}
+\begin{subtable}{\textwidth}
+\centering
+\begin{NiceTabular}{lccccccc}
+\toprule
+Metric & $\mathcal{D}$-WASPS (ours) & WASPS (ours) & $\mathcal{D}$-SoftDTW (params) & SoftDTW (params) & $\mathcal{D}$-SoftDTW (raw) & SoftDTW (raw) & STA~\cite{janati2020spatio} \\
+\midrule
+F1 & 74.1 $\pm$ 2.9 & 74.0 $\pm$ 2.9 & 42.5 $\pm$ 3.5 & 41.8 $\pm$ 3.2 & 56.0 $\pm$ 6.8 & 56.0 $\pm$ 6.8 & \textbf{74.4 $\pm$ 5.3} \\
+Time (s) & 1.4 $\pm$ 0.3 & 1.0 $\pm$ 0.2 & 1.1 $\pm$ 0.3 & 0.9 $\pm$ 0.3 & 2.1 $\pm$ 0.4 & \textbf{0.8 $\pm$ 0.1} & 2965.3 $\pm$ 176.0 \\
+RAM (MB) & 1856 & 1856 & 1856 & 1855 & 1856 & \textbf{1855} & 7906 \\
+\bottomrule
+\end{NiceTabular}
+\caption{CPAZMaL}
+\label{tab:exp1_knn_cpazmal}
+\end{subtable}
+}
+\end{table*}

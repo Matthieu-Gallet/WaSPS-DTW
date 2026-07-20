@@ -1,0 +1,37 @@
+\begin{table*}[htbp]
+\centering
+% \scalebox{\textwidth}
+{
+\caption{Comparative results (Barycenter) on River and CPAZMaL. F1 in \%, best value per row in bold. The $\mathcal{D}$- prefix denotes the divergence mode.}
+\label{tab:exp1_barycenter}
+\begin{subtable}{\textwidth}
+\centering
+\begin{NiceTabular}{lccccccc}
+\toprule
+Metric & $\mathcal{D}$-WASPS (ours) & WASPS (ours) & $\mathcal{D}$-SoftDTW (params) & SoftDTW (params) & $\mathcal{D}$-SoftDTW (raw) & SoftDTW (raw) & STA~\cite{janati2020spatio} \\
+\midrule
+F1 & \textbf{47.8 $\pm$ 2.9} & 47.3 $\pm$ 3.5 & 29.8 $\pm$ 2.6 & 29.7 $\pm$ 2.7 & 31.9 $\pm$ 4.8 & 31.9 $\pm$ 4.8 & 30.5 $\pm$ 4.8 \\
+Time (s) & 10.2 $\pm$ 3.3 & 9.4 $\pm$ 3.7 & 10.8 $\pm$ 3.9 & \textbf{8.2 $\pm$ 3.0} & 14.4 $\pm$ 4.8 & 11.1 $\pm$ 3.3 & 13423.5 $\pm$ 5288.3 \\
+RAM (MB) & 2466 & 2411 & 2430 & 2397 & 2624 & 2585 & \textbf{1571} \\
+\bottomrule
+\end{NiceTabular}
+\caption{River}
+\label{tab:exp1_barycenter_river}
+\vspace{0.75em}
+\end{subtable}
+\begin{subtable}{\textwidth}
+\centering
+\begin{NiceTabular}{lccccccc}
+\toprule
+Metric & $\mathcal{D}$-WASPS (ours) & WASPS (ours) & $\mathcal{D}$-SoftDTW (params) & SoftDTW (params) & $\mathcal{D}$-SoftDTW (raw) & SoftDTW (raw) & STA~\cite{janati2020spatio} \\
+\midrule
+F1 & 59.5 $\pm$ 3.7 & 60.7 $\pm$ 6.3 & 44.9 $\pm$ 3.5 & 41.7 $\pm$ 4.3 & \textbf{62.4 $\pm$ 11.0} & 62.3 $\pm$ 10.9 & 59.5 $\pm$ 8.9 \\
+Time (s) & 7.7 $\pm$ 2.5 & 6.0 $\pm$ 2.2 & 5.4 $\pm$ 2.0 & \textbf{4.6 $\pm$ 1.8} & 6.5 $\pm$ 2.2 & 5.5 $\pm$ 2.0 & 2864.4 $\pm$ 844.6 \\
+RAM (MB) & 2846 & 2752 & 2704 & 2649 & 2758 & 2721 & \textbf{1934} \\
+\bottomrule
+\end{NiceTabular}
+\caption{CPAZMaL}
+\label{tab:exp1_barycenter_cpazmal}
+\end{subtable}
+}
+\end{table*}

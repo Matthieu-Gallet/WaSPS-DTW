@@ -1,0 +1,51 @@
+# Decimation experiment — cpazmal decimation sweep, barycenter mode, divergence methods
+# + STA, at the per-method optimal gamma found by the baseline experiment
+# (results/gamma_search/cpazmal/best_params.json — reused, NOT recalibrated here; run
+# exp2_bary_baseline.sh first).
+#
+# dataset/classification blocks match configs/config_baseline.yaml's cpazmal: block
+# (window_size=22, samples_per_step=480 for non-STA / 48 for STA via the script's
+# --samples-per-step override, max_train_per_class=15, max_test_per_class=25) so this
+# experiment runs in exactly the same setting as the baseline, only decimation varies.
+# Single holdout fold, 5 seeds. cross_validation.n_splits MUST be explicit: an absent
+# cross_validation block does NOT default to holdout in _iterations()/_n_splits() — it
+# defaults to n_splits=5 (K-fold).
+#
+# Run: src/experiment/script/exp3_decimation.sh (preferred) or directly:
+#   python src/experiment/run_decimation.py --config configs/config_decimation.yaml \
+#       --gamma-search-dir results/gamma_search --n-jobs 4 --sta-n-jobs 2
+
+dataset:
+  type: cpazmal
+  family: weibull
+  hdf5_path: /home/mgallet/Documents/Codes/Python/1_DONE/CPAZMAL/DATASET/dataset_original/PAZTSX_CRYO_ML.hdf5
+  max_groups_per_class: null
+  window_size: 22
+
+classification:
+  k: 1
+  sta_epsilon: 0.05
+  samples_per_step: 480    # non-STA; STA sub-phase overrides to 48
+  max_train_per_class: 15
+  max_test_per_class: 25
+  lr: 0.05
+  n_steps_bary: 75
+  optimizer: sgd
+  early_stop_patience: 20
+  early_stop_tol: 1.0e-4
+  estimator: log_cumulant
+
+n_seeds: 5
+cross_validation:
+  n_splits: 1
+
+sensitivity:
+  n_steps_bary: 75
+  sweep_decimation:
+    fractions: [0.1, 0.2, 0.3, 0.4, 0.5]
+    samples_per_step: 480    # non-STA; STA sub-phase overrides to 48
+    max_train_per_class: 15
+    max_test_per_class: 25
+
+output:
+  dir: results/jax_exp3_decimation

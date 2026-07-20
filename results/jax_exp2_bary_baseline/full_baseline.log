@@ -1,0 +1,343 @@
+[01:30:03] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[01:30:03] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[01:30:03] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[01:30:08] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=43 data loaded in 1.56s (n_train=105 n_test=160)
+[01:30:08] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=44 data loaded in 1.58s (n_train=105 n_test=160)
+[01:30:08] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=45 data loaded in 1.62s (n_train=105 n_test=160)
+[01:30:08] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:08]   [river] gamma=10000.0 method=wasps mode=barycenter seed=42 data loaded in 1.61s (n_train=105 n_test=160)
+[01:30:19]   [river] gamma=10000.0 mode=barycenter seed=42 finished wasps in 11.1s (f1=0.481)
+[01:30:19]   [river] gamma=10000.0 mode=barycenter seed=44 finished wasps in 11.7s (f1=0.466)
+[01:30:20]   [river] gamma=10000.0 mode=barycenter seed=45 finished wasps in 12.2s (f1=0.522)
+[01:30:20]   [river] gamma=10000.0 mode=barycenter seed=43 finished wasps in 12.4s (f1=0.434)
+[01:30:21] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:21]   [river] gamma=10000.0 method=wasps mode=barycenter seed=46 data loaded in 1.19s (n_train=105 n_test=160)
+[01:30:24]   [river] gamma=10000.0 mode=barycenter seed=46 finished wasps in 3.7s (f1=0.490)
+[01:30:27] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps batch done in 20.8s peak_rss=9862MB (avg/job=2466MB)
+[01:30:27] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[01:30:31] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=43 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:31] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=42 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:31] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=44 data loaded in 1.43s (n_train=105 n_test=160)
+[01:30:31] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:31]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=45 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:42]   [river] gamma=10000.0 mode=barycenter seed=43 finished wasps_nodiv in 11.0s (f1=0.441)
+[01:30:42]   [river] gamma=10000.0 mode=barycenter seed=42 finished wasps_nodiv in 11.1s (f1=0.479)
+[01:30:42]   [river] gamma=10000.0 mode=barycenter seed=44 finished wasps_nodiv in 11.2s (f1=0.428)
+[01:30:43]   [river] gamma=10000.0 mode=barycenter seed=45 finished wasps_nodiv in 11.5s (f1=0.527)
+[01:30:43] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:43]   [river] gamma=10000.0 method=wasps_nodiv mode=barycenter seed=46 data loaded in 1.17s (n_train=105 n_test=160)
+[01:30:45]   [river] gamma=10000.0 mode=barycenter seed=46 finished wasps_nodiv in 2.1s (f1=0.490)
+[01:30:48] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv batch done in 18.3s peak_rss=9645MB (avg/job=2411MB)
+[01:30:48] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[01:30:52] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=42 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:52] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=43 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:52] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=44 data loaded in 1.37s (n_train=105 n_test=160)
+[01:30:52] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:30:52]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=45 data loaded in 1.35s (n_train=105 n_test=160)
+[01:31:04]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_params in 12.5s (f1=0.345)
+[01:31:04]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_params in 12.7s (f1=0.271)
+[01:31:04]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_params in 12.7s (f1=0.307)
+[01:31:05]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_params in 13.2s (f1=0.291)
+[01:31:05] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:05]   [river] gamma=100.0 method=eucl_params mode=barycenter seed=46 data loaded in 1.17s (n_train=105 n_test=160)
+[01:31:08]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_params in 3.0s (f1=0.279)
+[01:31:11] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params batch done in 20.8s peak_rss=9720MB (avg/job=2430MB)
+[01:31:11] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[01:31:14] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 1.06s (n_train=105 n_test=160)
+[01:31:14] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 1.13s (n_train=105 n_test=160)
+[01:31:14] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 1.14s (n_train=105 n_test=160)
+[01:31:14] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:14]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 1.15s (n_train=105 n_test=160)
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=43 finished eucl_params_nodiv in 9.6s (f1=0.345)
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=44 finished eucl_params_nodiv in 9.5s (f1=0.282)
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=45 finished eucl_params_nodiv in 9.8s (f1=0.307)
+[01:31:24]   [river] gamma=100.0 mode=barycenter seed=42 finished eucl_params_nodiv in 9.8s (f1=0.271)
+[01:31:25] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:25]   [river] gamma=100.0 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 0.95s (n_train=105 n_test=160)
+[01:31:27]   [river] gamma=100.0 mode=barycenter seed=46 finished eucl_params_nodiv in 2.3s (f1=0.279)
+[01:31:30] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv batch done in 16.5s peak_rss=9589MB (avg/job=2397MB)
+[01:31:30] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[01:31:34] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:34]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=45 data loaded in 1.57s (n_train=105 n_test=160)
+[01:31:34] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:34]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=43 data loaded in 1.76s (n_train=105 n_test=160)
+[01:31:34] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:34]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=42 data loaded in 1.89s (n_train=105 n_test=160)
+[01:31:35] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:35]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=44 data loaded in 2.28s (n_train=105 n_test=160)
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw in 16.6s (f1=0.253)
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw in 16.9s (f1=0.375)
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw in 16.4s (f1=0.344)
+[01:31:51]   [river] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw in 17.2s (f1=0.270)
+[01:31:52] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:31:52]   [river] gamma=0.0001 method=eucl_raw mode=barycenter seed=46 data loaded in 1.00s (n_train=105 n_test=160)
+[01:31:57]   [river] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw in 4.8s (f1=0.352)
+[01:31:59] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw batch done in 27.1s peak_rss=10495MB (avg/job=2624MB)
+[01:31:59] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[01:32:04] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 1.41s (n_train=105 n_test=160)
+[01:32:04] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 1.51s (n_train=105 n_test=160)
+[01:32:04] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 1.53s (n_train=105 n_test=160)
+[01:32:04] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:04]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 1.70s (n_train=105 n_test=160)
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw_nodiv in 12.8s (f1=0.344)
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw_nodiv in 12.9s (f1=0.270)
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw_nodiv in 12.4s (f1=0.253)
+[01:32:17]   [river] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw_nodiv in 12.9s (f1=0.375)
+[01:32:18] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=480 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:18]   [river] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 0.98s (n_train=105 n_test=160)
+[01:32:22]   [river] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw_nodiv in 4.6s (f1=0.352)
+[01:32:25] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv batch done in 23.2s peak_rss=10340MB (avg/job=2585MB)
+[01:32:25] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[01:32:25] ===== full_baseline done =====
+[01:32:28] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[01:32:28] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[01:32:28] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[01:32:32] [load] fold=None seed=43 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:32]   [river] gamma=0.0001 method=sta mode=barycenter seed=43 data loaded in 1.08s (n_train=105 n_test=160)
+[01:32:32] [load] fold=None seed=42 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[01:32:32]   [river] gamma=0.0001 method=sta mode=barycenter seed=42 data loaded in 1.12s (n_train=105 n_test=160)
+[06:53:00]   [river] gamma=0.0001 mode=barycenter seed=42 finished sta in 19228.6s (f1=0.245)
+[06:53:02] [load] fold=None seed=44 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[06:53:02]   [river] gamma=0.0001 method=sta mode=barycenter seed=44 data loaded in 1.06s (n_train=105 n_test=160)
+[06:53:06]   [river] gamma=0.0001 mode=barycenter seed=43 finished sta in 19233.9s (f1=0.298)
+[06:53:07] [load] fold=None seed=45 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[06:53:07]   [river] gamma=0.0001 method=sta mode=barycenter seed=45 data loaded in 1.03s (n_train=105 n_test=160)
+[10:07:51]   [river] gamma=0.0001 mode=barycenter seed=44 finished sta in 11689.4s (f1=0.307)
+[10:07:52] [load] fold=None seed=46 T=52 aggregate_days=7 window_size=None samples_per_step=48 n_train=105 (cap=105) n_test=160 (cap=175) classes_train=[0, 1, 4, 5]
+[10:07:52]   [river] gamma=0.0001 method=sta mode=barycenter seed=46 data loaded in 0.55s (n_train=105 n_test=160)
+[10:07:54]   [river] gamma=0.0001 mode=barycenter seed=45 finished sta in 11687.5s (f1=0.284)
+[11:35:50]   [river] gamma=0.0001 mode=barycenter seed=46 finished sta in 5278.1s (f1=0.391)
+[11:35:51] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta batch done in 36202.1s peak_rss=3142MB (avg/job=1571MB)
+[11:35:51] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[11:35:51] ===== full_baseline done =====
+[11:35:52] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:35:52] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 0.0001}
+[11:35:52] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps computing seeds=[42, 43, 44, 45, 46]
+[11:35:57] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=43 data loaded in 3.37s (n_train=104 n_test=135)
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=42 data loaded in 3.39s (n_train=104 n_test=135)
+[11:35:57] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=44 data loaded in 3.38s (n_train=104 n_test=135)
+[11:35:57] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:35:57]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=45 data loaded in 3.38s (n_train=104 n_test=135)
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps in 8.6s (f1=0.527)
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps in 9.1s (f1=0.598)
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps in 9.1s (f1=0.635)
+[11:36:06]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps in 9.2s (f1=0.594)
+[11:36:08] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:08]   [cpazmal] gamma=0.01 method=wasps mode=barycenter seed=46 data loaded in 2.61s (n_train=104 n_test=135)
+[11:36:11]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps in 2.7s (f1=0.622)
+[11:36:13] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps batch done in 18.9s peak_rss=11386MB (avg/job=2846MB)
+[11:36:13] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv computing seeds=[42, 43, 44, 45, 46]
+[11:36:17] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=44 data loaded in 3.33s (n_train=104 n_test=135)
+[11:36:17] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=42 data loaded in 3.34s (n_train=104 n_test=135)
+[11:36:17] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=45 data loaded in 3.35s (n_train=104 n_test=135)
+[11:36:17] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:17]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=43 data loaded in 3.38s (n_train=104 n_test=135)
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished wasps_nodiv in 7.1s (f1=0.635)
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished wasps_nodiv in 7.1s (f1=0.493)
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished wasps_nodiv in 7.1s (f1=0.686)
+[11:36:25]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished wasps_nodiv in 7.2s (f1=0.609)
+[11:36:27] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:27]   [cpazmal] gamma=0.01 method=wasps_nodiv mode=barycenter seed=46 data loaded in 2.54s (n_train=104 n_test=135)
+[11:36:29]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished wasps_nodiv in 1.7s (f1=0.611)
+[11:36:30] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv batch done in 16.3s peak_rss=11007MB (avg/job=2752MB)
+[11:36:30] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params computing seeds=[42, 43, 44, 45, 46]
+[11:36:35] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=45 data loaded in 3.41s (n_train=104 n_test=135)
+[11:36:35] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=43 data loaded in 3.44s (n_train=104 n_test=135)
+[11:36:35] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=44 data loaded in 3.44s (n_train=104 n_test=135)
+[11:36:35] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:35]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=42 data loaded in 3.45s (n_train=104 n_test=135)
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished eucl_params in 6.3s (f1=0.446)
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished eucl_params in 6.3s (f1=0.505)
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished eucl_params in 6.4s (f1=0.396)
+[11:36:42]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished eucl_params in 6.4s (f1=0.440)
+[11:36:44] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:44]   [cpazmal] gamma=0.01 method=eucl_params mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:36:46]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished eucl_params in 1.5s (f1=0.457)
+[11:36:47] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params batch done in 15.3s peak_rss=10816MB (avg/job=2704MB)
+[11:36:47] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv computing seeds=[42, 43, 44, 45, 46]
+[11:36:52] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=43 data loaded in 3.39s (n_train=104 n_test=135)
+[11:36:52] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=42 data loaded in 3.41s (n_train=104 n_test=135)
+[11:36:52] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=45 data loaded in 3.39s (n_train=104 n_test=135)
+[11:36:52] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:36:52]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=44 data loaded in 3.42s (n_train=104 n_test=135)
+[11:36:57]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished eucl_params_nodiv in 5.3s (f1=0.429)
+[11:36:58]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished eucl_params_nodiv in 5.5s (f1=0.405)
+[11:36:58]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished eucl_params_nodiv in 5.5s (f1=0.493)
+[11:36:58]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished eucl_params_nodiv in 5.5s (f1=0.387)
+[11:37:00] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:00]   [cpazmal] gamma=0.01 method=eucl_params_nodiv mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:37:01]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished eucl_params_nodiv in 1.0s (f1=0.369)
+[11:37:03] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv batch done in 14.0s peak_rss=10596MB (avg/job=2649MB)
+[11:37:03] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[11:37:08] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=44 data loaded in 3.51s (n_train=104 n_test=135)
+[11:37:08] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=43 data loaded in 3.49s (n_train=104 n_test=135)
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=42 data loaded in 3.49s (n_train=104 n_test=135)
+[11:37:08] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:08]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=45 data loaded in 3.51s (n_train=104 n_test=135)
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw in 7.5s (f1=0.726)
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw in 7.6s (f1=0.413)
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw in 7.6s (f1=0.705)
+[11:37:15]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw in 7.6s (f1=0.628)
+[11:37:18] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:18]   [cpazmal] gamma=0.0001 method=eucl_raw mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:37:20]   [cpazmal] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw in 2.2s (f1=0.655)
+[11:37:22] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw batch done in 17.3s peak_rss=11020MB (avg/job=2755MB)
+[11:37:22] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[11:37:26] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 3.36s (n_train=104 n_test=135)
+[11:37:26] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 3.39s (n_train=104 n_test=135)
+[11:37:26] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 3.44s (n_train=104 n_test=135)
+[11:37:26] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:26]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 3.43s (n_train=104 n_test=135)
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=44 finished eucl_raw_nodiv in 6.4s (f1=0.628)
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=45 finished eucl_raw_nodiv in 6.6s (f1=0.705)
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=43 finished eucl_raw_nodiv in 6.5s (f1=0.726)
+[11:37:33]   [cpazmal] gamma=0.0001 mode=barycenter seed=42 finished eucl_raw_nodiv in 6.6s (f1=0.413)
+[11:37:35] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:37:35]   [cpazmal] gamma=0.0001 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 2.58s (n_train=104 n_test=135)
+[11:37:37]   [cpazmal] gamma=0.0001 mode=barycenter seed=46 finished eucl_raw_nodiv in 1.4s (f1=0.655)
+[11:37:38] [full_baseline/cpazmal] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv batch done in 15.4s peak_rss=10881MB (avg/job=2720MB)
+[11:37:38] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[11:37:38] ===== full_baseline done =====
+[11:37:40] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:37:40] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 0.0001}
+[11:56:05] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:05] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[11:56:05] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:05] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[11:56:05] ===== full_baseline done =====
+[11:56:06] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:06] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[11:56:06] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta — all 5 seeds already present, skip (use --force to recompute)
+[11:56:06] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[11:56:06] ===== full_baseline done =====
+[11:56:08] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:08] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[11:56:08] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw computing seeds=[42, 43, 44, 45, 46]
+[11:56:13] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=44 data loaded in 3.37s (n_train=104 n_test=135)
+[11:56:13] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=43 data loaded in 3.34s (n_train=104 n_test=135)
+[11:56:13] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=45 data loaded in 3.39s (n_train=104 n_test=135)
+[11:56:13] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:13]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=42 data loaded in 3.42s (n_train=104 n_test=135)
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=42 finished eucl_raw in 7.6s (f1=0.416)
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=43 finished eucl_raw in 7.7s (f1=0.726)
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=44 finished eucl_raw in 7.7s (f1=0.628)
+[11:56:21]   [cpazmal] gamma=1.0 mode=barycenter seed=45 finished eucl_raw in 7.7s (f1=0.693)
+[11:56:23] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:23]   [cpazmal] gamma=1.0 method=eucl_raw mode=barycenter seed=46 data loaded in 2.56s (n_train=104 n_test=135)
+[11:56:25]   [cpazmal] gamma=1.0 mode=barycenter seed=46 finished eucl_raw in 2.2s (f1=0.648)
+[11:56:27] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw batch done in 17.4s peak_rss=11043MB (avg/job=2761MB)
+[11:56:27] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw_nodiv computing seeds=[42, 43, 44, 45, 46]
+[11:56:32] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=43 data loaded in 3.38s (n_train=104 n_test=135)
+[11:56:32] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=42 data loaded in 3.44s (n_train=104 n_test=135)
+[11:56:32] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=44 data loaded in 3.60s (n_train=104 n_test=135)
+[11:56:32] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:32]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=45 data loaded in 3.61s (n_train=104 n_test=135)
+[11:56:38]   [cpazmal] gamma=1.0 mode=barycenter seed=43 finished eucl_raw_nodiv in 6.5s (f1=0.719)
+[11:56:38]   [cpazmal] gamma=1.0 mode=barycenter seed=42 finished eucl_raw_nodiv in 6.5s (f1=0.416)
+[11:56:39]   [cpazmal] gamma=1.0 mode=barycenter seed=44 finished eucl_raw_nodiv in 6.5s (f1=0.628)
+[11:56:39]   [cpazmal] gamma=1.0 mode=barycenter seed=45 finished eucl_raw_nodiv in 6.5s (f1=0.690)
+[11:56:41] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=480 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:41]   [cpazmal] gamma=1.0 method=eucl_raw_nodiv mode=barycenter seed=46 data loaded in 2.58s (n_train=104 n_test=135)
+[11:56:43]   [cpazmal] gamma=1.0 mode=barycenter seed=46 finished eucl_raw_nodiv in 1.6s (f1=0.648)
+[11:56:44] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw_nodiv batch done in 15.7s peak_rss=10885MB (avg/job=2721MB)
+[11:56:44] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[11:56:44] ===== full_baseline done =====
+[11:56:46] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[11:56:46] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[11:56:46] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=sta computing seeds=[42, 43, 44, 45, 46]
+[11:56:50] [load] fold=None seed=43 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:50]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=43 data loaded in 2.48s (n_train=104 n_test=135)
+[11:56:50] [load] fold=None seed=42 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[11:56:50]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=42 data loaded in 2.51s (n_train=104 n_test=135)
+[12:53:48]   [cpazmal] gamma=0.01 mode=barycenter seed=43 finished sta in 3418.0s (f1=0.688)
+[12:53:48]   [cpazmal] gamma=0.01 mode=barycenter seed=42 finished sta in 3418.4s (f1=0.431)
+[12:53:50] [load] fold=None seed=44 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[12:53:50]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=44 data loaded in 2.31s (n_train=104 n_test=135)
+[12:53:51] [load] fold=None seed=45 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[12:53:51]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=45 data loaded in 2.29s (n_train=104 n_test=135)
+[13:46:16]   [cpazmal] gamma=0.01 mode=barycenter seed=44 finished sta in 3145.7s (f1=0.600)
+[13:46:18]   [cpazmal] gamma=0.01 mode=barycenter seed=45 finished sta in 3147.3s (f1=0.597)
+[13:46:19] [load] fold=None seed=46 T=29 aggregate_days=None window_size=22 samples_per_step=48 n_train=104 (cap=15) n_test=135 (cap=25) classes_train=[0, 1, 2, 3, 4, 5, 6]
+[13:46:19]   [cpazmal] gamma=0.01 method=sta mode=barycenter seed=46 data loaded in 2.62s (n_train=104 n_test=135)
+[14:06:12]   [cpazmal] gamma=0.01 mode=barycenter seed=46 finished sta in 1192.9s (f1=0.657)
+[14:06:12] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=sta batch done in 7765.9s peak_rss=3869MB (avg/job=1934MB)
+[14:06:12] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  sta@g=0.01/barycenter=0.595±0.089(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[14:06:12] ===== full_baseline done =====
+[18:14:47] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:47] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[18:14:47] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=10000.0 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=100.0 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] gamma=0.0001 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:47] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[18:14:47] ===== full_baseline done =====
+[18:14:49] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=river gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:49] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 10000.0, 'wasps_nodiv': 100.0, 'eucl_params': 100.0, 'eucl_params_nodiv': 100.0, 'eucl_raw': 0.0001, 'eucl_raw_nodiv': 0.0001, 'sta': 0.0001}
+[18:14:49] [full_baseline/river] gamma=0.0001 mode=barycenter method=sta — all 5 seeds already present, skip (use --force to recompute)
+[18:14:49] [full_baseline/river] eucl_params@g=100/barycenter=0.298±0.026(n=5)  eucl_params_nodiv@g=100/barycenter=0.297±0.027(n=5)  eucl_raw@g=0.0001/barycenter=0.319±0.048(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.319±0.048(n=5)  sta@g=0.0001/barycenter=0.305±0.048(n=5)  wasps@g=10000/barycenter=0.478±0.029(n=5)  wasps_nodiv@g=10000/barycenter=0.473±0.035(n=5)
+[18:14:49] ===== full_baseline done =====
+[18:14:50] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=None dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:50] methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] bary_methods=['wasps', 'wasps_nodiv', 'eucl_params', 'eucl_params_nodiv', 'eucl_raw', 'eucl_raw_nodiv'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=wasps_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=eucl_params_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] gamma=1.0 mode=barycenter method=eucl_raw_nodiv — all 5 seeds already present, skip (use --force to recompute)
+[18:14:50] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  sta@g=0.01/barycenter=0.595±0.089(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[18:14:50] ===== full_baseline done =====
+[18:14:52] ===== full_baseline config=configs/config_baseline.yaml seed=42 n_jobs=4 sta_n_jobs=2 dataset=cpazmal gamma=None modes=['barycenter'] force=False debug=True verbose=True =====
+[18:14:52] methods=['sta'] bary_methods=['sta'] n_seeds=5 estimator=log_cumulant gamma_by_method={'wasps': 0.01, 'wasps_nodiv': 0.01, 'eucl_params': 0.01, 'eucl_params_nodiv': 0.1, 'eucl_raw': 1.0, 'eucl_raw_nodiv': 0.0001, 'sta': 0.01}
+[18:14:52] [full_baseline/cpazmal] gamma=0.01 mode=barycenter method=sta — all 5 seeds already present, skip (use --force to recompute)
+[18:14:52] [full_baseline/cpazmal] eucl_params@g=0.01/barycenter=0.449±0.035(n=5)  eucl_params_nodiv@g=0.01/barycenter=0.417±0.043(n=5)  eucl_raw@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw@g=1/barycenter=0.622±0.109(n=5)  eucl_raw_nodiv@g=0.0001/barycenter=0.626±0.112(n=5)  eucl_raw_nodiv@g=1/barycenter=0.620±0.107(n=5)  sta@g=0.01/barycenter=0.595±0.089(n=5)  wasps@g=0.01/barycenter=0.595±0.037(n=5)  wasps_nodiv@g=0.01/barycenter=0.607±0.063(n=5)
+[18:14:52] ===== full_baseline done =====
